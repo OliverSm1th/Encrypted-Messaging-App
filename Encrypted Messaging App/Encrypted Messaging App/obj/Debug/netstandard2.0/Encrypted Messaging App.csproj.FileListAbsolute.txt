@@ -1,0 +1,20 @@
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\Encrypted Messaging App.deps.json
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\Encrypted Messaging App.dll
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\ref\Encrypted Messaging App.dll
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\Encrypted Messaging App.pdb
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.csproj.AssemblyReference.cache
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\App.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\AppShell.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.AssemblyInfoInputs.cache
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.AssemblyInfo.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.csproj.CoreCompileInputs.cache
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\XamlC.stamp
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.dll
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\ref\Encrypted Messaging App.dll
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.pdb
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\MainMessagePage.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\LoginPage.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\RegisterPage.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ForgotPasswordPage.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\LoadingPage.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\FriendRequestPage.xaml.g.cs

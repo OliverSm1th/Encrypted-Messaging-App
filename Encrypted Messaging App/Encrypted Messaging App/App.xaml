@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Encrypted_Messaging_App.App">
+    <!--
+        Define global resources and styles here, that apply to all pages in your app.
+    -->
+    <Application.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Primary">#2196F3</Color>
+            <Color x:Key="Gray">#FF778899</Color>
+            <!--#34ACBC-->
+
+            <x:String x:Key="IconUser">&#xf2bd;</x:String>
+            <x:String x:Key="IconHidden">&#xf070;</x:String>
+            <x:String x:Key="IconShown">&#xf06e;</x:String>
+            <x:String x:Key="IconEmail">&#xf0e0;</x:String>
+            <x:String x:Key="IconLogOut">&#xf2f5;</x:String>
+            <x:String x:Key="IconFriend">&#xf0c0;</x:String>
+            <x:String x:Key="IconHome">&#xf015;</x:String>
+        </ResourceDictionary>
+        
+        
+    </Application.Resources>
+</Application>

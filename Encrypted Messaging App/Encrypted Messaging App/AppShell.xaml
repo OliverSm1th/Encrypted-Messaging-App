@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Shell xmlns="http://xamarin.com/schemas/2014/forms" 
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:Encrypted_Messaging_App.Views"
+       Title="Encrypted_Messaging_App"
+       x:Class="Encrypted_Messaging_App.AppShell">
+
+    <!--
+        The overall app visual hierarchy is defined here, along with navigation.
+    
+        https://docs.microsoft.com/xamarin/xamarin-forms/app-fundamentals/shell/
+    -->
+
+    <Shell.Resources>
+        <ResourceDictionary>
+            <Style x:Key="BaseStyle" TargetType="Element">
+                <Setter Property="Shell.BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="Shell.ForegroundColor" Value="White" />
+                <Setter Property="Shell.TitleColor" Value="White" />
+                <Setter Property="Shell.DisabledColor" Value="#B4FFFFFF" />
+                <Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
+                <Setter Property="Shell.TabBarBackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="Shell.TabBarForegroundColor" Value="White"/>
+                <Setter Property="Shell.TabBarUnselectedColor" Value="#95FFFFFF"/>
+                <Setter Property="Shell.TabBarTitleColor" Value="White"/>
+            </Style>
+            <Style TargetType="TabBar" BasedOn="{StaticResource BaseStyle}" />
+            <Style TargetType="FlyoutItem" BasedOn="{StaticResource BaseStyle}" />
+        </ResourceDictionary>
+    </Shell.Resources>
+
+    <!--
+        If you would like to navigate to this content you can do so by calling
+        await Shell.Current.GoToAsync("//LoginPage");
+    -->
+    <ShellItem Route="LoginPage" FlyoutItemIsVisible="False">
+        <ShellContent ContentTemplate="{DataTemplate local:LoginPage}"/>
+    </ShellItem>
+
+    <ShellItem Route="LoadingPage" FlyoutItemIsVisible="False">
+        <ShellContent ContentTemplate="{DataTemplate local:LoadingPage}"/>
+    </ShellItem>
+
+
+    <FlyoutItem Title="Main Page" Route="MainMessagePage">
+        <FlyoutItem.Icon>
+            <FontImageSource
+                FontFamily="Icons-S"
+                Glyph="{StaticResource IconHome}"
+                Color="Black"
+                />
+        </FlyoutItem.Icon>
+        <ShellContent ContentTemplate="{DataTemplate local:MainMessagePage}"></ShellContent>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Friend Requests" Route="MainMessagePage">
+        <FlyoutItem.Icon>
+            <FontImageSource
+                FontFamily="Icons-S"
+                Glyph="{StaticResource IconFriend}"
+                Color="Black"
+                />
+        </FlyoutItem.Icon>
+        <ShellContent ContentTemplate="{DataTemplate local:FriendRequestPage}"></ShellContent>
+    </FlyoutItem>
+
+    <!--<FlyoutItem Title="Log Out" x:Name="LogOut">
+        <FlyoutItem.Icon>
+            <FontImageSource
+                FontFamily="Icons-S"
+                Glyph="{StaticResource IconLogOut}"
+                Color="Black"
+                />
+        </FlyoutItem.Icon>
+        
+        <ShellContent ContentTemplate="{DataTemplate local:MainMessagePage}"></ShellContent>
+    </FlyoutItem>-->
+
+
+
+</Shell>

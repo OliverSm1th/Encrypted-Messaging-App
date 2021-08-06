@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Encrypted_Messaging_App.Views.LoginPage"
+             Shell.FlyoutBehavior="Disabled"
+             Shell.NavBarIsVisible="False"
+             >
+    <ContentPage.Content>
+        <StackLayout VerticalOptions="Fill">
+
+            <Grid Padding="30" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="8*" />
+                    <RowDefinition Height="5*" />
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="7*"/>
+                    <RowDefinition Height="8*"/>
+                    <RowDefinition Height="4*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="8*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <!--Title-->
+                <Label Text="Login" 
+                   TextColor="Black"
+                   FontSize="30"
+                   FontFamily="Roboto-Black"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Start"
+                   Grid.ColumnSpan="2"
+                   />
+                
+                
+                <!--User Icon-->
+                <!--<BoxView BackgroundColor="Red"/>-->
+                <Label Text="{StaticResource IconUser}" 
+                       TextColor="Black" 
+                       FontSize="22" 
+                       VerticalTextAlignment="Center"
+                       HorizontalTextAlignment="Center"
+                       FontFamily="Icons-R" 
+                       Grid.Row="1"
+                       x:Name="UsernameIcon"
+                       />
+                <!--User Entry-->
+                <!--<BoxView Grid.Column="1" BackgroundColor="Blue"/>-->
+                <Entry Placeholder="Username" 
+                       PlaceholderColor="{StaticResource Gray}" 
+                       TextColor="{StaticResource Primary}" 
+                       FontSize="18"
+                       FontFamily="Roboto-Medium"
+                       HorizontalTextAlignment="Left"
+                       VerticalTextAlignment="Center"
+                       Grid.Column="1"
+                       Grid.Row="1"
+                       Grid.ColumnSpan="2"
+                       TextChanged="EditedEntry"
+                       Focused="UsernameFocused"
+                       Unfocused="UsernameFocused"
+                       x:Name="UsernameEntry"/>
+
+                    <!--Password Icon-->
+                <!--<BoxView Grid.Row="1" BackgroundColor="Green"/>-->
+                <Label Text="{StaticResource IconHidden}" 
+                       TextColor="Black" 
+                       FontSize="22" 
+                       HorizontalTextAlignment="Start"
+                       VerticalTextAlignment="Center"
+                       Margin="10,0,0,0"
+                       FontFamily="Icons-R" 
+                       Grid.Row="2"
+                       x:Name="PasswordIcon">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ChangeVisibility"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <!--Password Entry-->
+                <!--<BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="Purple"/>-->
+                <Entry Placeholder="Password" 
+                       PlaceholderColor="LightSlateGray" 
+                       TextColor="{StaticResource Primary}" 
+                       FontFamily="Roboto-Medium"
+                       IsPassword="True"
+                       HorizontalTextAlignment="Left"
+                       VerticalTextAlignment="Center"
+                       Grid.Row="2"
+                       Grid.Column="1"
+                       Grid.ColumnSpan="2"
+                       x:Name="PasswordEntry"
+                       TextChanged="EditedEntry"
+                       Focused="PasswordFocused"
+                       Unfocused="PasswordFocused"
+                       />
+                
+                <!--Forgot Password-->
+                <Label Text="Forgot Password?" 
+                       TextColor="{StaticResource Primary}" 
+                       FontFamily="Roboto-Black"
+                       FontSize="Small"
+                       Grid.Row="3" 
+                       Grid.Column="1" 
+                       Grid.ColumnSpan="2"
+                       HorizontalOptions="End">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ForgotPassword_Tap"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Button Text="Login" 
+                        FontFamily="Roboto-Bold"
+                        BackgroundColor="{StaticResource Gray}"
+                        Grid.Column="0" 
+                        Grid.ColumnSpan="3" 
+                        Grid.Row="4"
+                        x:Name="LoginButton"
+                        Clicked="LoginButton_Clicked" />
+                <Label Text="Invalid username or password"
+                       TextColor="Red"
+                       FontFamily="Roboto-Black"
+                       FontSize="Small"
+                       Grid.Row="5"
+                       Grid.ColumnSpan="3"
+                       HorizontalOptions="Center"
+                       IsVisible="false"
+                       x:Name="InvalidLabel"
+                       />
+
+            </Grid>
+            <Label
+                        TextColor="Orange"
+                        FontFamily="Roboto"
+                        HorizontalOptions="Center"
+                        Padding="0,0,0,30"
+                    >
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Don't have an account? "/>
+                        <Span Text="Sign Up" FontAttributes="Bold"/>
+                    </FormattedString>
+                </Label.FormattedText>
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Register_Tap"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
