@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Encrypted_Messaging_App.Models
+namespace Encrypted_Messaging_App
 {
-    class Message
+    public class Message
     {
         public Message(string content)
         {
@@ -14,11 +14,11 @@ namespace Encrypted_Messaging_App.Models
 
         }
         public string content { get; set; }
-        public DateTime createdTime { get; }
-        public DateTime deliveredTime { get; }
-        public DateTime readTime { get; }
-        public User author;
-        public User recipient;
+        public DateTime createdTime { get; set; }
+        public DateTime deliveredTime { get; set; }
+        public DateTime readTime { get; set; }
+        public User author { get; set; }
+        public User recipient { get; set; }
 
     }
 }

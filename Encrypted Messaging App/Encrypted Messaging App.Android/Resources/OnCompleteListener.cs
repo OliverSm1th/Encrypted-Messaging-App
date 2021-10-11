@@ -12,93 +12,93 @@ using System.Text;
 using System.Threading.Tasks;
 using Android.Gms.Tasks;
 using Firebase.Firestore;
+using System.Reflection;
+using Java.Util;
+using static Encrypted_Messaging_App.Views.GlobalVariables;
+using System.Numerics;
+using Firebase.Auth;
 
 namespace Encrypted_Messaging_App.Droid.Resources
 {
     class OnCompleteListener : Java.Lang.Object, IOnCompleteListener
     {
-        private TaskCompletionSource<CUser> _tcs;
+        private TaskCompletionSource<(bool, object)> _tcs;
+        private string Type;
         private string Username;
+        private CUser currentUser;
 
-        public OnCompleteListener(TaskCompletionSource<CUser> tcs, string username)
+        ListenerHelper Helper = new ListenerHelper();
+
+
+        public OnCompleteListener(TaskCompletionSource<(bool, object)> tcs, string type, string username = "")
         {
             _tcs = tcs;
+            Type = type;
             Username = username;
+            if(CurrentUser != null)
+            {
+                currentUser = CurrentUser;
+            }
         }
 
+        // When get() request is completed
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
-            Console.WriteLine("Started OnComplete");
             if (task.IsSuccessful)
             {
                 var result = task.Result;
-                if(result is DocumentSnapshot doc)
+                // Documents:
+                if (result is DocumentSnapshot doc)
                 {
-                    Console.WriteLine("Result is Document Snapshot");
-                    CUser user = new CUser(doc.Id, Username);
-
-                    try
+                    if(doc.Data == null)
                     {
-                        // Chats:
-                        if(doc.Get("chats") != null)
-                        {
-                            JavaList chats = (JavaList) doc.Get("chats");
-                            if(chats == null) { 
-                                Console.WriteLine("chats is undefined");
-                                return;
-                            }
-                            IEnumerator enumerator = chats.GetEnumerator();
-                            string[] chatsArr = new string[chats.Count];
-
-                            Console.WriteLine("--Chats--");
-                            enumerator.MoveNext();
-                            for(int i=0; i<chats.Count; i++)
-                            {
-                                Console.WriteLine($"{i}: {enumerator.Current}");
-                                chatsArr[i] = (string) enumerator.Current;
-                                enumerator.MoveNext();
-                            }
-                            user.SetChats(chatsArr);
-                        }
-                        /*if(doc.Get("requests") != null)
-                        {
-                            JavaList requests = (JavaList)doc.Get("requests");
-                            if(requests == null) {
-                                Console.WriteLine("requests is undefined");
-                                return;
-                            }
-                            IEnumerator enumerator = requests.GetEnumerator();
-                            string[] requestArr = new string[requests.Count];
-
-                            Console.WriteLine("--Requests--");
-                            enumerator.MoveNext();
-                            for(int i=0; i< requests.Count; i++)
-                            {
-                                Console.WriteLine($"{i}: {enumerator.Current}");
-                                requestArr[i] = (string)enumerator.Current;
-                                enumerator.MoveNext();
-                            }
-
-                        }*/
-
-                    } catch(Exception e)
-                    {
-                        Console.WriteLine($"Failed settings values: {e.Message}");
+                        Console.WriteLine($"No data found at doc for: {Type}");
+                        _tcs.TrySetResult((false, "No data found"));
+                        return;
                     }
-                    
-                    _tcs.TrySetResult(user);
-                    return;
+
+                    if (Type == "CUser")
+                    {
+                        _tcs.TrySetResult(Helper.ParseCUser(doc));
+                    }
+                    else if (Type == "UserFromUsername")
+                    {
+                        _tcs.TrySetResult(Helper.ParseUser_Username(doc));
+                    }
+                    else if(Type == "UserFromId")
+                    {
+                        _tcs.TrySetResult(Helper.ParseUser_Id(doc));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Type for Document provided");
+                        _tcs.TrySetResult((false, "Invalid Type provided (document)"));
+                    }
+                }
+                // Collections:
+                else if(result is QuerySnapshot collection)
+                {
+                    DocumentSnapshot[] docs = collection.Documents.ToArray();
+                    if (Type == "Requests")
+                    {
+                        _tcs.TrySetResult(Helper.ParseRequests(docs));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Type for Collection provided");
+                        _tcs.TrySetResult((false, "Invalid Type provided (collection)"));
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Result isn't Document Snapshot");
+                    Console.WriteLine("result isn't a document snapshot");
+                    _tcs.TrySetResult((false, "Path isn't valid"));
                 }
             }
             else
             {
-                Console.WriteLine("Setting default result...");
-                _tcs.TrySetResult((default(CUser)));
-                Console.WriteLine("Default Result set");
+                Console.WriteLine("Task unsuccessful, setting default result");
+                _tcs.TrySetResult((false, "Task Invalid"));
             }
         }
     }

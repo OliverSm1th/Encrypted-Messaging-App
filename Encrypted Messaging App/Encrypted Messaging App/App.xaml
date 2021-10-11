@@ -18,6 +18,7 @@
             <x:String x:Key="IconLogOut">&#xf2f5;</x:String>
             <x:String x:Key="IconFriend">&#xf0c0;</x:String>
             <x:String x:Key="IconHome">&#xf015;</x:String>
+            <x:String x:Key="IconSync">&#xf2f1;</x:String>
         </ResourceDictionary>
         
         

@@ -2,41 +2,19 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Encrypted_Messaging_App.Views.FriendRequestPage">
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <DataTemplate x:Key="userTemplate">
-                <Grid Padding="20,40,20,10">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Test" Clicked="Refresh">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                FontFamily="Icons-S"
+                Glyph="{StaticResource IconSync}"
+                Color="Black"
+                    Size="20"
+                />
+            </ToolbarItem.IconImageSource>
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label
-                           Text="{Binding}"
-                           BindingContext=""
-                           TextColor="Black"
-                           FontSize="Medium"
-                           FontFamily="Roboto"
-                           />
-                    <Label Text="check-circle"
-                           TextColor="Green"
-                           FontSize="22"
-                           FontFamily="Icons-R"
-                           Grid.Column="1"
-                           />
-                    <Label Text="times-circle"
-                           TextColor="Red"
-                           FontSize="22"
-                           FontFamily="Icons-R"
-                           Grid.Column="2"
-                           />
-                </Grid>
-            </DataTemplate>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
 
     <StackLayout>
         <Label Text="Friend Requests" 
@@ -46,79 +24,65 @@
                HorizontalOptions="Center"
                
                />
-        <ScrollView VerticalOptions="StartAndExpand" Padding="0,0,0,0">
-            <StackLayout x:Name="UserStack">
-                
-                
-                <!--<Grid Padding="20,10,20,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
+        <ScrollView VerticalOptions="StartAndExpand" Padding="0,-10,0,0" x:Name="UserScroll"> <StackLayout>
+                <StackLayout x:Name="UserList" BindableLayout.ItemsSource="{Binding Users}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="20,15,20,0" RowSpacing="0">
 
-                    <Label Text="UserName2" TextColor="Black" FontSize="Medium" FontFamily="Roboto" />
-                    
-                    <Label Text="check-circle" TextColor="Green" FontSize="22" FontFamily="Icons-R" Grid.Column="1" />
-                    <Label Text="times-circle" TextColor="Red" FontSize="22" FontFamily="Icons-R" Grid.Column="2" />
-                </Grid>
-                <Grid Padding="20,10,20,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label Text="UserName3" TextColor="Black" FontSize="Medium" FontFamily="Roboto" />
-
-                    <Label Text="check-circle" TextColor="Green" FontSize="22" FontFamily="Icons-R" Grid.Column="1" />
-                    <Label Text="times-circle" TextColor="Red" FontSize="22" FontFamily="Icons-R" Grid.Column="2" />
-                </Grid>
-                <Grid Padding="20,10,20,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label Text="UserName4" TextColor="Black" FontSize="Medium" FontFamily="Roboto" />
-
-                    <Label Text="check-circle" TextColor="Green" FontSize="22" FontFamily="Icons-R" Grid.Column="1" />
-                    <Label Text="times-circle" TextColor="Red" FontSize="22" FontFamily="Icons-R" Grid.Column="2" />
-                </Grid>
-                <Grid Padding="20,10,20,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label Text="UserName5" TextColor="Black" FontSize="Medium" FontFamily="Roboto" />
-
-                    <Label Text="check-circle" TextColor="Green" FontSize="22" FontFamily="Icons-R" Grid.Column="1" />
-                    <Label Text="times-circle" TextColor="Red" FontSize="22" FontFamily="Icons-R" Grid.Column="2" />
-                </Grid>
-                <Grid Padding="20,10,20,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Label Text="UserName6" TextColor="Black" FontSize="Medium" FontFamily="Roboto" />
-
-                    <Label Text="check-circle" TextColor="Green" FontSize="22" FontFamily="Icons-R" Grid.Column="1" />
-                    <Label Text="times-circle" TextColor="Red" FontSize="22" FontFamily="Icons-R" Grid.Column="2" />
-                </Grid>-->
-                <!--<BoxView HeightRequest="100" Color="Red"/>
-                <BoxView HeightRequest="200" Color="Green"/>
-                <BoxView HeightRequest="200" Color="Blue"/>
-                <BoxView HeightRequest="200" Color="Yellow"/>
-                <BoxView HeightRequest="200" Color="Pink"/>
-                <BoxView HeightRequest="200" Color="Purple"/>-->
-            </StackLayout>
-            
-        </ScrollView>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="9*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label
+                           Text="{Binding Username}"
+                           TextColor="Black"
+                                FontSize="Medium"
+                                FontFamily="Roboto"
+                           />
+                                <Label
+                                Text="{Binding Id}"
+                                TextColor="Gray"
+                                FontSize="Caption"
+                                FontFamily="Roboto"
+                                Grid.Row="1"
+                           />
+                                <Label Text="check-circle"
+                                ClassId="{Binding Id}"
+                                TextColor="Green"
+                                FontSize="22"
+                                FontFamily="Icons-R"
+                                
+                                Grid.Column="1"
+                                Grid.RowSpan="1" 
+                            >
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="AcceptRequest"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                                <Label Text="times-circle"
+                                ClassId="{Binding Id}"
+                                TextColor="Red"
+                                FontSize="22"
+                                FontFamily="Icons-R"
+                                Grid.Column="2"
+                                Grid.RowSpan="1"
+                           />
+                            </Grid>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+                <Label Text="No pending requests" 
+                       IsVisible="false" 
+                       TextColor="Gray"
+                       HorizontalOptions="CenterAndExpand"
+                       Padding="0,20,0,0"
+                       FontFamily="Roboto-Italic"
+                       FontSize="16"
+                       x:Name="NoRequests"
+                       />
+        </StackLayout>   </ScrollView>
         <Line BackgroundColor="Black" HeightRequest="5" VerticalOptions="End" TranslationY="-10"/>
         <Grid Padding="10,0,10,10" VerticalOptions="End">
             <Grid.RowDefinitions>
@@ -145,6 +109,7 @@
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="1"
+                   x:Name="RequestIcon"
                    />
             <Entry Placeholder="Username" 
                        PlaceholderColor="{StaticResource Gray}" 
@@ -156,12 +121,28 @@
                        Grid.Column="1"
                        Grid.ColumnSpan="1"
                        Grid.Row="1"
+                       TextChanged="EditedEntry"
+                       x:Name="UsernameEntry"/>
                        <!--TextChanged="EditedEntry"
                        Focused="UsernameFocused"
                        Unfocused="UsernameFocused"-->
-                       x:Name="UsernameEntry"/>
 
-            <Label Text="arrow-alt-circle-right"
+            <Button Text="arrow-alt-circle-right"
+                    FontFamily="Icons-R"
+                    FontSize="Medium"
+                    TextColor="Black"
+                    BackgroundColor="Transparent"
+                    BorderColor="Transparent"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Grid.Row="1"
+                    Grid.Column="2"
+                    Clicked="SendRequest"
+                    x:Name="RequestButton"/>
+
+
+
+            <!--<Label Text="arrow-alt-circle-right"
                    FontFamily="Icons-R"
                    FontSize="Medium"
                    TextColor="Black"
@@ -169,7 +150,11 @@
                    VerticalOptions="Center"
                     Grid.Row="1"
                     Grid.Column="2"
-                    />
+                    >
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="SendRequest"/>
+                </Label.GestureRecognizers>
+            </Label>-->
         </Grid>
     </StackLayout>
 </ContentPage>

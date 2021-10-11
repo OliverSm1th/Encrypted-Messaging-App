@@ -11,7 +11,7 @@ namespace Encrypted_Messaging_App
         {
             InitializeComponent();
 
-            Routing.RegisterRoute(nameof(MainMessagePage), typeof(MainMessagePage));
+            //Routing.RegisterRoute(nameof(MainMessagePage), typeof(MainMessagePage));
             Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
             Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));

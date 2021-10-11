@@ -25,6 +25,7 @@ namespace Encrypted_Messaging_App.Views
         protected override async void OnAppearing()  // When the login page appears, if they're already logged in, they could go direct to the main page
         {
             base.OnAppearing();
+            Console.WriteLine("~~ Login Page ~~");
 
             IAuthenticationService authenticationService = DependencyService.Resolve<IAuthenticationService>();
             if (authenticationService.isSignedIn())
@@ -45,19 +46,17 @@ namespace Encrypted_Messaging_App.Views
                 Console.WriteLine("Not resolved");
                 return;
             }
-            var resultObj = await authenticationService.LogIn(username, password);
-            bool result = resultObj.Item1;
-            if (result)
+            (bool success, string errorMsg) result = await authenticationService.LogIn(username, password);
+            if (result.success)
             {
                 await Shell.Current.GoToAsync($"//{nameof(LoadingPage)}");
             }
             else
             {
-
                 Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
                 Button LoginBtn = (Button)sender;
 
-                string type = resultObj.Item2;
+                string type = result.errorMsg;
                 if(type == "emailOrPassword")
                 {
                     InvalidMsg.IsVisible = true;

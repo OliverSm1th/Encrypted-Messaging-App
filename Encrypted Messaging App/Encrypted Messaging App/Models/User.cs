@@ -10,6 +10,7 @@ namespace Encrypted_Messaging_App
         public string Id { get; set; }
         public string Username { get; set; }
 
+        public User() { }
         public User(string id)
         {
             Id = id;
@@ -19,6 +20,11 @@ namespace Encrypted_Messaging_App
         {
             Id = id;
             Username = username;
+        }
+
+        public override string ToString()
+        {
+            return Username;
         }
 
 

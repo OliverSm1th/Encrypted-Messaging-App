@@ -22,6 +22,7 @@ namespace Encrypted_Messaging_App.Views
 
         public RegisterPage()
         {
+            Console.WriteLine("~~ Register Page ~~");
             InitializeComponent();
         }
 
@@ -156,7 +157,19 @@ namespace Encrypted_Messaging_App.Views
             }
             else
             {
-                await Shell.Current.GoToAsync($"//{nameof(MainMessagePage)}");
+                IManageFirestoreService UserService = DependencyService.Resolve<IManageFirestoreService>();
+                (bool success, string message) registerResult = await UserService.InitiliseUser(username);
+                if (registerResult.success)
+                {
+                    await Shell.Current.GoToAsync($"//{nameof(LoadingPage)}");
+                }
+                else
+                {
+                    IToastMessage toastMessage = DependencyService.Resolve<IToastMessage>();
+                    toastMessage.LongAlert($"Unable to register: {registerResult.message}");
+                    Console.WriteLine($"TOAST MESSAGE- Unable to register: {registerResult.message}");
+                }
+                
             }
 
 

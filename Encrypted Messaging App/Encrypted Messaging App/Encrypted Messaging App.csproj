@@ -41,8 +41,10 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Cloud.Firestore" Version="2.4.0" />
+    <PackageReference Include="PCLStorage" Version="1.0.2" />
     <PackageReference Include="Plugin.CloudFirestore" Version="4.1.0" />
-    <PackageReference Include="System.Runtime.WindowsRuntime.UI.Xaml" Version="4.7.0" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+    <!--<PackageReference Include="System.Runtime.WindowsRuntime.UI.Xaml" Version="4.7.0" />-->
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2083" />  
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>

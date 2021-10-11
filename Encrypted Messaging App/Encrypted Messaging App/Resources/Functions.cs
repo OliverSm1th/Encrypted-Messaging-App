@@ -1,20 +1,29 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+
+
+
 
 
 namespace Encrypted_Messaging_App.Views
 {
     class Functions
     {
-        public static bool isValidEmail(string email, bool excludeBlank = false)
-        {
+        
+        public static bool isValidEmail(string email, bool allowBlank = false)
+        {    /*
+             - Must have exactly one @
+             - The second part must have a period, but it can't be the last letter */
+
             if(email == null || email.Length == 0){
-                if (!excludeBlank) { return true; }
-                else { return false; }
+                return allowBlank;
             }
             string[] parts = email.Split('@');
             if(parts.Length != 2) { return false; }
@@ -25,6 +34,19 @@ namespace Encrypted_Messaging_App.Views
                 return true;
             }
             else { return false; }
+        }
+
+        public static bool isValidUsername(string username, bool allowBlank = false)
+        {    /*
+             - Must be only one word
+             - Min length=4 and Max length=15 */
+            char[] bannedChars = new char[] { '\'', '\\', '<', '>', '\"' };
+
+            if (username == null || username.Length == 0) { return allowBlank; }
+            if(username.Split(' ').Length != 1) { return false; }
+            if(username.Length<4 || username.Length > 15) { return false; }
+            if(username.IndexOfAny(bannedChars) != -1) { return false; }
+            return true;
         }
 
         public static void EntryFocused(string nameStart, View Content)
@@ -71,22 +93,62 @@ namespace Encrypted_Messaging_App.Views
         {
             Icon.TextColor = Color.FromHex("#E74C3C");
         }
-        public static void IconInvalidReset(Label[] Icons)
+        public static void IconInvalid(Button Icon)
+        {
+            Icon.TextColor = Color.FromHex("#E74C3C");
+        }
+
+        private static void ObjInvalidReset(Object[] Icons)
         {
             Color black = Color.FromHex("#000000");
             Color red = Color.FromHex("#E74C3C");
-            foreach (Label Icon in Icons)
+            foreach (object Icon in Icons)
             {
-                if(Icon.TextColor == red)
+                if ((Color)Icon.GetType().GetProperty("TextColor").GetValue(Icon, null) == red)
                 {
-                    Icon.TextColor = black;
+                    Icon.GetType().GetProperty("TextColor").SetValue(Icon, black);
                 }
             }
         }
+        public static void IconInvalidReset(Label[] Icons) {
+            ObjInvalidReset(Icons);
+        }
+        public static void IconInvalidReset(Button[] Icons)
+        {
+            ObjInvalidReset(Icons);
+        }
+
         public static void IconInvalidReset(Label Icon)
         {
             IconInvalidReset(new Label[] { Icon });
         }
-    
+        public static void IconInvalidReset(Button Icon)
+        {
+            IconInvalidReset(new Button[] { Icon });
+        }
+
+    }
+    class DebugManager
+    {
+        public static IToastMessage toast = DependencyService.Resolve<IToastMessage>();
+        public static void ErrorToast(string toastMsg, string debugMsg, [CallerFilePath] string sourceFilePath="", [CallerLineNumber] int sourceLineNumber=0)
+        {
+            if (!GlobalVariables.DeveloperMode) { toast.LongAlert($"{toastMsg}");
+            }
+            ErrorSilent(debugMsg, sourceFilePath, sourceLineNumber);
+        }
+        public static void ErrorSilent(string debugMsg, [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (GlobalVariables.DeveloperMode) { toast.LongAlert($"⚠️ {debugMsg}"); }
+            Console.WriteLine($"[ERROR] {LastOfPath(sourceFilePath)}:{sourceLineNumber}  |  {debugMsg}");
+
+        }
+
+        private static string LastOfPath(string path)
+        {
+            string[] parts = path.Split('/');
+            return parts[parts.Length - 1];
+        }
+
     }
 }

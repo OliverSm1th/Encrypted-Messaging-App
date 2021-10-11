@@ -13,29 +13,58 @@ namespace Encrypted_Messaging_App.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LoadingPage : ContentPage
     {
+        bool running = false;
         public LoadingPage()
         {
             InitializeComponent();
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Encrypted Messaging App/encrypted-messaging-app-b689c5915859.json");
-            Prepare();
+            //Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "Encrypted Messaging App/encrypted-messaging-app-b689c5915859.json");
         }
 
-        private async void Prepare() //object sender, EventArgs e
+        protected override async void OnAppearing() //object sender, EventArgs e
         {
+            if (running) { return; } else { running = true; }
+            Console.WriteLine("~~ Loading Page ~~");
+            base.OnAppearing();
+
+
             // Get messages from firestore
-            IManageUserService UserService = DependencyService.Resolve<IManageUserService>();
-            Task<CUser> Tuser = UserService.GetUser();
-            Console.WriteLine("Recieved Result");
-            CurrentUser = await Tuser;
- 
+            IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
+            Task<(bool success, object result)> TResponse = FirestoreService.FetchData("CUser");
 
-            Console.WriteLine("Recieved user");
-            CurrentUser.Output();
+            var response = await TResponse;
+            if (response.success)
+            {
+                Console.WriteLine("Recieved Result");
+                
+                CurrentUser = (CUser)response.result;
+                
 
-            Console.WriteLine("Going to main screen");
-            // Load main screen:
-            await Shell.Current.GoToAsync($"//{nameof(MainMessagePage)}");
+                Console.WriteLine("Recieved user");
+                CurrentUser.Output();
+                
+
+                // Load main screen:
+                await Shell.Current.GoToAsync($"//{nameof(MainMessagePage)}");
+
+                DependencyService.Get<IToastMessage>().LongAlert("Successfully Signed in!!");
+
+            } else if (response.result == "No data found")
+            {
+                DependencyService.Get<IToastMessage>().LongAlert("Account not found.");
+                await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
+            }
+            else
+            {
+                Console.WriteLine($"Unable to get CUser data: {response.result}");
+                DependencyService.Get<IToastMessage>().LongAlert("Unable to get user information");
+                await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
+            }      
         }
 
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+            running = false;
+        }
     }
 }
