@@ -114,13 +114,13 @@ namespace Encrypted_Messaging_App.Droid
 
 
 
-                      //   GET:  \\
+           //   GET:
         public Task<(bool, object)> FetchData(string type, params (string, string)[] arguments)
         {
+            Console.WriteLine($"Fetching Data for {type}:");
             var tcs = new TaskCompletionSource<(bool, object)>();
 
             string path = GetPath(type, arguments);
-            Console.WriteLine($"FetchData path: {path}");
             if (path is null)
             {
                 tcs.TrySetResult((false, $"Invalid type passed: {type}"));
@@ -129,8 +129,6 @@ namespace Encrypted_Messaging_App.Droid
 
 
             (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
-
-
             if (!reference.success)
             {
                 tcs.TrySetResult((false, $"Invalid path: {path}"));
@@ -202,7 +200,7 @@ namespace Encrypted_Messaging_App.Droid
 
 
 
-                      //   SET:   \\
+           //   SET:
         public async Task<(bool, string)> WriteObject(object obj, string path)
         {
             (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
@@ -400,7 +398,7 @@ namespace Encrypted_Messaging_App.Droid
                 Type type = propValue.GetType();
 
                 
-                if (type.IsArray || type.GetGenericTypeDefinition() == typeof(List<>))
+                if (type.IsArray) // || type.GetGenericTypeDefinition() == typeof(List<>)
                 {
                     if(type.GetGenericTypeDefinition() == typeof(List<>)) { propValue = ((List<object>)propValue).ToArray(); }
                     JavaList<HashMap> arrayMap = new JavaList<HashMap>();

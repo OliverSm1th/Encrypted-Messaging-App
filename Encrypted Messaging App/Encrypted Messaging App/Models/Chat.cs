@@ -109,10 +109,10 @@ namespace Encrypted_Messaging_App
 
     public class Chat
     {
-        public KeyData EncryptionInfo { get; set; }
-        public string Title { get; set; }
-        public User[] Users { get; set; }
-        public List<Message> Messages { get; set; }
+        public KeyData encryptionInfo { get; set; }
+        public string title { get; set; }
+        public User[] users { get; set; }
+        public List<Message> messages { get; set; }
         public string Id;
 
         private BigInteger encryptionKey;
@@ -124,13 +124,13 @@ namespace Encrypted_Messaging_App
         public Chat() { }
 
         // Constructors:
-        public void CreateFromData(KeyData encryptionInfo, BigInteger key, User[] users)
+        public void CreateFromData(KeyData chatEncryptInfo, BigInteger chatEncryptKey, User[] chatUsers)
         {
-            EncryptionInfo = encryptionInfo;
-            Users = users;
-            encryptionKey = key;
-            Messages = new List<Message>();
-            Title = "";
+            encryptionInfo = chatEncryptInfo;
+            users = chatUsers;
+            encryptionKey = chatEncryptKey;
+            messages = new List<Message>();
+            title = "";
         }
 
         public void GetFromServer(string chatID)
@@ -188,9 +188,9 @@ namespace Encrypted_Messaging_App
         // Private Methods:
         private void updateChat(Chat newChat)
         {
-            Messages = newChat.Messages;
-            Users = newChat.Users;
-            Title = newChat.Title;
+            messages = newChat.messages;
+            users = newChat.users;
+            title = newChat.title;
         }
         private bool propertiesDefined()
         {

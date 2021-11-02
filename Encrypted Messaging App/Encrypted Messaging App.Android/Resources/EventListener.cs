@@ -19,19 +19,18 @@ namespace Encrypted_Messaging_App.Droid.Resources
 {
     class EventListener : Java.Lang.Object, IEventListener
     {
-        string Type;
-        DocumentChange.Type ChangeType;
-        Action<object> Method;
-        private bool firstTime = true;
+        string EventType;
+        DocumentChange.Type ChangeType;     // ADDED/MODIFIED/REMOVED
+        Action<object> OnEventMethod;
         private bool IgnoreInitilal;
 
         ListenerHelper Helper = new ListenerHelper();    // Helper: Has Parse Functions which convert results into objects
-
+        private bool FirstTime = true;
 
         public EventListener(string type, Action<object> method, DocumentChange.Type changeType = null, bool ignoreInitial=false)
         {
-            Type = type;
-            Method = method;
+            EventType = type;
+            OnEventMethod = method;
             ChangeType = changeType;
             IgnoreInitilal = ignoreInitial;
         }
@@ -39,12 +38,11 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
         public void OnEvent(Java.Lang.Object obj, FirebaseFirestoreException error)
         {
-            if (firstTime) {
-                if (IgnoreInitilal) { return; }
-                Console.WriteLine($"EVENT INITILISED: {Type}"); 
+            if (FirstTime && IgnoreInitilal) { 
+                return;
+            } else {
+                Console.WriteLine($"EVENT TRIGGERED: {EventType}");
             }
-            else { Console.WriteLine($"EVENT TRIGGERED: {Type}"); }
-
             
 
             (bool success, object obj) response = (false, null);
@@ -52,51 +50,17 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             if (obj is DocumentSnapshot doc)
             {
-                
-                if(Type == "Chat")
-                {
-                    response = Helper.ParseChat(doc);
-                }
-                else if(Type == "ChatsID")
-                {
-                    response = Helper.ParseChatsID(doc);
-                }
-                else
-                {
-                    Console.WriteLine($"Invalid type {Type} for DocumentSnapshot");
-                    return;
-                }
+                response = HandleDocument(doc);
+                // Handles: Chat, ChatID
             } 
             else if(obj is QuerySnapshot collection)
             {
                 if (collection.IsEmpty)
                 {
-                    Console.WriteLine($"No docs found for: {Type}");
+                    Console.WriteLine($"No docs found for: {EventType}");
                 }
 
-                DocumentSnapshot[] docs = collection.Documents.ToArray();
-
-                if (ChangeType != null && !firstTime) // Filter documents by changeType (added,modified,removed)
-                {
-                    List<DocumentSnapshot> newDocs = new List<DocumentSnapshot>();
-                    foreach (DocumentChange change in collection.DocumentChanges)
-                    {
-                        if (change.GetType() == ChangeType) { newDocs.Add(change.Document); }
-                    }
-
-                    if (newDocs.Count == 0) { Console.WriteLine("No new documents"); }
-                    docs = newDocs.ToArray();
-                }
-
-                if (Type == "Requests")
-                {
-                    response = Helper.ParseRequests(docs);
-                }
-                else if (Type == "AcceptRequests")
-                {
-                    response = Helper.ParceARequests(docs);
-                }
-                else { Console.WriteLine($"Invalid type {Type} for QuerySnapshot"); }                
+                response = HandleCollection(collection);             
             }
             else
             {
@@ -106,9 +70,97 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             if (response.success)
             {
-                Method(response.obj);
+                OnEventMethod(response.obj);
             }
-            firstTime = false;
+            FirstTime = false;
+        }
+
+        public (bool, object) HandleDocument(DocumentSnapshot document)
+        {
+            /*
+            if (EventType == "Chat")
+            {
+                //return Helper.ParseChat(doc);
+                return Helper.GetType().GetMethod(EventType).Invoke(Helper, new object[]{ doc });
+            }
+            else if (EventType == "ChatsID")
+            {
+                return Helper.ParseChatsID(doc);
+            }
+            else
+            {
+
+            }*/
+            return InvokeHelperMethod(EventType, document);
+        }
+
+        public (bool, object) HandleCollection(QuerySnapshot collection)
+        {
+            DocumentSnapshot[] docs = GetFilteredDocs(collection);
+
+            return InvokeHelperMethod(EventType, docs);
+            /*
+            if (EventType == "Requests")
+                {
+                    response = Helper.ParseRequests(docs);
+                }
+                else if (EventType == "AcceptRequests")
+                {
+                    response = Helper.ParceARequests(docs);
+                }
+                else { Console.WriteLine($"Invalid type {EventType} for QuerySnapshot"); } 
+            */
+        }
+
+        public DocumentSnapshot[] GetFilteredDocs(QuerySnapshot collection)
+        {
+            // No ChangeType
+            if(ChangeType == null || FirstTime) {
+                return collection.Documents.ToArray();
+            }
+
+            // ChangeType: ADDED/MODIFIED/REMOVED
+            List<DocumentSnapshot> filteredDocs = new List<DocumentSnapshot>();
+
+            foreach (DocumentChange change in collection.DocumentChanges) {
+                if (change.GetType() == ChangeType) { 
+                    filteredDocs.Add(change.Document); 
+                }
+            }
+
+            if (filteredDocs.Count == 0) { Console.WriteLine("No documents after filter"); }
+            return filteredDocs.ToArray();
+        }
+
+
+        public (bool, object) InvokeHelperMethod(string methodName, object argument)
+        {
+            methodName = "Parse" + methodName;
+            MethodInfo helperMethod = Helper.GetType().GetMethod(methodName);
+            if (helperMethod != null  &&  helperMethod.GetParameters().Length > 0  &&  helperMethod.GetParameters()[0].ParameterType == argument.GetType())
+            {
+                (bool, object)result = ((bool, object))helperMethod.Invoke(Helper, new object[] { argument });
+                return result;
+            }
+            else
+            {
+                Console.WriteLine($"Invalid type {methodName} for Helper Method");
+                //OutputMethods(Helper.GetType().GetMethods());
+                if (helperMethod != null)
+                {
+                    Console.WriteLine($"Expected Type: {Helper.GetType().GetMethod(EventType).GetGenericArguments()[0]}\nActual Type: {argument.GetType()}");
+                }
+                
+                return (false, "");
+            }
+        }
+
+        private void OutputMethods(MethodInfo[] methods)
+        {
+            for(int i=0; i<methods.Length; i++)
+            {
+                Console.WriteLine(methods[i].Name);
+            }
         }
     }
 }

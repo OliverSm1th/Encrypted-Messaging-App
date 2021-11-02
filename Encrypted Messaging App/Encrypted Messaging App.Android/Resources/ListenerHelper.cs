@@ -154,7 +154,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             //return (false, "No username given");
             //}
             CUser user = new CUser(doc.Id, FirebaseAuth.Instance.CurrentUser.DisplayName);
-            return (true, user);
+            //return (true, user);
             try
             {
                 // Chats:
@@ -164,7 +164,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
                     string[] chatsArr = (string[])ParseEnumerator(chats.GetEnumerator(), chats.Count);
 
-
+                    user.chatsID = chatsArr;
                     //user.SetChats(chatsArr);
                 }
                 return (true, user);
@@ -281,7 +281,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
                 }
 
-                Chat chat = new Chat { Messages = messages, Users = users.ToArray() };
+                Chat chat = new Chat { messages = messages, users = users.ToArray() };
 
                 return (false, "");
             }
@@ -341,7 +341,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             return null;
         }
 
-        public (bool, object) ParceARequests(DocumentSnapshot[] docs)
+        public (bool, object) ParseAcceptRequests(DocumentSnapshot[] docs)
         {
             List<AcceptedRequest> requests = new List<AcceptedRequest>();
 
