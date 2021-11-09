@@ -44,6 +44,33 @@ namespace Encrypted_Messaging_App.Droid.Resources
         // When get() request is completed
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
+            if (!task.IsSuccessful) { HandleError($"Unable to complete task   (Type={Type})");  return; }
+
+            var result = task.Result;
+
+            if (result is DocumentSnapshot doc)
+            {
+                _tcs.TrySetResult(Helper.ParseObject(Type, doc));
+            } 
+            else if (result is QuerySnapshot collection)
+            {
+                if (collection.IsEmpty) { HandleError($"No docs found for: {Type}"); return; }
+
+                _tcs.TrySetResult(Helper.ParseObject(Type, collection.Documents.ToArray()));
+            }
+            else { HandleError($"Result isn't a document or collection: objectType={result.GetType()}  Type={Type}"); return; }
+        }
+
+        private void HandleError(string errorMsg)
+        {
+            Console.WriteLine(errorMsg);
+            _tcs.TrySetResult((false, errorMsg));
+        }
+
+
+
+        /*public void OnComplete(Android.Gms.Tasks.Task task)
+        {
             if (task.IsSuccessful)
             {
                 var result = task.Result;
@@ -100,6 +127,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 Console.WriteLine("Task unsuccessful, setting default result");
                 _tcs.TrySetResult((false, "Task Invalid"));
             }
-        }
+        }*/
     }
 }

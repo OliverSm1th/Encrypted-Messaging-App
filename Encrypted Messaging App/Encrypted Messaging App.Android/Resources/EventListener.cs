@@ -22,7 +22,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
         string EventType;
         DocumentChange.Type ChangeType;     // ADDED/MODIFIED/REMOVED
         Action<object> OnEventMethod;
-        private bool IgnoreInitilal;
+        private bool IgnoreFirstTime;
 
         ListenerHelper Helper = new ListenerHelper();    // Helper: Has Parse Functions which convert results into objects
         private bool FirstTime = true;
@@ -32,35 +32,29 @@ namespace Encrypted_Messaging_App.Droid.Resources
             EventType = type;
             OnEventMethod = method;
             ChangeType = changeType;
-            IgnoreInitilal = ignoreInitial;
+            IgnoreFirstTime = ignoreInitial;
         }
 
 
         public void OnEvent(Java.Lang.Object obj, FirebaseFirestoreException error)
         {
-            if (FirstTime && IgnoreInitilal) { 
-                return;
-            } else {
-                Console.WriteLine($"EVENT TRIGGERED: {EventType}");
-            }
-            
+            if ( FirstTime && IgnoreFirstTime ) {  return;  }
+
+            Console.WriteLine($"EVENT TRIGGERED: {EventType}");
 
             (bool success, object obj) response = (false, null);
 
 
-            if (obj is DocumentSnapshot doc)
+            if (obj is DocumentSnapshot doc)          // Chat/ChatID
             {
-                response = HandleDocument(doc);
-                // Handles: Chat, ChatID
+                response = Helper.ParseObject(EventType, doc);
             } 
             else if(obj is QuerySnapshot collection)
             {
-                if (collection.IsEmpty)
-                {
-                    Console.WriteLine($"No docs found for: {EventType}");
-                }
+                if (collection.IsEmpty) {  Console.WriteLine($"No docs found for: {EventType}"); }
 
-                response = HandleCollection(collection);             
+                DocumentSnapshot[] docs = GetFilteredDocs(collection);
+                response = Helper.ParseObject(EventType, docs);          
             }
             else
             {
@@ -75,44 +69,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             FirstTime = false;
         }
 
-        public (bool, object) HandleDocument(DocumentSnapshot document)
-        {
-            /*
-            if (EventType == "Chat")
-            {
-                //return Helper.ParseChat(doc);
-                return Helper.GetType().GetMethod(EventType).Invoke(Helper, new object[]{ doc });
-            }
-            else if (EventType == "ChatsID")
-            {
-                return Helper.ParseChatsID(doc);
-            }
-            else
-            {
-
-            }*/
-            return InvokeHelperMethod(EventType, document);
-        }
-
-        public (bool, object) HandleCollection(QuerySnapshot collection)
-        {
-            DocumentSnapshot[] docs = GetFilteredDocs(collection);
-
-            return InvokeHelperMethod(EventType, docs);
-            /*
-            if (EventType == "Requests")
-                {
-                    response = Helper.ParseRequests(docs);
-                }
-                else if (EventType == "AcceptRequests")
-                {
-                    response = Helper.ParceARequests(docs);
-                }
-                else { Console.WriteLine($"Invalid type {EventType} for QuerySnapshot"); } 
-            */
-        }
-
-        public DocumentSnapshot[] GetFilteredDocs(QuerySnapshot collection)
+        private DocumentSnapshot[] GetFilteredDocs(QuerySnapshot collection)
         {
             // No ChangeType
             if(ChangeType == null || FirstTime) {
@@ -133,7 +90,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
         }
 
 
-        public (bool, object) InvokeHelperMethod(string methodName, object argument)
+        public (bool, object) InvokeListenerHelperMethod(string methodName, object argument)
         {
             methodName = "Parse" + methodName;
             MethodInfo helperMethod = Helper.GetType().GetMethod(methodName);
@@ -155,7 +112,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             }
         }
 
-        private void OutputMethods(MethodInfo[] methods)
+        private void OutputMethods(MethodInfo[] methods)  // Debugging Method
         {
             for(int i=0; i<methods.Length; i++)
             {

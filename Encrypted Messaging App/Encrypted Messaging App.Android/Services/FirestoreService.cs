@@ -40,7 +40,7 @@ namespace Encrypted_Messaging_App.Droid
 
         private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string[] pathLevels)
         {
-            if(pathLevels.Length == 0) { return (false, null, null); }
+            if(pathLevels==null || pathLevels.Length == 0) { return (false, null, null); }
 
             CollectionReference collection = FirebaseFirestore.Instance.Collection(pathLevels[0]);
             DocumentReference document = null;
@@ -67,7 +67,7 @@ namespace Encrypted_Messaging_App.Droid
         }
 
 
-        public string GetPath(string type, params (string, string)[] arguments) //Dictionary<string, string> arguments = null
+        public string GetPath(string type, params (string, string)[] arguments)
         {
             Dictionary<string, string> dictArgs = arguments.ToDictionary(arg => arg.Item1, arg => arg.Item2);
             if (!firestorePaths.ContainsKey(type) || firestorePaths[type] == null)
@@ -80,6 +80,9 @@ namespace Encrypted_Messaging_App.Droid
             for (int i=0; i<pathLevels.Length; i++)
             {
                 pathLevels[i] = parseLevelArgument(pathLevels[i], dictArgs);
+                
+                if(pathLevels[i] == null)     { return null; }
+                if(pathLevels[i].Length == 0) { pathLevels = pathLevels.Where((s, index) => index!=i).ToArray(); ; i--; }
             }
             Console.WriteLine($"Path generated: {type} -> {string.Join("/", pathLevels)}");
             return string.Join("/", pathLevels);
@@ -90,8 +93,8 @@ namespace Encrypted_Messaging_App.Droid
             {
                 levelName = levelName.TrimStart('<').TrimEnd('>');
 
-                if (arguments == null) { Console.WriteLine($"No Arguments have been set (Expecting {levelName})"); return ""; }
-                else if (arguments[levelName] == null) { Console.WriteLine($"Missing Argument: {levelName}"); return ""; }
+                if (arguments == null) { Console.WriteLine($"No Arguments have been set (Expecting {levelName})"); return null; }
+                else if (!arguments.ContainsKey(levelName)) { Console.WriteLine($"Missing Argument: {levelName}"); return null; }
                 else
                 {
                     levelName = arguments[levelName];
@@ -207,16 +210,25 @@ namespace Encrypted_Messaging_App.Droid
             if (!reference.success)
             {
                 return (false, $"Invalid path given: {path}");
-            } else if(reference.document is null)
+            } 
+            /*else if(reference.document is null)
             {
                 return (false, "Invalid length of path given, must be odd to give document");
-            }
+            }*/
 
             HashMap objHashMap = GetMap(obj);
             try
             {
-                await reference.document.Set(objHashMap);
-                return (true, "");
+                if(reference.document is null)
+                {
+                    DocumentReference newDocumentRef = (DocumentReference) await reference.collection.Add(objHashMap);
+                    return (true, newDocumentRef.Id);
+                }
+                else
+                {
+                    await reference.document.Set(objHashMap);
+                    return (true, "");
+                }
             }
             catch(Exception e)
             {
@@ -273,7 +285,8 @@ namespace Encrypted_Messaging_App.Droid
         // Test to see if the WriteObject function works, will be implemented in the actual classes if works.
         public async Task<(bool, string)> InitiliseChat(Chat chat)
         {
-            return await WriteObject(chat, GetPath("Chat", arguments:("CHATID", chat.Id)));
+            // Expected: (bool success, string newChatID)
+            return await WriteObject(chat,  GetPath("Chat", ("CHATID", ""))  );
         }
 
         public async Task<(bool, string)> SendAcceptedRequest(string requestUserID, AcceptedRequest ARequest)

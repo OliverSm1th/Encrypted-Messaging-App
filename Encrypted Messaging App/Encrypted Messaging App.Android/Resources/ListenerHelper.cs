@@ -20,42 +20,26 @@ namespace Encrypted_Messaging_App.Droid.Resources
 {
     class ListenerHelper
     {
-        // Test method
-        private Type targetType;
-        private object GetObject(DocumentSnapshot doc, Type type, string optionalExtra = "")
+        public (bool, object) ParseObject(string objectName, object input)
         {
-            var instance = Activator.CreateInstance(type);
-            if (optionalExtra.Length > 0)
+            string methodName = "Parse" + objectName;
+            MethodInfo helperMethod = this.GetType().GetMethod(methodName);
+            if (helperMethod != null && helperMethod.GetParameters().Length > 0 && helperMethod.GetParameters()[0].ParameterType == input.GetType())
             {
-                var final = doc.Get(optionalExtra);
-                Console.WriteLine("Got extra");
+                (bool, object) result = ((bool, object))helperMethod.Invoke(this, new object[] { input });
+                return result;
             }
-
-            foreach (PropertyInfo prop in targetType.GetProperties())
+            else
             {
-                var test = prop.GetValue(instance, null);
-                Type childType = test.GetType();
-                Console.WriteLine($"Type: {childType.ToString()}");
-
-
-                if (!childType.Namespace.StartsWith("System"))
+                Console.WriteLine($"Invalid type {methodName} for Helper Method");
+                //OutputMethods(Helper.GetType().GetMethods());
+                if (helperMethod != null)
                 {
-                    Console.WriteLine($"{prop.Name}: ");
-                    foreach (PropertyInfo testProp in test.GetType().GetProperties())
-                    {
-                        Console.WriteLine($"Inner: {testProp.Name}:{testProp.GetValue(prop, null).ToString()}");
-                    }
-                    //map.Put(prop.Name, GetMap(test));
+                    Console.WriteLine($"Expected Input Type: {this.GetType().GetMethod(methodName).GetGenericArguments()[0]}\nActual Input Type Provided: {input.GetType()}");
+                }
 
-                    Console.WriteLine("\n");
-                }
-                else
-                {
-                    Console.WriteLine($"{prop.Name}:{test.ToString()}");
-                    //map.Put(prop.Name, test.ToString());
-                }
+                return (false, "Invalid type given to ParseObject");
             }
-            return instance;
         }
 
 
@@ -145,6 +129,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             return instance;
         }
 
+        // Parse Objects:
         // User
         public (bool, object) ParseCUser(DocumentSnapshot doc) // Private user info: chatsID
         {
@@ -370,7 +355,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return null;
             }
         }
-
+        //----------//
 
 
         // Useful Functions
@@ -428,6 +413,46 @@ namespace Encrypted_Messaging_App.Droid.Resources
         public object[] ParseJavaList(JavaList list)
         {
             return ParseEnumerator( list.GetEnumerator(), list.Count);
+        }
+
+
+
+        // Test method
+        private Type targetType;
+        private object GetObject(DocumentSnapshot doc, Type type, string optionalExtra = "")
+        {
+            var instance = Activator.CreateInstance(type);
+            if (optionalExtra.Length > 0)
+            {
+                var final = doc.Get(optionalExtra);
+                Console.WriteLine("Got extra");
+            }
+
+            foreach (PropertyInfo prop in targetType.GetProperties())
+            {
+                var test = prop.GetValue(instance, null);
+                Type childType = test.GetType();
+                Console.WriteLine($"Type: {childType.ToString()}");
+
+
+                if (!childType.Namespace.StartsWith("System"))
+                {
+                    Console.WriteLine($"{prop.Name}: ");
+                    foreach (PropertyInfo testProp in test.GetType().GetProperties())
+                    {
+                        Console.WriteLine($"Inner: {testProp.Name}:{testProp.GetValue(prop, null).ToString()}");
+                    }
+                    //map.Put(prop.Name, GetMap(test));
+
+                    Console.WriteLine("\n");
+                }
+                else
+                {
+                    Console.WriteLine($"{prop.Name}:{test.ToString()}");
+                    //map.Put(prop.Name, test.ToString());
+                }
+            }
+            return instance;
         }
     }
 }
