@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using System.Numerics;
 using System.Linq;
+using static Encrypted_Messaging_App.LoggerService;
+
 
 namespace Encrypted_Messaging_App
 {
@@ -37,14 +39,22 @@ namespace Encrypted_Messaging_App
 
         public List<Chat> chats = new List<Chat>();
         public Action<object> chatsChangedAction;
-        private void addChat(string chatID)
+        private async void addChat(string chatID)
         {
             if (chats.Where(chat => chat.Id == chatID).ToArray().Length == 0)
             {
                 Chat newChat = new Chat();
-                newChat.GetFromServer(chatID);
-                newChat.initiliseListener();
-                chats.Add(newChat);
+                newChat.SetID(chatID);
+                bool result = await newChat.GetFromServer();
+                if (result)
+                {
+                    newChat.initiliseListener(true);
+                    chats.Add(newChat);
+                }
+                else
+                {
+                    DebugManager.ErrorSilent($"Can't add Chat {chatID} to Chats: Can't get info from server");
+                }
             }
             else
             {
@@ -66,6 +76,7 @@ namespace Encrypted_Messaging_App
             set
             {
                 // Syncs the chats to chatID, adds or removes chats accordingly
+                //if(value == null) { _chatsID = new string[0]; }
                 string[] addedChatsID = value.Except(_chatsID).ToArray();
                 string[] removedChatsID = _chatsID.Except(value).ToArray();
 
@@ -92,7 +103,7 @@ namespace Encrypted_Messaging_App
 
         public void ChatsIDListenerInit()
         {
-            FirestoreService.ListenData("ChatsID", (newchatsID) => chatsID = (string[])newchatsID);
+            FirestoreService.ListenData<string[]>("ChatsID", (newchatsID) => chatsID = (string[])newchatsID);
         }
 
 
@@ -152,12 +163,12 @@ namespace Encrypted_Messaging_App
 
         public void PendingRequestListenerInit()          // When Requests (Server) is changed -> Update friendRequests
         {
-            FirestoreService.ListenData("Requests", (requests) => friendRequests = (Request[])requests);
+            FirestoreService.ListenData<Request[]>("Requests", (requests) => friendRequests = (Request[])requests);
         }
 
         public async Task<(bool, string)> FetchFriendRequests()  // DEBUG: Refresh button
         {
-            (bool success, object result) response = await FirestoreService.FetchData("Requests");
+            (bool success, object result) response = await FirestoreService.FetchData<Request[]>("Requests");
             if (response.success)
             {
                 friendRequests = (Request[])response.result;
@@ -173,11 +184,13 @@ namespace Encrypted_Messaging_App
         //   --- Accepted Friend Request ---
         public void AcceptedRequestListenerInit()   // When AcceptRequests (Server) is changed -> Handle in AcceptRequestHandler
         {
-            FirestoreService.ListenData("AcceptRequests", AcceptRequestHandler);
+            FirestoreService.ListenData<AcceptedRequest[]>("AcceptRequests", AcceptRequestHandler);
         }
         private void AcceptRequestHandler(object requests)  // Creates new local chat and deletes AcceptRequest
         {
+            if(requests == null) { return; }
             AcceptedRequest[] acceptedRequests = (AcceptedRequest[])requests;
+            
             foreach(AcceptedRequest accepted in acceptedRequests)
             {
                 accepted.HandleRequest();
@@ -199,8 +212,8 @@ namespace Encrypted_Messaging_App
         //   Other useful functions:
         public void Output()
         {
-            Console.WriteLine($"{Username} info: ");
-            Console.WriteLine($"     ID: {Id}");
+            Debug($"{Username} info: ");
+            Debug($"ID: {Id}", 1);
 
 
             string chatIDMsg = "";
@@ -210,9 +223,9 @@ namespace Encrypted_Messaging_App
                 {
                     chatIDMsg += chat + ", ";
                 }
-                Console.WriteLine($"     Chat ID's: {chatIDMsg.Trim().Trim(',')}");
+                Debug($"Chat ID's: {chatIDMsg.Trim().Trim(',')}", 1);
             }
-            else { Console.WriteLine("     Chat ID's:  None"); }
+            else { Debug("     Chat ID's:  None", 1); }
 
 
             string requestMsg = "";
@@ -222,9 +235,9 @@ namespace Encrypted_Messaging_App
                 {
                     requestMsg += request.SourceUser.Id + ",";
                 }
-                Console.WriteLine($"     Pending Friend Requests: {requestMsg.Trim().Trim(',')}");
+                Debug($"     Pending Friend Requests: {requestMsg.Trim().Trim(',')}", 1);
             }
-            else { Console.WriteLine("     Pending Friend Requests: None"); }
+            else { Debug("     Pending Friend Requests: None", 1); }
         }
         public User GetUser()
         {

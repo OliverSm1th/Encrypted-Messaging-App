@@ -85,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Message.cs" />
-    <Compile Include="Resources\EventListener.cs" />
+    <Compile Include="Resources\OnEventListener.cs" />
     <Compile Include="Resources\ListenerHelper.cs" />
     <Compile Include="Resources\OnCompleteListener.cs" />
     <Compile Include="Services\FirestoreService.cs" />

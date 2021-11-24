@@ -7,6 +7,7 @@ using Android.Widget;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,17 +24,17 @@ namespace Encrypted_Messaging_App.Droid.Resources
     class OnCompleteListener : Java.Lang.Object, IOnCompleteListener
     {
         private TaskCompletionSource<(bool, object)> _tcs;
-        private string Type;
+        private Type ReturnType;
         private string Username;
         private CUser currentUser;
 
         ListenerHelper Helper = new ListenerHelper();
+      
 
-
-        public OnCompleteListener(TaskCompletionSource<(bool, object)> tcs, string type, string username = "")
+        public OnCompleteListener(TaskCompletionSource<(bool, object)> tcs, Type returnType, string username = "")
         {
             _tcs = tcs;
-            Type = type;
+            ReturnType = returnType;
             Username = username;
             if(CurrentUser != null)
             {
@@ -44,21 +45,21 @@ namespace Encrypted_Messaging_App.Droid.Resources
         // When get() request is completed
         public void OnComplete(Android.Gms.Tasks.Task task)
         {
-            if (!task.IsSuccessful) { HandleError($"Unable to complete task   (Type={Type})");  return; }
+            if (!task.IsSuccessful) { HandleError($"Unable to complete task   (Type={ReturnType.Name})");  return; }
 
             var result = task.Result;
 
             if (result is DocumentSnapshot doc)
             {
-                _tcs.TrySetResult(Helper.ParseObject(Type, doc));
+                _tcs.TrySetResult(Helper.ParseObject2(doc, ReturnType));
             } 
             else if (result is QuerySnapshot collection)
             {
-                if (collection.IsEmpty) { HandleError($"No docs found for: {Type}"); return; }
+                if (collection.IsEmpty) { HandleError($"No docs found for: {ReturnType.Name}"); return; }
 
-                _tcs.TrySetResult(Helper.ParseObject(Type, collection.Documents.ToArray()));
+                _tcs.TrySetResult(Helper.ParseObject2(collection.Documents.ToArray(), ReturnType));
             }
-            else { HandleError($"Result isn't a document or collection: objectType={result.GetType()}  Type={Type}"); return; }
+            else { HandleError($"Result isn't a document or collection: objectType={result.GetType()}  Type={ReturnType.Name}"); return; }
         }
 
         private void HandleError(string errorMsg)

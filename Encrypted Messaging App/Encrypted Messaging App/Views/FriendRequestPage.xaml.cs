@@ -22,7 +22,7 @@ namespace Encrypted_Messaging_App.Views
         IToastMessage toastMessage = DependencyService.Get<IToastMessage>();
 
         Request[] currentRequests;
-        
+        IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
 
         public FriendRequestPage()
         { 
@@ -140,10 +140,10 @@ namespace Encrypted_Messaging_App.Views
             // Add new Chat to firestore
             (bool success, string message) result = await newChat.initiliseChatFirestore();
             if (!result.success) { DebugManager.ErrorToast("Unable to create new chat", $"Can't initilise chat: {result.message}"); return; }
-            newChat.initiliseListener();
+            //newChat.initiliseListener();
             result = await newChat.addToUserFirestore(CurrentUser.Id);
             if (!result.success) { DebugManager.ErrorToast("Unable to create new chat", $"Can't add ChatID to user: {result.message}"); return; }
-
+            // TODO: Delete chat object (another is created)
 
 
             // TODO: AcceptedRequest to UserA  with chatID   (delete Request)
@@ -172,7 +172,7 @@ namespace Encrypted_Messaging_App.Views
 
             //(bool success, object user) user_result = await DependencyService.Resolve<IManageFirestoreService>().GetUserFromUsername(usernameEntry.Text);
             Console.WriteLine($"Fetching UserID of: {usernameEntry.Text}");
-            (bool success, object user) user_result = await DependencyService.Resolve<IManageFirestoreService>().FetchData("UserFromUsername", ("USERNAME", usernameEntry.Text)); //new Dictionary<string, string>{ { "USERNAME", usernameEntry.Text } }
+            (bool success, object user) user_result = await FirestoreService.FetchData<User>("UserFromUsername", ("USERNAME", usernameEntry.Text)); //new Dictionary<string, string>{ { "USERNAME", usernameEntry.Text } }
             if (!user_result.success)
             {
                 toastMessage.LongAlert($"Couldn't find user {usernameEntry.Text}");

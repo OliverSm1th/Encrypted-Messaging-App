@@ -111,8 +111,9 @@ namespace Encrypted_Messaging_App
     {
         public KeyData encryptionInfo { get; set; }
         public string title { get; set; }
-        public User[] users { get; set; }
-        public List<Message> messages { get; set; }
+        public User[] users;
+        public string[] userIDs { get; set; }
+        public Message[] messages { get; set; }
         public string Id;
 
         private BigInteger encryptionKey;
@@ -128,14 +129,30 @@ namespace Encrypted_Messaging_App
         {
             encryptionInfo = chatEncryptInfo;
             users = chatUsers;
+            userIDs = new string[chatUsers.Length];
+            for (int i=0; i<chatUsers.Length; i++)
+            {
+                userIDs[i] = chatUsers[i].Id;
+            }
             encryptionKey = chatEncryptKey;
-            messages = new List<Message>();
+            messages = new Message[] { };
             title = "";
         }
 
-        public void GetFromServer(string chatID)
+        public void SetID(string chatID)
         {
             Id = chatID;
+        }
+        public async Task<bool> GetFromServer()
+        {
+            if (Id != null)
+            {
+                (bool success, object result)response = await FirestoreService.FetchData<Chat>("Chat", arguments: ("CHATID", Id));
+                if (!response.success) { return false; }
+                updateChat((Chat)response.result);
+                return true;
+            }
+            return false;
         }
 
 
@@ -163,18 +180,18 @@ namespace Encrypted_Messaging_App
 
         public async Task<(bool, string)> addToUserFirestore(string CUserID)
         {
-            (bool success, string message) result = await FirestoreService.AddToArray(CUserID, FirestoreService.GetPath("CUser")+"/chatsID");
+            (bool success, string message) result = await FirestoreService.AddToArray(Id, FirestoreService.GetPath("CUser")+"/chatsID");
             return result;
         }
 
         
         
         // Listeners:
-        public bool initiliseListener()
+        public bool initiliseListener(bool ignoreFirst)
         {
             if(Id != null)
             {
-                FirestoreService.ListenData("Chat", (result) => updateChat((Chat)result), arguments:("CHATID", Id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                FirestoreService.ListenData<Chat>("Chat", (result) => updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments:("CHATID", Id));  //new Dictionary<string, string> { { "CHATID", Id } }
                 return true;
             }
             return false;
@@ -190,6 +207,7 @@ namespace Encrypted_Messaging_App
         {
             messages = newChat.messages;
             users = newChat.users;
+            userIDs = newChat.userIDs;
             title = newChat.title;
         }
         private bool propertiesDefined()

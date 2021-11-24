@@ -19,6 +19,7 @@ using Android.Gms.Extensions;
 using Encrypted_Messaging_App.Droid.Resources;
 using Java.Util;
 using System.Reflection;
+using static Encrypted_Messaging_App.LoggerService;
 
 [assembly: Dependency(typeof(Encrypted_Messaging_App.Droid.ManageFirestoreService))]
 
@@ -26,8 +27,8 @@ using System.Reflection;
 namespace Encrypted_Messaging_App.Droid
 {
     class ManageFirestoreService : IManageFirestoreService
-    {
-        // Main manager for everything firestore
+    { // Main manager for everything firestore
+
         private Dictionary<string, string> firestorePaths = new Dictionary<string, string>
         {
             {"Requests", $"requests/pending/[USERID]" },
@@ -35,12 +36,14 @@ namespace Encrypted_Messaging_App.Droid
             {"CUser", $"users/[USERID]" },
             {"UserFromUsername", $"usersPublic/<USERNAME>" },
             {"UserFromId", $"usersPublicID/<USERID>" },
-            {"Chat", $"chats/<CHATID>" }
+            {"Chat", $"chats/<CHATID>" },
+            {"ChatsID", $"users/[USERID]/chatsID" }
         };
 
         private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string[] pathLevels)
         {
-            if(pathLevels==null || pathLevels.Length == 0) { return (false, null, null); }
+            if (pathLevels == null || pathLevels.Length == 0) { return (false, null, null); }
+
 
             CollectionReference collection = FirebaseFirestore.Instance.Collection(pathLevels[0]);
             DocumentReference document = null;
@@ -67,15 +70,31 @@ namespace Encrypted_Messaging_App.Droid
         }
 
 
-        public string GetPath(string type, params (string, string)[] arguments)
+        public string GetPath(string pathInfo, params (string, string)[] arguments)
         {
+            
+            if (pathInfo.Split("/").Length > 1)   // Allows you to do:  CUser/chatsID
+            {
+                Debug($"Splitting path: {pathInfo}", 1, true);
+                string[] pathParts = pathInfo.Split("/");
+                string pathPt1 = GetPath(pathParts[0], arguments);
+                string pathPt2 = GetPath(string.Join("/", pathParts.Skip(1).ToArray()));
+                if (pathPt1 == null || pathPt2 == null) { Error("Splitting path failed", 1); return null; }
+                else { return pathPt1 + "/" + pathPt2; }
+            } 
+
+
+            string type = pathInfo;
             Dictionary<string, string> dictArgs = arguments.ToDictionary(arg => arg.Item1, arg => arg.Item2);
+
             if (!firestorePaths.ContainsKey(type) || firestorePaths[type] == null)
             {
-                Console.WriteLine($"Invalid type passed: {type}");
-                return null;
+                Error($"Invalid type passed: {type}, can't get path", 1);
+                return parseLevelArgument(type, dictArgs);
             }
 
+
+            
             string[] pathLevels = firestorePaths[type].Split("/");
             for (int i=0; i<pathLevels.Length; i++)
             {
@@ -84,7 +103,7 @@ namespace Encrypted_Messaging_App.Droid
                 if(pathLevels[i] == null)     { return null; }
                 if(pathLevels[i].Length == 0) { pathLevels = pathLevels.Where((s, index) => index!=i).ToArray(); ; i--; }
             }
-            Console.WriteLine($"Path generated: {type} -> {string.Join("/", pathLevels)}");
+            Debug($"Path generated: {type} -> {string.Join("/", pathLevels)}", 1);
             return string.Join("/", pathLevels);
         }
         private string parseLevelArgument(string levelName, Dictionary<string, string> arguments)
@@ -93,8 +112,8 @@ namespace Encrypted_Messaging_App.Droid
             {
                 levelName = levelName.TrimStart('<').TrimEnd('>');
 
-                if (arguments == null) { Console.WriteLine($"No Arguments have been set (Expecting {levelName})"); return null; }
-                else if (!arguments.ContainsKey(levelName)) { Console.WriteLine($"Missing Argument: {levelName}"); return null; }
+                if (arguments == null) { Error($"No Arguments have been set (Expecting {levelName})", 1); return null; }
+                else if (!arguments.ContainsKey(levelName)) { Error($"Missing Argument: {levelName}", 1); return null; }
                 else
                 {
                     levelName = arguments[levelName];
@@ -109,7 +128,7 @@ namespace Encrypted_Messaging_App.Droid
                 }
                 else
                 {
-                    Console.WriteLine($"Unrecognised automatic argument: {levelName}");
+                    Error($"Unrecognised automatic argument: {levelName}", 1);
                 }
             }
             return levelName;
@@ -117,19 +136,23 @@ namespace Encrypted_Messaging_App.Droid
 
 
 
-           //   GET:
-        public Task<(bool, object)> FetchData(string type, params (string, string)[] arguments)
+        //   GET:
+        public Task<(bool, object)> FetchData<returnType>(string pathInfo, params (string, string)[] arguments)
         {
-            Console.WriteLine($"Fetching Data for {type}:");
+            Debug($"Fetching Data for {pathInfo}:", 0, true);
             var tcs = new TaskCompletionSource<(bool, object)>();
 
-            string path = GetPath(type, arguments);
+            string path = GetPath(pathInfo, arguments);
+            string fieldName = null;
             if (path is null)
             {
-                tcs.TrySetResult((false, $"Invalid type passed: {type}"));
+                tcs.TrySetResult((false, $"Invalid type passed: {pathInfo}, can't fetch data"));
                 return tcs.Task;
             }
-
+            if (isFieldType(typeof(returnType)))
+            {
+                fieldName = popFieldName(ref path);
+            }
 
             (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
             if (!reference.success)
@@ -138,8 +161,8 @@ namespace Encrypted_Messaging_App.Droid
             }
             else
             {
-                if (reference.collection == null) { reference.document.Get().AddOnCompleteListener(new OnCompleteListener(tcs, type));   }
-                else                              { reference.collection.Get().AddOnCompleteListener(new OnCompleteListener(tcs, type)); }
+                if (reference.document != null) { reference.document.Get().AddOnCompleteListener(new OnCompleteListener(tcs, typeof(returnType)));   }
+                else                              { reference.collection.Get().AddOnCompleteListener(new OnCompleteListener(tcs, typeof(returnType))); }
             }
             return tcs.Task;
 
@@ -148,23 +171,32 @@ namespace Encrypted_Messaging_App.Droid
         // Common:
         public async Task<User> UserFromId(string id) 
         {
-            (bool success, object user) response = await FetchData("UserFromId", ("USERID", id));  //new Dictionary<string, string> { { "USERID", id } }
+            (bool success, object user) response = await FetchData<User>("UserFromId", ("USERID", id));  //new Dictionary<string, string> { { "USERID", id } }
 
             return response.success ? (User)response.user : null;
         }
         public async Task<User> UserFromUsername(string username)
         {
-            (bool success, object user) response = await FetchData("UserFromUsername", ("USERNAME", username)); //new Dictionary<string, string> { { "USERID", username } }
+            (bool success, object user) response = await FetchData<User>("UserFromUsername", ("USERNAME", username)); //new Dictionary<string, string> { { "USERID", username } }
 
             return response.success ? (User)response.user : null;
         }
 
 
+
+
         // Listeners:
-        private List<IListenerRegistration> Liseners = new List<IListenerRegistration>();
-        public bool ListenData(string type, Action<object> action, string changeType = null, bool ignoreInitialEvent = false, params (string, string)[] arguments) //Dictionary<string, string> arguments = null
+        private List<IListenerRegistration> Listeners = new List<IListenerRegistration>();
+        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, bool ignoreInitialEvent = false, params (string, string)[] arguments) //Dictionary<string, string> arguments = null
         {
-            string path = GetPath(type, arguments);
+            Debug($"Listening Data for {pathInfo}:", 0, true);
+            string path = GetPath(pathInfo, arguments);
+            string fieldName = null;
+
+            if (isFieldType(typeof(returnType)))
+            {
+                fieldName = popFieldName(ref path);
+            }
             if(path is null) { return false; }
             DocumentChange.Type ChangeType = getDocChangeType(changeType);
 
@@ -173,14 +205,14 @@ namespace Encrypted_Messaging_App.Droid
 
             if (reference.success)
             {
-                if (!(reference.document is null)) { 
-                    Liseners.Add(reference.document.AddSnapshotListener(new EventListener(type, action, ChangeType, ignoreInitialEvent))); 
-                } else { 
-                    Liseners.Add(reference.collection.AddSnapshotListener(new EventListener(type, action, ChangeType, ignoreInitialEvent))); 
-                } return true;
+                IListenerRegistration currListenerReg;
+                if (reference.document != null) { currListenerReg = reference.document.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, ignoreInitialEvent, fieldName));
+                } else {                          currListenerReg = reference.collection.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, ignoreInitialEvent, fieldName)); }
+                Listeners.Add(currListenerReg);
+                return true;
             } else 
             {
-                Console.WriteLine($"Invalid path: {path}");
+                Error($"Invalid path: {path}");
                 return false;
             }
         }
@@ -194,7 +226,7 @@ namespace Encrypted_Messaging_App.Droid
 
         public void RemoveListeners()
         {
-            foreach(IListenerRegistration listener in Liseners)
+            foreach(IListenerRegistration listener in Listeners)
             {
                 listener.Remove();
             }
@@ -202,6 +234,21 @@ namespace Encrypted_Messaging_App.Droid
 
 
 
+        private bool isFieldType(Type returnType)
+        {
+            return returnType.Namespace.StartsWith("System") || (returnType.IsArray && returnType.GetElementType().Namespace.StartsWith("System"));
+        }
+        private string popFieldName(ref string inputPath)
+        {
+            string[] inputArray = inputPath.Split("/");
+
+            List<string> inputList = inputArray.ToList();
+            string removedValue = inputArray[inputArray.Length - 1];
+            inputList.RemoveAt(inputArray.Length - 1);
+            inputPath = string.Join('/', inputList.ToArray());
+
+            return removedValue;
+        }
 
            //   SET:
         public async Task<(bool, string)> WriteObject(object obj, string path)
@@ -264,29 +311,12 @@ namespace Encrypted_Messaging_App.Droid
             }
         }
 
-        /*
-        public async Task<(bool, string)> InitiliseChat(Chat chat) //User[] users
-        {
-            HashMap map = GetMap(chat);
-
-
-            CollectionReference collection = FirebaseFirestore.Instance.Collection("chats");
-            try
-            {
-                DocumentReference doc = (DocumentReference) await collection.Add(map);
-                return (true, doc.Id);
-            }
-            catch(Exception e)
-            {
-                return (false, e.Message);
-            }
-        }*/
 
         // Test to see if the WriteObject function works, will be implemented in the actual classes if works.
         public async Task<(bool, string)> InitiliseChat(Chat chat)
         {
-            // Expected: (bool success, string newChatID)
-            return await WriteObject(chat,  GetPath("Chat", ("CHATID", ""))  );
+            (bool success, string newChatID) result = await WriteObject(chat, GetPath("Chat", ("CHATID", "")));
+            return result;  // Check if success=True
         }
 
         public async Task<(bool, string)> SendAcceptedRequest(string requestUserID, AcceptedRequest ARequest)
@@ -304,10 +334,10 @@ namespace Encrypted_Messaging_App.Droid
             try
             {
                 await userPendingRequests.Delete();
-                Console.WriteLine($"Deleted Pending Request for id:{FirebaseAuth.Instance.CurrentUser.Uid}");
+                Debug($"Deleted Pending Request for id:{FirebaseAuth.Instance.CurrentUser.Uid}");
 
                 await userAcceptedRequests.Set(acceptMap);
-                Console.WriteLine($"Added Accepted Request for id:{requestUserID}");
+                Debug($"Added Accepted Request for id:{requestUserID}");
                 return (true, "");
             } catch(Exception e)
             {
@@ -327,7 +357,7 @@ namespace Encrypted_Messaging_App.Droid
             try
             {
                 await userCollection.Document(request.SourceUser.Id).Set(pendingRequest);
-                Console.WriteLine("Added Pending Request");
+                Debug("Added Pending Request");
                 return (true, "");
             } catch(Exception e)
             {
@@ -355,9 +385,9 @@ namespace Encrypted_Messaging_App.Droid
         {
             List<string> pathLevels = path.Split('/').ToList();
             string fieldLevel = PopFromList(ref pathLevels, -1);
-            (bool invalidPath, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
+            (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(pathLevels.ToArray());
 
-            if (reference.invalidPath)
+            if (!reference.success)
             {
                 return (false, $"Invalid path given: {path}");
             }
@@ -398,55 +428,59 @@ namespace Encrypted_Messaging_App.Droid
         // Utility functions
         private HashMap GetMap(object obj) // Converts any object into a hashmap for saving to firestore
         {
+            // Organising Output Logs
             string parentMethodName = (new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name;
             string indent = "";
             if(parentMethodName == "GetMap") { indent = "     ";  }
-            Console.WriteLine($"{indent}Converting {obj.GetType()} to HashMap...");
+            Debug($"{indent}Converting {obj.GetType()} to HashMap...");
+
             
             HashMap map = new HashMap();
             foreach (PropertyInfo prop in obj.GetType().GetProperties())
             {
                 var propValue = prop.GetValue(obj, null);
-                if(propValue == null) { Console.WriteLine($"{prop} is not defined in {obj.GetType()}"); }
+                if(propValue == null) { Error($"{prop} is not defined in {obj.GetType()}", 1); }
                 Type type = propValue.GetType();
 
-                
-                if (type.IsArray) // || type.GetGenericTypeDefinition() == typeof(List<>)
+                // Contains other objects
+                if (type.IsArray || type.IsGenericType)
                 {
-                    if(type.GetGenericTypeDefinition() == typeof(List<>)) { propValue = ((List<object>)propValue).ToArray(); }
+                    bool isGenericListType = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>);
+                    if (isGenericListType && propValue is List<object> propList) { propValue = propList.ToArray(); }
+
+
                     JavaList<HashMap> arrayMap = new JavaList<HashMap>();
                     int index = 0;
                     foreach (var item in (object[])propValue){
                         if (item is string str_item) {
-                            Console.WriteLine($"{indent}{index}: {str_item}"); }
+                            Debug($"{indent}{index}: {str_item}", 1);
+                            arrayMap.Add(str_item);
+                        }
                         else {
-                            Console.WriteLine($"{indent}{index}: {item.GetType()}"); }
+                            Debug($"{indent}{index}: {item.GetType()}", 1);
+                            arrayMap.Add(GetMap(item));
+                        }
 
-                        arrayMap.Add(GetMap(item));
+                        
                         index++;
                     }
                     map.Put(prop.Name, arrayMap);
                 }
+                // Is a base object
                 else if (!type.Namespace.StartsWith("System"))
                 {
-                    Console.WriteLine($"{indent}{prop.Name}: ");
-                    //foreach (PropertyInfo testProp in prop.GetType().GetProperties())
-                    //{
-                    //    Console.WriteLine($"Inner: {testProp.Name}:{testProp.GetValue(prop, null).ToString()}");
-                    //}
+                    Debug($"{indent}{prop.Name}: ", 1);
                     map.Put(prop.Name, GetMap(propValue));
-
-                    Console.WriteLine("\n");
                 }
                 else
                 {
-                    Console.WriteLine($"{indent}{prop.Name}:{propValue.ToString()}");
+                    Debug($"{indent}{prop.Name}:{propValue}", 1);
                     map.Put(prop.Name, propValue.ToString());
                 }
             }
             if(obj.GetType().GetProperties().Length == 0)
             {
-                Console.WriteLine($"No properties found of object of type: {obj.GetType().ToString()}");
+                Debug($"No properties found of object of type: {obj.GetType()}", 1);
             }
             return map;
         }

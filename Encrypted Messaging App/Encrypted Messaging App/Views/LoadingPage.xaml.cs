@@ -29,7 +29,7 @@ namespace Encrypted_Messaging_App.Views
 
             // Get messages from firestore
             IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
-            Task<(bool success, object result)> TResponse = FirestoreService.FetchData("CUser");
+            Task<(bool success, object result)> TResponse = FirestoreService.FetchData<CUser>("CUser");
 
             var response = await TResponse;
             if (response.success)

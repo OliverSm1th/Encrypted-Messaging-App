@@ -6,9 +6,9 @@ namespace Encrypted_Messaging_App
 {
     public class Message
     {
-        public Message(string content)
+        public Message(string p_content)
         {
-            content = content;
+            content = p_content;
             createdTime = DateTime.Now;
 
 

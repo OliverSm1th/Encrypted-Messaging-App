@@ -61,7 +61,7 @@ namespace Encrypted_Messaging_App
                 SQLiteService.ChatKeys.Set(newChatID, DH.getSharedKey(EncryptionInfo).ToString());
                 
                 Chat newChat = new Chat();
-                newChat.GetFromServer(newChatID);
+                newChat.SetID(newChatID);
                 await newChat.addToUserFirestore(CurrentUser.Id);
 
             }
