@@ -62,6 +62,11 @@ namespace Encrypted_Messaging_App.Views
                 noChatLabel.IsVisible = true;
             }
         }
+        public void RefreshChats(object sender)
+        {
+            CurrentUser.Output();
+        }
+
 
         public void ChatTapped(object sender, EventArgs e)
         {

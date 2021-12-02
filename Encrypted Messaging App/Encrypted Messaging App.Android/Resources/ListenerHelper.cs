@@ -61,7 +61,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
         }
 
 
-        public (bool, object) ParseObject(string objectName, object input)
+        /*public (bool, object) ParseObject(string objectName, object input)
         {
             string methodName = "Parse" + objectName;
             MethodInfo helperMethod = this.GetType().GetMethod(methodName);
@@ -87,7 +87,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             }
             return (false, "Invalid type/params given to ParseObject");
         }
-
+        */
 
         private T ToObject<T>(JavaDictionary dict) where T : class, new() // WARNING: Also update EventListener Version
         {
@@ -178,6 +178,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
 
         // User
+        /*
         public (bool, object) ParseCUser(DocumentSnapshot doc)
         {
             // Private user info: chatsID
@@ -199,7 +200,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             }
             catch (Exception e)
             {
-                Error($"Failed settings values: {e.Message}");
+                //Error($"Failed settings values: {e.Message}");
                 return (false, "Failed to get user");
             }
         }
@@ -322,20 +323,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return (false, "Failed to get chats");
             }
         }
-        public (bool, object) ParseMessage(object messageObj)
-        {
-            // Content
-            //if (messageObj.)
-            //{
-
-            //}
-            // Times
-
-            // Author
-
-            // Recipient
-            return (false, "");
-        }
+        
 
         // Request
         public (bool, object) ParseRequests(DocumentSnapshot[] docs)
@@ -351,6 +339,85 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if (request != null) { requests.Add(request); }
             }
             return (true, requests.ToArray());
+        }
+       
+
+        public (bool, object) ParseAcceptRequests(DocumentSnapshot[] docs)
+        {
+            List<AcceptedRequest> requests = new List<AcceptedRequest>();
+
+            foreach (DocumentSnapshot doc in docs)
+            {
+                JavaDictionary data = (JavaDictionary)doc.Data;
+                AcceptedRequest request = ParseARequest(data);
+                if (request != null) { requests.Add(request); }
+                doc.Reference.Delete();
+            }
+            return (true, requests.ToArray());
+        }
+        */
+        //-------------------//
+
+
+        // Version 2.0
+
+        public (bool, object) ParseObject(object input, Type expectedType)
+        {
+            Debug($"Parsing: {expectedType.Name}", includeMethod: true, indentationLvl: 1);
+            if (!returnTypes.ContainsKey(expectedType))
+            {
+                Error($"Unexpected type {expectedType.Name}", indentationLvl: 2);
+                return (false, $"Type to convert to {expectedType.Name} not in Helper Method (2)");
+            }
+
+            string methodName = returnTypes[expectedType];
+
+            MethodInfo helperMethod = this.GetType().GetMethod(methodName);
+
+            bool valid = true;
+            if (helperMethod == null)
+            {
+                Error($"Unexpected type {methodName} for Helper Method (not included)", 2); valid = false;
+            }
+            else if (helperMethod.GetParameters().Length == 0)
+            {
+                Error($"No parameters specified for target method ({methodName})", 2); valid = false;
+            }
+            else if (helperMethod.GetParameters()[0].ParameterType != input.GetType())
+            {
+                Error($"Expected Parameter Type: {this.GetType().GetMethod(methodName).GetParameters()[0]}\nParameter Type Provided: {input.GetType()}  ({methodName})", 2); valid = false;
+            }
+
+            if (valid)
+            {
+                Debug($"{expectedType.Name}- Invoking method: {helperMethod.Name}", 1);
+                object resultFromMethod = helperMethod.Invoke(this, new object[] { input });
+
+                (bool, object) result = CovertReturnedTuple((ITuple)resultFromMethod);
+                Debug($"{expectedType.Name}- Received result from method: ({result.Item1}, {result.Item2})", 2);
+
+                return result;
+            }
+            else
+            {
+                return (false, "Invalid type/params given to ParseObject");
+            }
+        }
+
+
+        public (ParseStatus, Request[]) ParseRequests(DocumentSnapshot[] docs)
+        {
+            List<Request> requests = new List<Request>();
+
+            foreach (DocumentSnapshot doc in docs)
+            {
+                var t_data = doc.Data;
+
+                JavaDictionary data = (JavaDictionary)t_data;
+                Request request = ParseRequest(data);
+                if (request != null) { requests.Add(request); }
+            }
+            return (new ParseStatus(true), requests.ToArray());
         }
         private Request ParseRequest(JavaDictionary data)
         {
@@ -372,7 +439,8 @@ namespace Encrypted_Messaging_App.Droid.Resources
             return null;
         }
 
-        public (bool, object) ParseAcceptRequests(DocumentSnapshot[] docs)
+
+        public (ParseStatus, AcceptedRequest[]) ParseAcceptRequests(DocumentSnapshot[] docs)
         {
             List<AcceptedRequest> requests = new List<AcceptedRequest>();
 
@@ -383,7 +451,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if (request != null) { requests.Add(request); }
                 doc.Reference.Delete();
             }
-            return (true, requests.ToArray());
+            return (new ParseStatus(true), requests.ToArray());
         }
         private AcceptedRequest ParseARequest(JavaDictionary data)
         {
@@ -401,80 +469,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return null;
             }
         }
-        //-------------------//
-
-
-        // Version 2.0
-
-        public (bool, object) ParseObject2(object input, Type expectedType)
-        {
-            Debug($"Parsing: {expectedType.Name}", includeMethod: true, indentationLvl: 1);
-            if (!returnTypes.ContainsKey(expectedType))
-            {
-                Error($"Unexpected type {expectedType.Name}", indentationLvl: 2);
-                return (false, $"Type to convert to {expectedType.Name} not in Helper Method (2)");
-            }
-
-            string methodName = returnTypes[expectedType];
-
-            MethodInfo helperMethod = this.GetType().GetMethod(methodName);
-
-            bool valid = true;
-            if (helperMethod == null) {
-                Error($"Unexpected type {methodName} for Helper Method (not included)", 2); valid = false;
-            }  else if (helperMethod.GetParameters().Length == 0) {
-                Error($"No parameters specified for target method ({methodName})", 2); valid = false;
-            } else if (helperMethod.GetParameters()[0].ParameterType != input.GetType()) {
-                Error($"Expected Parameter Type: {this.GetType().GetMethod(methodName).GetParameters()[0]}\nParameter Type Provided: {input.GetType()}  ({methodName})", 2); valid = false;
-            }
-            
-
-
-            if (valid)
-            {
-                Debug($"{expectedType.Name}- Invoking method: {helperMethod.Name}", 1);
-                object resultFromMethod = helperMethod.Invoke(this, new object[] { input });
-
-                (bool, object) result = CovertReturnedTuple((ITuple)resultFromMethod);
-                Debug($"{expectedType.Name}- Received result from method: ({result.Item1}, {result.Item2})", 2);
-
-                return result;
-            }
-            else
-            {
-                return (false, "Invalid type/params given to ParseObject");
-            }
-        }
-
-
-        public (ParseStatus, Request[]) ParseRequests2(DocumentSnapshot[] docs)
-        {
-            List<Request> requests = new List<Request>();
-
-            foreach (DocumentSnapshot doc in docs)
-            {
-                var t_data = doc.Data;
-
-                JavaDictionary data = (JavaDictionary)t_data;
-                Request request = ParseRequest(data);
-                if (request != null) { requests.Add(request); }
-            }
-            return (new ParseStatus(true), requests.ToArray());
-        }
-        public (ParseStatus, AcceptedRequest[]) ParseAcceptRequests2(DocumentSnapshot[] docs)
-        {
-            List<AcceptedRequest> requests = new List<AcceptedRequest>();
-
-            foreach (DocumentSnapshot doc in docs)
-            {
-                JavaDictionary data = (JavaDictionary)doc.Data;
-                AcceptedRequest request = ParseARequest(data);
-                if (request != null) { requests.Add(request); }
-                doc.Reference.Delete();
-            }
-            return (new ParseStatus(true), requests.ToArray());
-        }
-        public (ParseStatus, Chat) ParseChat2(DocumentSnapshot doc)
+        public (ParseStatus, Chat) ParseChat(DocumentSnapshot doc)
         {
             List<Message> messages = new List<Message>();
             List<User> users = new List<User>();
@@ -528,7 +523,21 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return (new ParseStatus(false, "Failed to get chats"), null);
             }
         }
-        public (ParseStatus, CUser) ParseCUser2(DocumentSnapshot doc)
+        public (bool, object) ParseMessage(object messageObj)
+        {
+            // Content
+            //if (messageObj.)
+            //{
+
+            //}
+            // Times
+
+            // Author
+
+            // Recipient
+            return (false, "");
+        }
+        public (ParseStatus, CUser) ParseCUser(DocumentSnapshot doc)
         {
             // Private user info: chatsID
 
@@ -572,14 +581,13 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 }
                 else
                 {
-                    Error("Invalid User object given: Id-"+doc.Id);
+                    return (new ParseStatus(false, "Invalid user object given"), null);
                 }
 
                 return (new ParseStatus(true), user);
             }
             catch (Exception e)
             {
-                Error($"Failed settings values: {e.Message}");
                 return (new ParseStatus(false, "Failed to get user"), null);
             }
         }
@@ -592,11 +600,12 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return (new ParseStatus(true), ConvertObjArr(result));
             } catch(Exception e)
             {
-                Error($"Unable to parseEnumerator: {list.Count}");
+                //Error($"Unable to parseEnumerator: {list.Count}");
                 return (new ParseStatus(false, "Failed to ParseEnumerator"), null);
             }
         }
 
+        // 
         public object[] ParseEnumerator(IEnumerator enumerator, int length)
         {
             // Enumerator -> Object[]

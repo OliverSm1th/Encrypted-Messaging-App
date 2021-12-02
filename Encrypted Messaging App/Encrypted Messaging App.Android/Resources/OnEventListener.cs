@@ -50,13 +50,14 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             if (obj is DocumentSnapshot doc)          // Chat/ChatID
             {
+                if(doc.Data == null) { OnEventMethod(null); return; }
                 if(FieldName == null) {
-                    response = Helper.ParseObject2(doc, EventType);
+                    response = Helper.ParseObject(doc, EventType);
                 }
                 else
                 {
                     object field = doc.Get(FieldName);
-                    response = Helper.ParseObject2(field, EventType);
+                    response = Helper.ParseObject(field, EventType);
                 }
             } 
             else if(obj is QuerySnapshot collection)
@@ -66,7 +67,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 }
                 DocumentSnapshot[] docs = GetFilteredDocs(collection);
                 
-                response = Helper.ParseObject2(docs, EventType);    
+                response = Helper.ParseObject(docs, EventType);    
             }
             else
             {

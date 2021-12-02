@@ -18,3 +18,24 @@ D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Mes
 D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ForgotPasswordPage.xaml.g.cs
 D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\LoadingPage.xaml.g.cs
 D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\FriendRequestPage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\Encrypted Messaging App.deps.json
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\Encrypted Messaging App.dll
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\ref\Encrypted Messaging App.dll
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\bin\Debug\netstandard2.0\Encrypted Messaging App.pdb
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.csproj.AssemblyReference.cache
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\App.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\AppShell.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ForgotPasswordPage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\FriendRequestPage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\LoadingPage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\LoginPage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\MainMessagePage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\RegisterPage.xaml.g.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.AssemblyInfoInputs.cache
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.AssemblyInfo.cs
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.csproj.CoreCompileInputs.cache
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\XamlC.stamp
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.dll
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\ref\Encrypted Messaging App.dll
+C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.pdb

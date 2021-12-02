@@ -25,17 +25,15 @@ namespace Encrypted_Messaging_App.Droid.Resources
     {
         private TaskCompletionSource<(bool, object)> _tcs;
         private Type ReturnType;
-        private string Username;
         private CUser currentUser;
 
         ListenerHelper Helper = new ListenerHelper();
       
 
-        public OnCompleteListener(TaskCompletionSource<(bool, object)> tcs, Type returnType, string username = "")
+        public OnCompleteListener(TaskCompletionSource<(bool, object)> tcs, Type returnType)
         {
             _tcs = tcs;
             ReturnType = returnType;
-            Username = username;
             if(CurrentUser != null)
             {
                 currentUser = CurrentUser;
@@ -51,13 +49,14 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             if (result is DocumentSnapshot doc)
             {
-                _tcs.TrySetResult(Helper.ParseObject2(doc, ReturnType));
+                if(doc.Data == null) { _tcs.TrySetResult((false, "Invalid document path")); }
+                _tcs.TrySetResult(Helper.ParseObject(doc, ReturnType));
             } 
             else if (result is QuerySnapshot collection)
             {
                 if (collection.IsEmpty) { HandleError($"No docs found for: {ReturnType.Name}"); return; }
 
-                _tcs.TrySetResult(Helper.ParseObject2(collection.Documents.ToArray(), ReturnType));
+                _tcs.TrySetResult(Helper.ParseObject(collection.Documents.ToArray(), ReturnType));
             }
             else { HandleError($"Result isn't a document or collection: objectType={result.GetType()}  Type={ReturnType.Name}"); return; }
         }
