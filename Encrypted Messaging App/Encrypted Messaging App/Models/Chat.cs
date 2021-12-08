@@ -9,6 +9,7 @@ using Encrypted_Messaging_App.Views;
 using Encrypted_Messaging_App.Services;
 using System.Linq;
 using System.Reflection;
+using static Encrypted_Messaging_App.LoggerService;
 
 namespace Encrypted_Messaging_App
 {
@@ -114,7 +115,7 @@ namespace Encrypted_Messaging_App
         public User[] users;
         public string[] userIDs { get; set; }
         public Message[] messages { get; set; }
-        public string Id;
+        public string id { get; set; }
 
         private BigInteger encryptionKey;
 
@@ -141,13 +142,13 @@ namespace Encrypted_Messaging_App
 
         public void SetID(string chatID)
         {
-            Id = chatID;
+            id = chatID;
         }
         public async Task<bool> GetFromServer()
         {
-            if (Id != null)
+            if (id != null)
             {
-                (bool success, object result)response = await FirestoreService.FetchData<Chat>("Chat", arguments: ("CHATID", Id));
+                (bool success, object result)response = await FirestoreService.FetchData<Chat>("Chat", arguments: ("CHATID", id));
                 if (!response.success) { return false; }
                 updateChat((Chat)response.result);
                 return true;
@@ -164,8 +165,8 @@ namespace Encrypted_Messaging_App
 
             if (result.success)
             {
-                Id = result.message;
-                Console.WriteLine($"Set id to: {Id}");
+                id = result.message;
+                Console.WriteLine($"Set id to: {id}");
             }
 
             return result;
@@ -173,14 +174,14 @@ namespace Encrypted_Messaging_App
 
         public async Task<(bool, string)> updateTitle(string newTitle)
         {
-            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, FirestoreService.GetPath("Chat", arguments: ("CHATID", Id))+"/Title");
+            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, FirestoreService.GetPath("Chat", arguments: ("CHATID", id))+"/Title");
             return result;
         }
 
 
         public async Task<(bool, string)> addToUserFirestore(string CUserID)
         {
-            (bool success, string message) result = await FirestoreService.AddToArray(Id, FirestoreService.GetPath("CUser")+"/chatsID");
+            (bool success, string message) result = await FirestoreService.AddToArray(id, FirestoreService.GetPath("CUser")+"/chatsID");
             return result;
         }
 
@@ -189,9 +190,9 @@ namespace Encrypted_Messaging_App
         // Listeners:
         public bool initiliseListener(bool ignoreFirst)
         {
-            if(Id != null)
+            if(id != null)
             {
-                FirestoreService.ListenData<Chat>("Chat", (result) => updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments:("CHATID", Id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                FirestoreService.ListenData<Chat>("Chat", (result) => updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments:("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
                 return true;
             }
             return false;
@@ -205,10 +206,18 @@ namespace Encrypted_Messaging_App
         // Private Methods:
         private void updateChat(Chat newChat)
         {
+            if(newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
             messages = newChat.messages;
+
             users = newChat.users;
+            if (newChat.users == null || newChat.users.Length < 2) { Error($"Invalid users retrieved for: {id}"); }
+            else if (newChat.userIDs.Length != newChat.users.Length) { Error($"Invalid users from userID for: {id}  ({userIDs.Length} userID vs {users.Length} users)"); }
+
             userIDs = newChat.userIDs;
+            if (newChat.userIDs == null || newChat.userIDs.Length < 2) { Error($"Invalid users retrieved for: {id}"); }
+
             title = newChat.title;
+            if(title == null || title.Length == 0) { title = generateDefaultTitle(); }
         }
         private bool propertiesDefined()
         {
@@ -222,6 +231,23 @@ namespace Encrypted_Messaging_App
                 }
             }
             return defined;
+        }
+        private string generateDefaultTitle()
+        {
+            string title = "";
+            foreach (User user in users)
+            {
+                title = title + user.Username + ", ";
+            }
+            if(users.Length > 0)
+            {
+                return title.Remove(title.Length - 2);
+            }
+            else
+            {
+                return "Empty Chat";
+            }
+            
         }
 
         

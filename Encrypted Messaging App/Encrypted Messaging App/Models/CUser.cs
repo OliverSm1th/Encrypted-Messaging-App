@@ -41,7 +41,7 @@ namespace Encrypted_Messaging_App
         public Action<object> chatsChangedAction;
         private async void addChat(string chatID)
         {
-            if (chats.Where(chat => chat.Id == chatID).ToArray().Length == 0)
+            if (chats.Where(chat => chat.id == chatID).ToArray().Length == 0)
             {
                 Chat newChat = new Chat();
                 newChat.SetID(chatID);
@@ -63,7 +63,7 @@ namespace Encrypted_Messaging_App
         }
         private void removeChat(string chatID)
         {
-            int removedNum = chats.RemoveAll(chat => { if (chat.Id == chatID) { chat.removeListener(); return true; } return false; });
+            int removedNum = chats.RemoveAll(chat => { if (chat.id == chatID) { chat.removeListener(); return true; } return false; });
 
 
             if (removedNum == 0) { DebugManager.ErrorSilent($"Can't remove Chat {chatID} from Chats: Doesn't exist"); }
@@ -219,13 +219,27 @@ namespace Encrypted_Messaging_App
             string chatIDMsg = "";
             if (chatsID != null && chatsID.Length != 0)
             {
-                foreach (string chat in chatsID)
+                foreach (string chatID in chatsID)
                 {
-                    chatIDMsg += chat + ", ";
+                    chatIDMsg += chatID + ", ";
                 }
-                Debug($"Chat ID's: {chatIDMsg.Trim().Trim(',')}", 1);
+                Debug($"     Chat ID's: {chatIDMsg.Trim().Trim(',')}", 1);
             }
             else { Debug("     Chat ID's:  None", 1); }
+
+            if(chats != null && chats.Count != 0)
+            {
+                Debug("     Chats: ");
+                foreach (Chat chat in chats)
+                {
+                    if (chat.title == null) { Error($"Chat title not defined for: {chat.id}"); }
+                    else if (chat.messages == null) { Error($"Chat Messages not defined for: {chat.id}"); }
+                    else if (chat.userIDs == null) { Error($"Chat UserIDs not defined for: {chat.id}"); }
+                    else { Debug($"          title:{chat.title}, id:{chat.id}, msgs:{chat.messages.Length} usrs:{chat.userIDs.Length}"); }
+                }
+            }
+            else { Debug("     Chats:  None"); }
+
 
 
             string requestMsg = "";

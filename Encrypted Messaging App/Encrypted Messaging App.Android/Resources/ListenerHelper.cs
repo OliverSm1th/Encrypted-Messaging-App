@@ -473,6 +473,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
         {
             List<Message> messages = new List<Message>();
             List<User> users = new List<User>();
+            List<string> userIDs = new List<string>();
 
             try
             {
@@ -496,24 +497,20 @@ namespace Encrypted_Messaging_App.Droid.Resources
                         }
                     }
                 }
-                if (doc.Get("users") != null)
+                if (doc.Get("userIDs") != null)
                 {
-                    JavaList usersObj = (JavaList)doc.Get("users");
+                    JavaList usersObj = (JavaList)doc.Get("userIDs");
 
-
-                    
                     object[] userArr = ParseJavaList(usersObj);
 
-                    //foreach (object user in userArr)
-                    //{
-                        //users.Add((string)user);
-                    //}
-
-
-
+                    foreach (object user in userArr)
+                    {
+                        userIDs.Add((string)user);
+                        
+                    }
                 }
 
-                Chat chat = new Chat { messages = messages.ToArray(), users = users.ToArray() };
+                Chat chat = new Chat { messages = messages.ToArray(), userIDs = userIDs.ToArray() };
 
                 return (new ParseStatus(true), chat);
             }

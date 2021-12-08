@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -30,7 +30,7 @@ namespace Encrypted_Messaging_App.Views
 
             Chat[] chats = CurrentUser.chats.ToArray();
             //DisplayChats(CurrentUser.chats.ToArray());
-            CurrentUser.chatsChangedAction = (newChats) => DisplayChats( (Chat[])newChats );
+            CurrentUser.chatsChangedAction = (newChats) => DisplayChats((Chat[])newChats);
         }
 
         protected override void OnDisappearing()
@@ -42,18 +42,20 @@ namespace Encrypted_Messaging_App.Views
         Chat[] currentChats;
         private void DisplayChats(Chat[] chats)
         {
-            if(chats == currentChats) { return; }
+            LoggerService.Log($"Displaying chats: length: {chats.Length}");
+            if (chats == currentChats) { return; }
             else { currentChats = chats; }
 
             Label noChatLabel = (Label)Content.FindByName("NoChats");
 
             ChatsCollection.Clear();
 
-            if(chats != null && chats.Length > 0)
+            if (chats != null && chats.Length > 0)
             {
-                for(int i=0; i < chats.Length; i++)
+                for (int i = 0; i < chats.Length; i++)
                 {
                     ChatsCollection.Add(chats[i]);
+                    Console.WriteLine($"{chats[i].id} chat has been added to list");
                 }
                 noChatLabel.IsVisible = false;
             }
@@ -62,9 +64,12 @@ namespace Encrypted_Messaging_App.Views
                 noChatLabel.IsVisible = true;
             }
         }
-        public void RefreshChats(object sender)
+
+        public void Refresh(object sender, EventArgs e)
         {
+            LoggerService.Log("Refreshing");
             CurrentUser.Output();
+            DisplayChats(CurrentUser.chats.ToArray());
         }
 
 

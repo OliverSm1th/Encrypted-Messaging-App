@@ -147,7 +147,7 @@ namespace Encrypted_Messaging_App.Views
 
 
             // TODO: AcceptedRequest to UserA  with chatID   (delete Request)
-            result  = await request.accept(newChat.Id);
+            result  = await request.accept(newChat.id);
             if (!result.success) { DebugManager.ErrorToast("Unable to  request", $"Send AcceptedRequest Failed: {result.message}"); }
         }
         public void DenyRequest(object sender, EventArgs e)
