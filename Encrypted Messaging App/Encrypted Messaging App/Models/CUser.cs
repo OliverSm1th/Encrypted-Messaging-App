@@ -39,7 +39,7 @@ namespace Encrypted_Messaging_App
 
         public List<Chat> chats = new List<Chat>();
         public Action<object> chatsChangedAction;
-        private async void addChat(string chatID)
+        private async Task addChat(string chatID)
         {
             if (chats.Where(chat => chat.id == chatID).ToArray().Length == 0)
             {
@@ -70,36 +70,43 @@ namespace Encrypted_Messaging_App
         }
         
 
+
         public string[] chatsID
         {
             get { return _chatsID; }
             set
             {
+                Log("chatID changed:");
                 // Syncs the chats to chatID, adds or removes chats accordingly
-                //if(value == null) { _chatsID = new string[0]; }
-                string[] addedChatsID = value.Except(_chatsID).ToArray();
-                string[] removedChatsID = _chatsID.Except(value).ToArray();
+                chatsIDSet(value);
 
-                _chatsID = value;
-
-                foreach (string chatID in removedChatsID)
-                {
-                    removeChat(chatID);
-                }
-                foreach (string chatID in addedChatsID)
-                {
-                    addChat(chatID);
-                }
-
-                if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
-                {
-                    chatsChangedAction(chats.ToArray());
-                }
-                
             }
         }
         private string[] _chatsID = new string[0];
-        
+        private async void chatsIDSet(string[] newChatsID)
+        {
+            string[] addedChatsID = newChatsID.Except(_chatsID).ToArray();
+            string[] removedChatsID = _chatsID.Except(newChatsID).ToArray();
+
+            _chatsID = newChatsID;
+
+            foreach (string chatID in removedChatsID)
+            {
+                removeChat(chatID);
+                Log($"Removed: {chatID}");
+            }
+            foreach (string chatID in addedChatsID)
+            {
+                await addChat(chatID);
+                Log($"Added: {chatID}");
+            }
+
+            if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
+            {
+                chatsChangedAction(chats.ToArray());
+                Log("Firing chatChangedAction");
+            }
+        }
 
         public void ChatsIDListenerInit()
         {

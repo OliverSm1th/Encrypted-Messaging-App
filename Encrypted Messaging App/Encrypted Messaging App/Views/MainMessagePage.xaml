@@ -41,26 +41,37 @@
                 <StackLayout x:Name="UserList" BindableLayout.ItemsSource="{Binding ChatsCollection}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Grid Padding="20,15,20,0" RowSpacing="0" ClassId="Binding Id">
+                            <Grid RowSpacing="0" ClassId="Binding Id" BackgroundColor="{StaticResource Secondary}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="ChatTapped"/>
                                 </Grid.GestureRecognizers>
-                                <!--<Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="9*"/>
-                                        <ColumnDefinition Width="1*"/>
-                                        <ColumnDefinition Width="1*"/>
-                                    </Grid.ColumnDefinitions>!-->
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="30*"/>
+                                    <RowDefinition Height="20*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="9*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" BackgroundColor="{StaticResource Primary}" HeightRequest="1" VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
+
                                 <Label
-                                        Text="{Binding Title}"
+                                        Text="{Binding title}"
                                         TextColor="Black"
                                         FontSize="Medium"
-                                        FontFamily="Roboto"/>
+                                        FontFamily="Roboto"
+                                        Grid.Row="1"
+                                        Padding="20,10,0,0"/>
                                 <Label
                                         Text="{Binding id}"
                                         TextColor="Gray"
                                         FontSize="Caption"
                                         FontFamily="Roboto"
-                                        Grid.Row="1"/>
+                                        Grid.Row="2"
+                                        Padding="20,0,0,0"
+                                        />
                             </Grid>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>

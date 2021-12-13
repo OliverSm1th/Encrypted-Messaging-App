@@ -29,7 +29,8 @@ namespace Encrypted_Messaging_App.Views
             Console.WriteLine("~~ Main Message Page ~~");
 
             Chat[] chats = CurrentUser.chats.ToArray();
-            //DisplayChats(CurrentUser.chats.ToArray());
+            DisplayChats(CurrentUser.chats.ToArray());
+            
             CurrentUser.chatsChangedAction = (newChats) => DisplayChats((Chat[])newChats);
         }
 

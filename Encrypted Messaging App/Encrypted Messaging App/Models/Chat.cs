@@ -112,8 +112,24 @@ namespace Encrypted_Messaging_App
     {
         public KeyData encryptionInfo { get; set; }
         public string title { get; set; }
-        public User[] users;
-        public string[] userIDs { get; set; }
+        public List<User> users = new List<User>();
+
+        
+        public string[] userIDs 
+        {
+            get { return _userIDs; } 
+            set
+            {
+                // Doesn't update users
+                _userIDs = value;
+            }
+        }
+        private string[] _userIDs = new string[0];
+
+        
+
+
+
         public Message[] messages { get; set; }
         public string id { get; set; }
 
@@ -125,11 +141,41 @@ namespace Encrypted_Messaging_App
 
         public Chat() { }
 
+        // Sync users with userIDs
+        public async Task setUserIDsAndUsers(string[] newUserIDs)
+        {
+            string[] addedIDs = newUserIDs.Except(_userIDs).ToArray();
+            string[] removedIDs = _userIDs.Except(newUserIDs).ToArray();
+            _userIDs = newUserIDs;
+
+            foreach (string userID in removedIDs) { users.RemoveAll(user => user.Id == userID); }
+            foreach (string userID in addedIDs) { await addUser(userID); }
+        }
+        public async Task<bool> RefreshUsersFromIDs()
+        {
+            users = new List<User>();
+            bool success = true;
+            foreach (string userID in userIDs)
+            {
+                success &= await addUser(userID);
+            }
+            return success;
+        }
+        private async Task<bool> addUser(string userId)
+        {
+            User result = await FirestoreService.UserFromId(userId);
+            if (result == null) { Error($"Unable to add user: {userId} (chat: {id})"); return false; }
+            users.Add(result);
+            return true;
+        }
+
+
+
         // Constructors:
         public void CreateFromData(KeyData chatEncryptInfo, BigInteger chatEncryptKey, User[] chatUsers)
         {
             encryptionInfo = chatEncryptInfo;
-            users = chatUsers;
+            users = chatUsers.ToList();
             userIDs = new string[chatUsers.Length];
             for (int i=0; i<chatUsers.Length; i++)
             {
@@ -144,16 +190,44 @@ namespace Encrypted_Messaging_App
         {
             id = chatID;
         }
+        
+        
+        
+        // Firestore Fetch:
+        public async Task<bool> FetchAndListen()
+        {
+            bool result = await GetFromServer();
+            if (!result) { Error($"Can't get chat from server: {id}"); return false; }
+            result = initiliseListener(true);
+            return result;
+        }
+
+
+
         public async Task<bool> GetFromServer()
         {
-            if (id != null)
+            if (id == null) { return false; }
+            
+            (bool success, object result)response = await FirestoreService.FetchData<Chat>("Chat", arguments: ("CHATID", id));
+            if (!response.success) { return false; }
+
+            await updateChat((Chat)response.result);
+            return true;
+        }
+        
+        
+        public bool initiliseListener(bool ignoreFirst)
+        {
+            if(id != null)
             {
-                (bool success, object result)response = await FirestoreService.FetchData<Chat>("Chat", arguments: ("CHATID", id));
-                if (!response.success) { return false; }
-                updateChat((Chat)response.result);
+                FirestoreService.ListenData<Chat>("Chat", (result) => _ = updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
                 return true;
             }
             return false;
+        }
+        public void removeListener()
+        {
+            FirestoreService.RemoveListeners();
         }
 
 
@@ -171,53 +245,47 @@ namespace Encrypted_Messaging_App
 
             return result;
         }
-
         public async Task<(bool, string)> updateTitle(string newTitle)
         {
-            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, FirestoreService.GetPath("Chat", arguments: ("CHATID", id))+"/Title");
+            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, FirestoreService.GetPath("Chat", arguments: ("CHATID", id)) + "/Title");
             return result;
         }
-
-
         public async Task<(bool, string)> addToUserFirestore(string CUserID)
         {
-            (bool success, string message) result = await FirestoreService.AddToArray(id, FirestoreService.GetPath("CUser")+"/chatsID");
+            (bool success, string message) result = await FirestoreService.AddToArray(id, FirestoreService.GetPath("CUser") + "/chatsID");
             return result;
         }
 
-        
-        
-        // Listeners:
-        public bool initiliseListener(bool ignoreFirst)
-        {
-            if(id != null)
-            {
-                FirestoreService.ListenData<Chat>("Chat", (result) => updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments:("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
-                return true;
-            }
-            return false;
-        }
-        public void removeListener()
-        {
-            FirestoreService.RemoveListeners();
-        }
+
+
+
+
+
+
+
 
 
         // Private Methods:
-        private void updateChat(Chat newChat)
+        private async Task updateChat(Chat newChat)
         {
             if(newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
             messages = newChat.messages;
 
-            users = newChat.users;
-            if (newChat.users == null || newChat.users.Length < 2) { Error($"Invalid users retrieved for: {id}"); }
-            else if (newChat.userIDs.Length != newChat.users.Length) { Error($"Invalid users from userID for: {id}  ({userIDs.Length} userID vs {users.Length} users)"); }
+            if (newChat.userIDs == null || newChat.userIDs.Length < 2) { Error($"Invalid user IDs retrieved for: {id}"); }
+            else { await setUserIDsAndUsers(newChat.userIDs); }
+            
 
-            userIDs = newChat.userIDs;
-            if (newChat.userIDs == null || newChat.userIDs.Length < 2) { Error($"Invalid users retrieved for: {id}"); }
+            if (users == null || users.Count < 2) { Error($"Invalid users retrieved from userIDs for: {id}"); }
+            else if (userIDs.Length != users.Count) { Error($"Invalid users from userID for: {id}  ({userIDs.Length} userID vs {users.Count} users)"); }
+            
+            
+
 
             title = newChat.title;
-            if(title == null || title.Length == 0) { title = generateDefaultTitle(); }
+            if(title == null || title.Length == 0) {
+                if (newChat.userIDs != null) { title = generateDefaultTitle(); }
+                else { title = "  "; }
+            }
         }
         private bool propertiesDefined()
         {
@@ -239,7 +307,7 @@ namespace Encrypted_Messaging_App
             {
                 title = title + user.Username + ", ";
             }
-            if(users.Length > 0)
+            if(users.Count > 0)
             {
                 return title.Remove(title.Length - 2);
             }

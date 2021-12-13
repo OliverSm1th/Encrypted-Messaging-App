@@ -506,7 +506,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
                     foreach (object user in userArr)
                     {
                         userIDs.Add((string)user);
-                        
                     }
                 }
 
@@ -564,29 +563,22 @@ namespace Encrypted_Messaging_App.Droid.Resources
             User user = new User();
             
 
-            try
+            if (doc.Get("Username") != null)
             {
-                if (doc.Get("Username") != null)
-                {
-                    user.Username = (string)doc.Get("Username");
-                    user.Id = doc.Id;
-                }
-                else if(doc.Get("Id") != null)
-                {
-                    user.Id = (string)doc.Get("Id");
-                    user.Username = doc.Id;
-                }
-                else
-                {
-                    return (new ParseStatus(false, "Invalid user object given"), null);
-                }
+                user.Username = (string)doc.Get("Username");
+                user.Id = doc.Id;
+            }
+            else if(doc.Get("Id") != null)
+            {
+                user.Id = (string)doc.Get("Id");
+                user.Username = doc.Id;
+            }
+            else
+            {
+                return (new ParseStatus(false, $"User object doesn't contain \'Username\' or \'Id\'"), null);
+            }
 
-                return (new ParseStatus(true), user);
-            }
-            catch (Exception e)
-            {
-                return (new ParseStatus(false, "Failed to get user"), null);
-            }
+            return (new ParseStatus(true), user);
         }
         public (ParseStatus, string[]) ParseStringArr(JavaList list)
         {

@@ -251,6 +251,7 @@ namespace Encrypted_Messaging_App.Droid
         }
 
            //   SET:
+        // TODO: Improve WriteObject with the new path system
         public async Task<(bool, string)> WriteObject(object obj, string path)
         {
             (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
@@ -288,21 +289,25 @@ namespace Encrypted_Messaging_App.Droid
         public async Task<(bool, string)> InitiliseUser(string username)
         {
             HashMap privateMap = new HashMap();
-            privateMap.Put("username", username);
+            privateMap.Put("Username", username);
             privateMap.Put("chatsID", new JavaList<string>());
 
             HashMap publicMap = new HashMap();
             publicMap.Put("Id", FirebaseAuth.Instance.CurrentUser.Uid);
+            HashMap publicMap2 = new HashMap();
+            publicMap2.Put("Username", username);
 
             // Private User Data
             DocumentReference docRef = FirebaseFirestore.Instance.Collection("users").Document(FirebaseAuth.Instance.CurrentUser.Uid);
             // Public
             DocumentReference publicDocRef = FirebaseFirestore.Instance.Collection("usersPublic").Document(username);
+            DocumentReference publicDocRef2 = FirebaseFirestore.Instance.Collection("usersPublicID").Document(FirebaseAuth.Instance.CurrentUser.Uid);
 
             try
             {
                 await docRef.Set(privateMap);
                 await publicDocRef.Set(publicMap);
+                await publicDocRef2.Set(username);
                 return (true, "");
             }
             catch (Exception e)
@@ -311,7 +316,7 @@ namespace Encrypted_Messaging_App.Droid
             }
         }
 
-
+        // TODO: Replace all these functions with versions of the WriteObject
         // Test to see if the WriteObject function works, will be implemented in the actual classes if works.
         public async Task<(bool, string)> InitiliseChat(Chat chat)
         {
