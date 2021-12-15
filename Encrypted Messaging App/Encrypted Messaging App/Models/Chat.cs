@@ -113,8 +113,6 @@ namespace Encrypted_Messaging_App
         public KeyData encryptionInfo { get; set; }
         public string title { get; set; }
         public List<User> users = new List<User>();
-
-        
         public string[] userIDs 
         {
             get { return _userIDs; } 
@@ -124,12 +122,7 @@ namespace Encrypted_Messaging_App
                 _userIDs = value;
             }
         }
-        private string[] _userIDs = new string[0];
-
-        
-
-
-
+        private string[] _userIDs = new string[0]; 
         public Message[] messages { get; set; }
         public string id { get; set; }
 
@@ -220,8 +213,8 @@ namespace Encrypted_Messaging_App
         {
             if(id != null)
             {
-                FirestoreService.ListenData<Chat>("Chat", (result) => _ = updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
-                return true;
+                bool success = FirestoreService.ListenData<Chat>("Chat", (result) => updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                return success;
             }
             return false;
         }
@@ -232,28 +225,34 @@ namespace Encrypted_Messaging_App
 
 
         // Firestore Update/Create:
-        public async Task<(bool, string)> initiliseChatFirestore()
+        public async Task<bool> initiliseChatFirestore()
         {
-            if (!propertiesDefined()) { return (false, "Not all properties are defined: Invalid Chat Object"); }
+            id = "";
+            if (!propertiesDefined()) { Error("Not all properties are defined: Invalid Chat Object"); return false; }
             (bool success, string message) result = await FirestoreService.InitiliseChat(this);
 
-            if (result.success)
-            {
+            if (result.success) {
                 id = result.message;
-                Console.WriteLine($"Set id to: {id}");
+                _ = FirestoreService.UpdateString(id, "Chat", ("CHATID", id));
             }
+            
+            return result.success;
 
-            return result;
         }
-        public async Task<(bool, string)> updateTitle(string newTitle)
+        public async Task<bool> updateTitle(string newTitle)
         {
-            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, FirestoreService.GetPath("Chat", arguments: ("CHATID", id)) + "/Title");
-            return result;
+            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, "Chat/Title", ("CHATID", id));   //FirestoreService.GetPath("Chat", arguments: ("CHATID", id)) + "/Title"
+            if (!result.success) { Error($"Can\'t change title of {id} to: {newTitle}      {result.message}"); }
+            return result.success;
         }
-        public async Task<(bool, string)> addToUserFirestore(string CUserID)
+        public async Task<bool> addToUserFirestore(string CUserID)
         {
-            (bool success, string message) result = await FirestoreService.AddToArray(id, FirestoreService.GetPath("CUser") + "/chatsID");
-            return result;
+            (bool success, string message) result = await FirestoreService.AddToArray(id, "CUser/chatsID");
+            if (!result.success)
+            {
+                Error($"Unable to add chat-{id} to firestore-{CUserID}:   {result.message}");
+            }
+            return result.success;
         }
 
 

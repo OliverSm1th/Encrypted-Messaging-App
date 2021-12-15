@@ -71,8 +71,7 @@ namespace Encrypted_Messaging_App.Droid
 
 
         public string GetPath(string pathInfo, params (string, string)[] arguments)
-        {
-            
+        {            
             if (pathInfo.Split("/").Length > 1)   // Allows you to do:  CUser/chatsID
             {
                 Debug($"Splitting path: {pathInfo}", 1, true);
@@ -80,7 +79,10 @@ namespace Encrypted_Messaging_App.Droid
                 string pathPt1 = GetPath(pathParts[0], arguments);
                 string pathPt2 = GetPath(string.Join("/", pathParts.Skip(1).ToArray()));
                 if (pathPt1 == null || pathPt2 == null) { Error("Splitting path failed", 1); return null; }
-                else { return pathPt1 + "/" + pathPt2; }
+                else {
+                    //Debug($"Path generated: {pathPt1}/{pathPt2}", 1);
+                    return pathPt1 + "/" + pathPt2; 
+                }
             } 
 
 
@@ -89,7 +91,7 @@ namespace Encrypted_Messaging_App.Droid
 
             if (!firestorePaths.ContainsKey(type) || firestorePaths[type] == null)
             {
-                Error($"Invalid type passed: {type}, can't get path", 1);
+                //Error($"Invalid type passed: {type}, can't get path", 1);
                 return parseLevelArgument(type, dictArgs);
             }
 
@@ -103,7 +105,7 @@ namespace Encrypted_Messaging_App.Droid
                 if(pathLevels[i] == null)     { return null; }
                 if(pathLevels[i].Length == 0) { pathLevels = pathLevels.Where((s, index) => index!=i).ToArray(); ; i--; }
             }
-            Debug($"Path generated: {type} -> {string.Join("/", pathLevels)}", 1);
+            Debug($"Path expanded: {type} -> {string.Join("/", pathLevels)}", 1);
             return string.Join("/", pathLevels);
         }
         private string parseLevelArgument(string levelName, Dictionary<string, string> arguments)
@@ -414,18 +416,21 @@ namespace Encrypted_Messaging_App.Droid
             }
         }
 
-        public async Task<(bool, string)> AddToArray(string newItem, string path)
+        public async Task<(bool, string)> AddToArray(string newItem, string pathInfo, params (string, string)[] arguments)
         {
+            string path = GetPath(pathInfo, arguments);
             return await UpdateField(FieldValue.ArrayUnion(newItem), path);
         }
 
-        public async Task<(bool, string)> RemoveFromArray(string oldItem, string path)
+        public async Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments)
         {
+            string path = GetPath(pathInfo, arguments);
             return await UpdateField(FieldValue.ArrayRemove(oldItem), path);
         }
 
-        public async Task<(bool, string)> UpdateString(string newString, string path)
+        public async Task<(bool, string)> UpdateString(string newString, string pathInfo, params (string, string)[] arguments)
         {
+            string path = GetPath(pathInfo, arguments);
             return await UpdateField(newString, path);
         }
 

@@ -43,9 +43,10 @@ namespace Encrypted_Messaging_App.Views
         Chat[] currentChats;
         private void DisplayChats(Chat[] chats)
         {
-            LoggerService.Log($"Displaying chats: length: {chats.Length}");
+           
             if (chats == currentChats) { return; }
             else { currentChats = chats; }
+            LoggerService.Log($"Displaying chats: length: {chats.Length}");
 
             Label noChatLabel = (Label)Content.FindByName("NoChats");
 

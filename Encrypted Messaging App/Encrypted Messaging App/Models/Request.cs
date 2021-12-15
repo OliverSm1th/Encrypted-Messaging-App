@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using Encrypted_Messaging_App.Views;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
+using static Encrypted_Messaging_App.LoggerService;
 using Encrypted_Messaging_App.Services;
 
 namespace Encrypted_Messaging_App
@@ -50,6 +51,8 @@ namespace Encrypted_Messaging_App
 
         public async void HandleRequest()
         {
+            User requestUser = await DependencyService.Resolve<IManageFirestoreService>().UserFromId(requestUserID);
+
             //chatsID.Add(accepted.newChatID);
             string privateKey = SQLiteService.PendingRequests.Get(requestUserID);
 
@@ -62,12 +65,21 @@ namespace Encrypted_Messaging_App
                 
                 Chat newChat = new Chat();
                 newChat.SetID(newChatID);
-                await newChat.addToUserFirestore(CurrentUser.Id);
+                bool result = await newChat.addToUserFirestore(CurrentUser.Id);
+                if (!result)
+                {
+                    ErrorToast($"Can\'t initilise chat with {requestUser.Username}");
+                }
+                else
+                {
+                    toast.ShortAlert($"{requestUser.Username} accepted you\'re friend request!");
+                }
 
             }
             else
             {
-                DebugManager.ErrorToast("Unable to retrieve data", $"Unable to handle accepted request response from: {requestUserID}");
+                ErrorToast($"Can\'t initilise chat with {requestUser.Username}");
+                Error($"No private key found in SQLiteService for: {requestUserID}");
             }
         }
     }
@@ -101,14 +113,18 @@ namespace Encrypted_Messaging_App
 
 
         // Accept Request: Respond to DH + send AcceptedRequest obj to SourceUser
-        public async Task<(bool, string)> accept(string chatID)     
+        public async Task<bool> accept(string chatID)     
         {
             EncryptionInfo = userDH.Respond(EncryptionInfo);
 
             (bool success, string message) result = await FirestoreService.SendAcceptedRequest(SourceUser.Id, new AcceptedRequest(chatID, EncryptionInfo));
 
+            if (!result.success)
+            {
+                Error($"Can\'t accept request from {SourceUser.Id}:    {result.message}");
+            }
 
-            return result;
+            return result.success;
         }
 
         // Send Request:  Send Request obj to TargetUser + save DH
@@ -116,11 +132,11 @@ namespace Encrypted_Messaging_App
         {
             (bool success, string message) result = await FirestoreService.SendRequest(this, targetUserID);
 
-            if (!result.success) { Console.WriteLine($"Send Request Failed: {result.message} (Couldn't send request)"); return false; }
+            if (!result.success) { Error($"Send Request Failed: {result.message} (Couldn't send request)"); return false; }
 
             bool SQLresult = SQLiteService.PendingRequests.Set(targetUserID, userDH.getPrivateKey().ToString());
 
-            if (!SQLresult) { Console.WriteLine($"Send Request Failed: {result.message} (Couldn't save SQL)"); return false; }
+            if (!SQLresult) { Error($"Send Request Failed: {result.message} (Couldn't save SQL)"); return false; }
             return true;
         }
     }

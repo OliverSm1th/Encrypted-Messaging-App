@@ -16,9 +16,9 @@ namespace Encrypted_Messaging_App
         Task<(bool, string)> SendAcceptedRequest(string requestUserID, AcceptedRequest ARequest);
         Task<(bool, string)> SendRequest(Request request, string requestUserID);
 
-        Task<(bool, string)> AddToArray(string newItem, string path);
+        Task<(bool, string)> AddToArray(string newString, string pathInfo, params (string, string)[] arguments);
 
-        Task<(bool, string)> UpdateString(string newString, string path);
+        Task<(bool, string)> UpdateString(string newString, string pathInfo, params (string, string)[] arguments);
 
 
 

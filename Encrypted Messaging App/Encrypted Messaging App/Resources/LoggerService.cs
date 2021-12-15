@@ -4,13 +4,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Diagnostics;
 using System.Reflection;
+using Xamarin.Forms;
 
 namespace Encrypted_Messaging_App
 {
     public static class LoggerService
     {
         static int errorMsgMaxLength = 30;
-
+        public static IToastMessage toast = DependencyService.Resolve<IToastMessage>();
 
 
 
@@ -26,6 +27,10 @@ namespace Encrypted_Messaging_App
 
 
             Console.WriteLine($"{new string('ㅤ', indentationLvl*2)}Error: {message}".PadRight(45) +$"{fileName}/{className}/{methodName}:{lineNumber}");
+        }
+        public static void ErrorToast(string toastMessage)
+        {
+            toast.LongAlert($"{toastMessage}");
         }
 
         public static void Debug(string message, int indentationLvl = 0, bool includeMethod = false, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller=null, [CallerFilePathAttribute] string filePath=null)

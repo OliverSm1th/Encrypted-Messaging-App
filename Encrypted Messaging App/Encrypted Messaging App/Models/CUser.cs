@@ -45,20 +45,23 @@ namespace Encrypted_Messaging_App
             {
                 Chat newChat = new Chat();
                 newChat.SetID(chatID);
-                bool result = await newChat.GetFromServer();
-                if (result)
-                {
-                    newChat.initiliseListener(true);
-                    chats.Add(newChat);
-                }
-                else
-                {
-                    DebugManager.ErrorSilent($"Can't add Chat {chatID} to Chats: Can't get info from server");
-                }
+                //bool result = await newChat.GetFromServer();
+                //if (result)
+                //{
+                //    newChat.initiliseListener(true);
+                //    chats.Add(newChat);
+                //}
+                //else
+                //{
+                //    Error($"Can't add Chat {chatID} to Chats: Can't get info from server");
+                //}
+                bool result = await newChat.FetchAndListen();
+                if (result) { chats.Add(newChat); }
+                
             }
             else
             {
-                DebugManager.ErrorSilent($"Can't add Chat {chatID} to Chats: Already Exists");
+                Error($"Can't add Chat {chatID} to Chats: Already Exists");
             }
         }
         private void removeChat(string chatID)
@@ -66,7 +69,7 @@ namespace Encrypted_Messaging_App
             int removedNum = chats.RemoveAll(chat => { if (chat.id == chatID) { chat.removeListener(); return true; } return false; });
 
 
-            if (removedNum == 0) { DebugManager.ErrorSilent($"Can't remove Chat {chatID} from Chats: Doesn't exist"); }
+            if (removedNum == 0) { Error($"Can't remove Chat {chatID} from Chats: Doesn't exist"); }
         }
         
 
@@ -76,7 +79,6 @@ namespace Encrypted_Messaging_App
             get { return _chatsID; }
             set
             {
-                Log("chatID changed:");
                 // Syncs the chats to chatID, adds or removes chats accordingly
                 chatsIDSet(value);
 
@@ -93,18 +95,15 @@ namespace Encrypted_Messaging_App
             foreach (string chatID in removedChatsID)
             {
                 removeChat(chatID);
-                Log($"Removed: {chatID}");
             }
             foreach (string chatID in addedChatsID)
             {
                 await addChat(chatID);
-                Log($"Added: {chatID}");
             }
 
             if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
             {
                 chatsChangedAction(chats.ToArray());
-                Log("Firing chatChangedAction");
             }
         }
 
@@ -173,29 +172,30 @@ namespace Encrypted_Messaging_App
             FirestoreService.ListenData<Request[]>("Requests", (requests) => friendRequests = (Request[])requests);
         }
 
-        public async Task<(bool, string)> FetchFriendRequests()  // DEBUG: Refresh button
+        public async Task<bool> FetchFriendRequests()  // DEBUG: Refresh button
         {
             (bool success, object result) response = await FirestoreService.FetchData<Request[]>("Requests");
             if (response.success)
             {
                 friendRequests = (Request[])response.result;
-                return (true, "");
+                return true;
             }
             else
             {
-                return (false, (string)response.result);
+                Error($"Can`'t fetch request: {response.result}");
+                return false;
             }
         }
 
 
         //   --- Accepted Friend Request ---
-        public void AcceptedRequestListenerInit()   // When AcceptRequests (Server) is changed -> Handle in AcceptRequestHandler
-        {
+        public void AcceptedRequestListenerInit()
+        {   // When AcceptRequests (Server) is changed -> Handle in AcceptRequestHandler
             FirestoreService.ListenData<AcceptedRequest[]>("AcceptRequests", AcceptRequestHandler);
         }
-        private void AcceptRequestHandler(object requests)  // Creates new local chat and deletes AcceptRequest
-        {
-            if(requests == null) { return; }
+        private void AcceptRequestHandler(object requests)
+        {   // Creates new local chat and deletes AcceptRequest
+            if (requests == null) { return; }
             AcceptedRequest[] acceptedRequests = (AcceptedRequest[])requests;
             
             foreach(AcceptedRequest accepted in acceptedRequests)
@@ -246,6 +246,8 @@ namespace Encrypted_Messaging_App
                 }
             }
             else { Debug("     Chats:  None"); }
+
+
 
 
 

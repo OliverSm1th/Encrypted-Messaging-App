@@ -10,7 +10,9 @@ using System.Numerics;
 
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using static Encrypted_Messaging_App.Views.Functions;
+using static Encrypted_Messaging_App.LoggerService;
 using System.Collections.ObjectModel;
+
 
 namespace Encrypted_Messaging_App.Views
 {
@@ -19,7 +21,7 @@ namespace Encrypted_Messaging_App.Views
     {
         public ObservableCollection<User> Users { get; } = new ObservableCollection<User>();
         Dictionary<string, Request> Requests = new Dictionary<string, Request>();
-        IToastMessage toastMessage = DependencyService.Get<IToastMessage>();
+
 
         Request[] currentRequests;
         IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
@@ -57,8 +59,8 @@ namespace Encrypted_Messaging_App.Views
         // When refresh button is pressed
         public async void Refresh(object sender, EventArgs e)
         {
-            (bool, string) response = await CurrentUser.FetchFriendRequests();
-            if (response.Item1)
+            bool success = await CurrentUser.FetchFriendRequests();
+            if (success)
             {
                 Console.WriteLine("Updating Requests:");
                 DisplayRequests(CurrentUser.friendRequests);
@@ -83,7 +85,7 @@ namespace Encrypted_Messaging_App.Views
                 for (int i = 0; i < requests.Length; i++)
                 {
                     User user = requests[i].SourceUser;
-                    if(user == null) { DebugManager.ErrorSilent("Request user is null"); return; }
+                    if(user == null) { Error("Request user is null"); return; }
 
                     Users.Add(user);
                     Console.WriteLine($"{user.Username} has been added!");
@@ -117,7 +119,7 @@ namespace Encrypted_Messaging_App.Views
             }
             if (acceptUser == null)
             {
-                toastMessage.LongAlert("Couldn't find friend request");
+                toast.LongAlert("Couldn't find friend request");
                 return;
             }
 
@@ -130,7 +132,7 @@ namespace Encrypted_Messaging_App.Views
             DiffieHellman userDH = new DiffieHellman();
             requestKeyData = userDH.Respond(requestKeyData);
             BigInteger sharedKey = userDH.getSharedKey(requestKeyData);
-            //PendingRequests[acceptUser.Id] = userDH;
+
 
             // Create new Chat session with keyData
             Chat newChat = new Chat();
@@ -138,17 +140,16 @@ namespace Encrypted_Messaging_App.Views
             
 
             // Add new Chat to firestore
-            (bool success, string message) result = await newChat.initiliseChatFirestore();
-            if (!result.success) { DebugManager.ErrorToast("Unable to create new chat", $"Can't initilise chat: {result.message}"); return; }
-            //newChat.initiliseListener();
-            result = await newChat.addToUserFirestore(CurrentUser.Id);
-            if (!result.success) { DebugManager.ErrorToast("Unable to create new chat", $"Can't add ChatID to user: {result.message}"); return; }
-            // TODO: Delete chat object (another is created)
+            bool success = await newChat.initiliseChatFirestore();
+            if (!success) { ErrorToast("Unable to create new chat"); return; }
 
 
-            // TODO: AcceptedRequest to UserA  with chatID   (delete Request)
-            result  = await request.accept(newChat.id);
-            if (!result.success) { DebugManager.ErrorToast("Unable to  request", $"Send AcceptedRequest Failed: {result.message}"); }
+            success = await newChat.addToUserFirestore(CurrentUser.Id);
+            if (!success) { ErrorToast("Unable to create new chat"); return; }
+
+
+            success = await request.accept(newChat.id);
+            if (!success) { ErrorToast("Unable to accept request"); }
         }
         public void DenyRequest(object sender, EventArgs e)
         {
@@ -175,7 +176,7 @@ namespace Encrypted_Messaging_App.Views
             (bool success, object user) user_result = await FirestoreService.FetchData<User>("UserFromUsername", ("USERNAME", usernameEntry.Text)); //new Dictionary<string, string>{ { "USERNAME", usernameEntry.Text } }
             if (!user_result.success)
             {
-                toastMessage.LongAlert($"Couldn't find user {usernameEntry.Text}");
+                toast.LongAlert($"Couldn't find user {usernameEntry.Text}");
                 Console.WriteLine($"Error: Couldn't find user {usernameEntry.Text}, message: {user_result.user}");
                 return;
             } 
