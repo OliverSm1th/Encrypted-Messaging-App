@@ -53,17 +53,6 @@
     </ShellItem>
 
 
-    <!--<FlyoutItem Title="Main Page" Route="MainMessagePage">
-        <FlyoutItem.Icon>
-            <FontImageSource
-                FontFamily="Icons-S"
-                Glyph="{StaticResource IconHome}"
-                Color="Black"
-                />
-        </FlyoutItem.Icon>
-        <ShellContent ContentTemplate="{DataTemplate local:MainMessagePage}"></ShellContent>
-    </FlyoutItem>-->
-
     <FlyoutItem Title="Friend Requests" Route="FriendRequestPage">
         <FlyoutItem.Icon>
             <FontImageSource
@@ -74,7 +63,6 @@
         </FlyoutItem.Icon>
         <ShellContent ContentTemplate="{DataTemplate local:FriendRequestPage}"></ShellContent>
     </FlyoutItem>
-
 
 
 

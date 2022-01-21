@@ -29,7 +29,7 @@ namespace Encrypted_Messaging_App.Views
             Console.WriteLine("~~ Main Message Page ~~");
 
             Chat[] chats = CurrentUser.chats.ToArray();
-            DisplayChats(CurrentUser.chats.ToArray());
+            //DisplayChats(CurrentUser.chats.ToArray());
             
             CurrentUser.chatsChangedAction = (newChats) => DisplayChats((Chat[])newChats);
         }
@@ -79,6 +79,14 @@ namespace Encrypted_Messaging_App.Views
         {
             Grid chatGrid = (Grid)sender;
             Console.WriteLine($"Tapped: {chatGrid.ClassId}");
+            foreach (Chat chat in currentChats){
+                if (chat.id == chatGrid.ClassId)
+                {
+                    CurrentChat = chat;
+                }
+            }
+
+            Shell.Current.GoToAsync($"{nameof(ChatPage)}");
         }
 
 

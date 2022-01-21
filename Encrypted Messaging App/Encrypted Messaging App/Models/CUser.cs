@@ -56,6 +56,7 @@ namespace Encrypted_Messaging_App
                 //    Error($"Can't add Chat {chatID} to Chats: Can't get info from server");
                 //}
                 bool result = await newChat.FetchAndListen();
+                Log("Finished fetching the chat");
                 if (result) { chats.Add(newChat); }
                 
             }
@@ -89,6 +90,8 @@ namespace Encrypted_Messaging_App
         {
             string[] addedChatsID = newChatsID.Except(_chatsID).ToArray();
             string[] removedChatsID = _chatsID.Except(newChatsID).ToArray();
+
+            if(addedChatsID.Length == 0 && removedChatsID.Length == 0) { return; }
 
             _chatsID = newChatsID;
 

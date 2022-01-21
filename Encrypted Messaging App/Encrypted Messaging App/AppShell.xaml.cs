@@ -17,6 +17,7 @@ namespace Encrypted_Messaging_App
             Routing.RegisterRoute(nameof(ForgotPasswordPage), typeof(ForgotPasswordPage));
             Routing.RegisterRoute(nameof(LoadingPage), typeof(LoadingPage));
             Routing.RegisterRoute(nameof(FriendRequestPage), typeof(FriendRequestPage));
+            Routing.RegisterRoute(nameof(ChatPage), typeof(ChatPage));
 
 
         }

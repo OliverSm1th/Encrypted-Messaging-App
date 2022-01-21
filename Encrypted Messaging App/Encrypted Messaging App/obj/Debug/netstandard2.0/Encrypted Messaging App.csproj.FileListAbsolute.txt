@@ -39,3 +39,4 @@ C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypt
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.dll
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\ref\Encrypted Messaging App.dll
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Encrypted Messaging App.pdb
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ChatPage.xaml.g.cs

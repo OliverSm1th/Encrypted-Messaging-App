@@ -18,32 +18,30 @@ using static Encrypted_Messaging_App.LoggerService;
 
 namespace Encrypted_Messaging_App.Droid.Resources
 {
+
     class OnEventListener : Java.Lang.Object, IEventListener
     {
         Type EventType;
         DocumentChange.Type ChangeType;     // ADDED/MODIFIED/REMOVED
         Action<object> OnEventMethod;
-        private bool IgnoreFirstTime;
         private string FieldName;
 
         ListenerHelper Helper = new ListenerHelper();    // Helper: Has Parse Functions which convert results into objects
-        private bool FirstTime = true;
 
-        public OnEventListener(Type returnType, Action<object> method, DocumentChange.Type changeType = null, bool ignoreInitial=false, string optionalFieldName=null)
+        public OnEventListener(Type returnType, Action<object> method, DocumentChange.Type changeType = null, string optionalFieldName=null)
         {
             EventType = returnType;
             OnEventMethod = method;
             ChangeType = changeType;
-            IgnoreFirstTime = ignoreInitial;
             FieldName = optionalFieldName;
         }
 
 
         public void OnEvent(Java.Lang.Object obj, FirebaseFirestoreException error)
         {
-            if ( FirstTime && IgnoreFirstTime ) {  return;  }
 
             Debug($"Event Triggered: {EventType}");
+
 
             (bool success, object obj) response = (false, null);
 
@@ -79,13 +77,12 @@ namespace Encrypted_Messaging_App.Droid.Resources
             {
                 OnEventMethod(response.obj);
             }
-            FirstTime = false;
         }
 
         private DocumentSnapshot[] GetFilteredDocs(QuerySnapshot collection)
         {
             // No ChangeType
-            if(ChangeType == null || FirstTime) {
+            if(ChangeType == null) {
                 return collection.Documents.ToArray();
             }
 

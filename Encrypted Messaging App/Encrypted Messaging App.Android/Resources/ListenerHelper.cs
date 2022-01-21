@@ -474,6 +474,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             List<Message> messages = new List<Message>();
             List<User> users = new List<User>();
             List<string> userIDs = new List<string>();
+            string title = null;
 
             try
             {
@@ -508,8 +509,12 @@ namespace Encrypted_Messaging_App.Droid.Resources
                         userIDs.Add((string)user);
                     }
                 }
+                if (doc.Get("title") != null)
+                {
+                    title = (string)doc.Get("title");
+                }
 
-                Chat chat = new Chat { messages = messages.ToArray(), userIDs = userIDs.ToArray() };
+                Chat chat = new Chat { messages = messages.ToArray(), userIDs = userIDs.ToArray(), title = title };
 
                 return (new ParseStatus(true), chat);
             }

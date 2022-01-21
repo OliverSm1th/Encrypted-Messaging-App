@@ -40,6 +40,8 @@ namespace Encrypted_Messaging_App.Droid
             {"ChatsID", $"users/[USERID]/chatsID" }
         };
 
+        private Dictionary<string, TaskCompletionSource<bool>> uncompletedFetchTasks = new Dictionary<string, TaskCompletionSource<bool>>();
+
         private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string[] pathLevels)
         {
             if (pathLevels == null || pathLevels.Length == 0) { return (false, null, null); }
@@ -189,7 +191,7 @@ namespace Encrypted_Messaging_App.Droid
 
         // Listeners:
         private List<IListenerRegistration> Listeners = new List<IListenerRegistration>();
-        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, bool ignoreInitialEvent = false, params (string, string)[] arguments) //Dictionary<string, string> arguments = null
+        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, params (string, string)[] arguments) //Dictionary<string, string> arguments = null
         {
             Debug($"Listening Data for {pathInfo}:", 0, true);
             string path = GetPath(pathInfo, arguments);
@@ -208,8 +210,8 @@ namespace Encrypted_Messaging_App.Droid
             if (reference.success)
             {
                 IListenerRegistration currListenerReg;
-                if (reference.document != null) { currListenerReg = reference.document.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, ignoreInitialEvent, fieldName));
-                } else {                          currListenerReg = reference.collection.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, ignoreInitialEvent, fieldName)); }
+                if (reference.document != null) { currListenerReg = reference.document.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName));
+                } else {                          currListenerReg = reference.collection.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName)); }
                 Listeners.Add(currListenerReg);
                 return true;
             } else 
@@ -218,6 +220,19 @@ namespace Encrypted_Messaging_App.Droid
                 return false;
             }
         }
+        public Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial =true , params (string, string)[] arguments)
+        {
+            TaskCompletionSource<bool> fetchDataCompletion = new TaskCompletionSource<bool>();
+
+
+            bool result = ListenData<returnType>(pathInfo, (object result) => { Console.WriteLine("Resolved Listener!!"); action.Invoke(result); fetchDataCompletion.TrySetResult(true); }, changeType, arguments);
+            if (!result) { fetchDataCompletion.TrySetResult(false); }
+
+            return fetchDataCompletion.Task;
+        }
+
+
+
         private DocumentChange.Type getDocChangeType(string changeType)
         {
             if (changeType == "added") { return DocumentChange.Type.Added; }

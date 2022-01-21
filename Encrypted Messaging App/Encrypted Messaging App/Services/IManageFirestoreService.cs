@@ -23,7 +23,9 @@ namespace Encrypted_Messaging_App
 
 
         Task<(bool, object)> FetchData<ReturnType>(string type, params (string, string)[] arguments);
-        bool ListenData<ReturnType>(string type, Action<object> action, string changeType = null, bool ignoreInitialEvent = false, params (string, string)[] arguments);
+
+        bool ListenData<ReturnType>(string type, Action<object> action, string changeType = null, params (string, string)[] arguments);
+        Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, params (string, string)[] arguments);
 
         Task<User> UserFromId(string id);
         Task<User> UserFromUsername(string username);

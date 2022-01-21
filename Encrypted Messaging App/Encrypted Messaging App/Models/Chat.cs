@@ -189,9 +189,10 @@ namespace Encrypted_Messaging_App
         // Firestore Fetch:
         public async Task<bool> FetchAndListen()
         {
-            bool result = await GetFromServer();
+            bool result = await initiliseListener();
+            //bool result = await GetFromServer();
             if (!result) { Error($"Can't get chat from server: {id}"); return false; }
-            result = initiliseListener(true);
+            //result = initiliseListener(true);
             return result;
         }
 
@@ -209,11 +210,13 @@ namespace Encrypted_Messaging_App
         }
         
         
-        public bool initiliseListener(bool ignoreFirst)
+        public async Task<bool> initiliseListener()
         {
             if(id != null)
             {
-                bool success = FirestoreService.ListenData<Chat>("Chat", (result) => updateChat((Chat)result), ignoreInitialEvent: ignoreFirst, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                TaskCompletionSource<bool> chatUpdatedTask = new TaskCompletionSource<bool>();
+                bool success = await FirestoreService.ListenDataAsync<Chat>("Chat", async (result) => { await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true); }, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                await chatUpdatedTask.Task;
                 return success;
             }
             return false;
