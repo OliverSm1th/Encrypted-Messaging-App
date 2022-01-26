@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-
+using static Encrypted_Messaging_App.LoggerService;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 
 namespace Encrypted_Messaging_App.Views
@@ -29,9 +29,10 @@ namespace Encrypted_Messaging_App.Views
             Console.WriteLine("~~ Main Message Page ~~");
 
             Chat[] chats = CurrentUser.chats.ToArray();
-            //DisplayChats(CurrentUser.chats.ToArray());
+
+            DisplayChats(CurrentUser.chats.ToArray());
             
-            CurrentUser.chatsChangedAction = (newChats) => DisplayChats((Chat[])newChats);
+            CurrentUser.chatsChangedAction = (newChats, index) => { if (index == -1) { DisplayChats((Chat[])newChats); } else { UpdateChats((Chat[])newChats, index); } };
         }
 
         protected override void OnDisappearing()
@@ -67,9 +68,20 @@ namespace Encrypted_Messaging_App.Views
             }
         }
 
+        private void UpdateChats(Chat[] chats, int indexToChange)
+        {
+            if(chats.Length > indexToChange && ChatsCollection.Count == chats.Length)
+            {
+                ChatsCollection[indexToChange] = chats[indexToChange];
+            }
+            else {
+                Error($"Invalid parameters (chats:{chats.Length}, collection: {ChatsCollection.Count}, index: {indexToChange})");
+            }
+        }
+
         public void Refresh(object sender, EventArgs e)
         {
-            LoggerService.Log("Refreshing");
+            Log("Refreshing");
             CurrentUser.Output();
             DisplayChats(CurrentUser.chats.ToArray());
         }
@@ -91,6 +103,13 @@ namespace Encrypted_Messaging_App.Views
 
 
 
+        public async void ChangeThemePopOut(object sender, EventArgs e)
+        {
+            string action = await DisplayActionSheet("Change Theme:", "Cancel", null, "🟦 Blue", "🟥 Red");
+            if(action == null || action == "Cancel") { return; }
+            Functions.setColour(action.Split(' ')[1]);
+        }
+
 
         public void LogOut(object sender, EventArgs e)
         {
@@ -102,6 +121,5 @@ namespace Encrypted_Messaging_App.Views
                 Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
             }
         }
-
     }
 }

@@ -74,7 +74,7 @@
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
                 <Label Text="No pending requests" 
-                       IsVisible="false" 
+                       Opacity="0"
                        TextColor="Gray"
                        HorizontalOptions="CenterAndExpand"
                        Padding="0,20,0,0"
@@ -113,7 +113,7 @@
                    />
             <Entry Placeholder="Username" 
                        PlaceholderColor="{StaticResource Gray}" 
-                       TextColor="{StaticResource Primary}" 
+                       TextColor="{DynamicResource Primary}" 
                        FontSize="18"
                        FontFamily="Roboto-Medium"
                        HorizontalTextAlignment="Left"

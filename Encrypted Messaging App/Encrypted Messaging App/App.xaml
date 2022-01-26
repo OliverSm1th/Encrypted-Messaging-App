@@ -8,7 +8,9 @@
     <Application.Resources>
         <ResourceDictionary>
             <Color x:Key="Primary">#2196F3</Color>
+            <Color x:Key="PrimaryLight"></Color>
             <Color x:Key="Secondary">#77BEF5</Color>
+            <Color x:Key="SecondaryLight"></Color>
             <Color x:Key="Gray">#FF778899</Color>
             <!--#34ACBC-->
 
@@ -20,6 +22,7 @@
             <x:String x:Key="IconFriend">&#xf0c0;</x:String>
             <x:String x:Key="IconHome">&#xf015;</x:String>
             <x:String x:Key="IconSync">&#xf2f1;</x:String>
+            <x:String x:Key="IconSend">&#xf1d8;</x:String>
         </ResourceDictionary>
         
         

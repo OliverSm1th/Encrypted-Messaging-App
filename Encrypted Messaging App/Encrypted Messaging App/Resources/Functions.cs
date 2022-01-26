@@ -16,7 +16,16 @@ namespace Encrypted_Messaging_App.Views
 {
     class Functions
     {
-        
+        static Dictionary<string, string[]> colourDict = new Dictionary<string, string[]>(){
+            {"Values", new string [] {"Primary", "PrimaryLight", "Secondary", "SecondaryLight"} },
+            {"Blue",   new string [] {"2196F3",  "6ec5ff",       "77BEF5",    "acf2ff" } },
+            //{"Red",    new string [] {"b71c1c",  "f05545",       "f44336",    "ff7961", } }
+            {"Red",    new string [] { "d32f2f",  "f05545",       "f44336",    "ff7961", } }
+        };
+
+
+
+
         public static bool isValidEmail(string email, bool allowBlank = false)
         {    /*
              - Must have exactly one @
@@ -125,6 +134,24 @@ namespace Encrypted_Messaging_App.Views
         public static void IconInvalidReset(Button Icon)
         {
             IconInvalidReset(new Button[] { Icon });
+        }
+
+
+        public static void setColour(string colourName)
+        {
+            if (!colourDict.ContainsKey(colourName)) { LoggerService.Error($"Colour: {colourName} not found"); return; }
+
+            for (int i = 0; i < colourDict["Values"].Length; i++)
+            {
+                string currentColourKey = colourDict["Values"][i];
+                string currentColourValue = colourDict[colourName][i];
+                if (!App.Current.Resources.ContainsKey(currentColourKey)) { LoggerService.Error($"Colour key: {currentColourKey} not found in Resources"); }
+                App.Current.Resources[currentColourKey] = Color.FromHex(currentColourValue);
+                LoggerService.Log($"Saved {currentColourValue} to value {currentColourKey}");
+            }
+
+            LoggerService.Log("Set all colours");
+
         }
 
     }

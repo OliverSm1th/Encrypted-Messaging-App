@@ -480,23 +480,28 @@ namespace Encrypted_Messaging_App.Droid.Resources
             {
                 if (doc.Get("messages") != null)
                 {
+
+
                     JavaList messagesObj = (JavaList)doc.Get("messages");
 
+                    
 
-                    object[] messageArr = ParseEnumerator(messagesObj.GetEnumerator(), messagesObj.Count);
-
-                    foreach (object message in messageArr)
+                    for(int i =0; i<messagesObj.Count; i++)
                     {
-                        (bool success, object message) result = ParseMessage(message);
-                        if (result.success)
-                        {
-                            messages.Add((Message)message);
-                        }
-                        else
-                        {
-                            Error("Unable to parse message");
-                        }
+                        JavaDictionary messageObj = (JavaDictionary)messagesObj.Get(i);
+
+
+                        Message messageResult = ParseMessage(messageObj);
+
+                        if (messageResult != null) { messages.Add(messageResult); }
+                        else { Error("Unable to parse message"); }
+
+                        Log($"Done: {i}");
+
                     }
+
+                    Log("Done!!");
+
                 }
                 if (doc.Get("userIDs") != null)
                 {
@@ -524,19 +529,17 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return (new ParseStatus(false, "Failed to get chats"), null);
             }
         }
-        public (bool, object) ParseMessage(object messageObj)
+        public Message ParseMessage(JavaDictionary data)
         {
-            // Content
-            //if (messageObj.)
-            //{
 
-            //}
-            // Times
-
-            // Author
-
-            // Recipient
-            return (false, "");
+            if(data["author"] is JavaDictionary authorDict && data["content"] is string content && long.TryParse(data["createdTime"].ToString(), out long createdTime) && long.TryParse(data["deliveredTime"].ToString(), out long deliveredTime) && long.TryParse(data["readTime"].ToString(), out long readTime))
+            {
+                User author = ToObject<User>(authorDict);
+                return new Message { author = author, content = content, createdTime = DateTime.FromBinary(createdTime), deliveredTime = DateTime.FromBinary(deliveredTime), readTime = DateTime.FromBinary(readTime) };
+                
+            }
+            Log(data["content"].ToString());
+            return null;
         }
         public (ParseStatus, CUser) ParseCUser(DocumentSnapshot doc)
         {
@@ -621,6 +624,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 }
 
             }
+            object[] newArray = (object[])array;
             return array;
         }
         private string[] ConvertObjArr(object[] input)

@@ -91,12 +91,11 @@ namespace Encrypted_Messaging_App.Views
                     Console.WriteLine($"{user.Username} has been added!");
                     Requests[user.Id] = requests[i];
                 }
-                noRequestLabel.IsVisible = false;
-                Console.WriteLine("All Added!");
+                noRequestLabel.Opacity = 0;
             }
             else
             {
-                noRequestLabel.IsVisible = true;
+                noRequestLabel.Opacity = 1;
             }
             
         }

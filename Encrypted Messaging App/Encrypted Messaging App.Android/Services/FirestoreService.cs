@@ -401,6 +401,17 @@ namespace Encrypted_Messaging_App.Droid
             }
         }
 
+        public async Task<(bool, string)> AddMessageToChat(Message message, string chatID)
+        {
+            string path = GetPath("Chat/messages", ("CHATID", chatID));
+
+            object messageObj = GetMap(message);
+
+            (bool success, string message) result = await UpdateField(FieldValue.ArrayUnion((Java.Lang.Object)messageObj), path);
+
+            return result;
+        }
+
         
         // Update Field:
         private async Task<(bool, string)> UpdateField(Java.Lang.Object obj, string path)
@@ -496,6 +507,11 @@ namespace Encrypted_Messaging_App.Droid
                 {
                     Debug($"{indent}{prop.Name}: ", 1);
                     map.Put(prop.Name, GetMap(propValue));
+                }
+                else if (type == typeof(DateTime))
+                {   // Convert date/time to binary for more efficient storage and converting
+                    Debug($"{indent}{prop.Name}:{propValue}", 1);
+                    map.Put(prop.Name, ((DateTime)propValue).ToBinary().ToString());
                 }
                 else
                 {

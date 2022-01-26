@@ -19,7 +19,7 @@ namespace Encrypted_Messaging_App
         Task<(bool, string)> AddToArray(string newString, string pathInfo, params (string, string)[] arguments);
 
         Task<(bool, string)> UpdateString(string newString, string pathInfo, params (string, string)[] arguments);
-
+        Task<(bool, string)> AddMessageToChat(Message message, string chatID);
 
 
         Task<(bool, object)> FetchData<ReturnType>(string type, params (string, string)[] arguments);

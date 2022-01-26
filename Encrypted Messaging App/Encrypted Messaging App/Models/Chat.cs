@@ -128,6 +128,10 @@ namespace Encrypted_Messaging_App
 
         private BigInteger encryptionKey;
 
+        public Action headerChangedAction;   // Changed Title/Id (refresh chatList + chatPage)
+        public Action contentChangedAction;  // Changed/Send messages (refresh chatPage)
+
+
 
         IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
 
@@ -161,7 +165,15 @@ namespace Encrypted_Messaging_App
             users.Add(result);
             return true;
         }
-
+        public async Task<bool> sendMessage(Message newMessage)
+        {
+            (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
+            if (!result.success)
+            {
+                Error($"Unable to add message- to chat{id}:            {result.message}");
+            }
+            return result.success;
+        }
 
 
         // Constructors:
@@ -215,7 +227,7 @@ namespace Encrypted_Messaging_App
             if(id != null)
             {
                 TaskCompletionSource<bool> chatUpdatedTask = new TaskCompletionSource<bool>();
-                bool success = await FirestoreService.ListenDataAsync<Chat>("Chat", async (result) => { await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true); }, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                bool success = FirestoreService.ListenData<Chat>("Chat", async (result) => { await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true); }, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
                 await chatUpdatedTask.Task;
                 return success;
             }
@@ -268,10 +280,17 @@ namespace Encrypted_Messaging_App
 
 
         // Private Methods:
-        private async Task updateChat(Chat newChat)
+        private async Task updateChat(Chat newChat) 
         {
-            if(newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
-            messages = newChat.messages;
+            bool headerChanged = false;
+            bool contentChanged = false;
+
+            if (newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
+            else if(messages != newChat.messages) { 
+                contentChanged = true; 
+                messages = newChat.messages; 
+            }
+            
 
             if (newChat.userIDs == null || newChat.userIDs.Length < 2) { Error($"Invalid user IDs retrieved for: {id}"); }
             else { await setUserIDsAndUsers(newChat.userIDs); }
@@ -282,11 +301,26 @@ namespace Encrypted_Messaging_App
             
             
 
+            if(title != newChat.title)
+            {
+                title = newChat.title;
+                if (title == null || title.Length == 0)
+                {
+                    if (newChat.userIDs != null) { title = generateDefaultTitle(); }
+                    else { title = "  "; }
+                }
+                headerChanged = true;
+            }
+            
 
-            title = newChat.title;
-            if(title == null || title.Length == 0) {
-                if (newChat.userIDs != null) { title = generateDefaultTitle(); }
-                else { title = "  "; }
+
+            if (headerChanged && headerChangedAction != null)
+            {
+                headerChangedAction.Invoke();
+            }
+            if (contentChanged && contentChangedAction != null)
+            {
+                contentChangedAction.Invoke();
             }
         }
         private bool propertiesDefined()

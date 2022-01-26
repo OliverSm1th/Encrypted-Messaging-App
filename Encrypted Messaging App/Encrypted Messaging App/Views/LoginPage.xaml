@@ -49,7 +49,7 @@
                 <!--<BoxView Grid.Column="1" BackgroundColor="Blue"/>-->
                 <Entry Placeholder="Username" 
                        PlaceholderColor="{StaticResource Gray}" 
-                       TextColor="{StaticResource Primary}" 
+                       TextColor="{DynamicResource Primary}" 
                        FontSize="18"
                        FontFamily="Roboto-Medium"
                        HorizontalTextAlignment="Left"
@@ -81,7 +81,7 @@
                 <!--<BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="Purple"/>-->
                 <Entry Placeholder="Password" 
                        PlaceholderColor="LightSlateGray" 
-                       TextColor="{StaticResource Primary}" 
+                       TextColor="{DynamicResource Primary}" 
                        FontFamily="Roboto-Medium"
                        IsPassword="True"
                        HorizontalTextAlignment="Left"
@@ -97,7 +97,7 @@
                 
                 <!--Forgot Password-->
                 <Label Text="Forgot Password?" 
-                       TextColor="{StaticResource Primary}" 
+                       TextColor="{DynamicResource Primary}" 
                        FontFamily="Roboto-Black"
                        FontSize="Small"
                        Grid.Row="3" 

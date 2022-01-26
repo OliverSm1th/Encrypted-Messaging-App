@@ -38,7 +38,7 @@ namespace Encrypted_Messaging_App
         //   --- Chats ---
 
         public List<Chat> chats = new List<Chat>();
-        public Action<object> chatsChangedAction;
+        public Action<object, int> chatsChangedAction;  //chats, index (optional)
         private async Task addChat(string chatID)
         {
             if (chats.Where(chat => chat.id == chatID).ToArray().Length == 0)
@@ -57,7 +57,12 @@ namespace Encrypted_Messaging_App
                 //}
                 bool result = await newChat.FetchAndListen();
                 Log("Finished fetching the chat");
-                if (result) { chats.Add(newChat); }
+                if (result) { 
+                    chats.Add(newChat);
+
+                    // Add listener to trigger chatsChangedAction when it's edited
+                    newChat.headerChangedAction = () => chatsChangedAction(chats.ToArray(), chats.IndexOf((Chat)newChat));
+                }
                 
             }
             else
@@ -106,7 +111,7 @@ namespace Encrypted_Messaging_App
 
             if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
             {
-                chatsChangedAction(chats.ToArray());
+                chatsChangedAction(chats.ToArray(), -1);
             }
         }
 
