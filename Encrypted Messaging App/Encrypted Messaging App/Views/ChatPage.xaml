@@ -26,7 +26,7 @@
                 <StackLayout x:Name="MessageList" BindableLayout.ItemsSource="{Binding MessagesCollection}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Grid RowSpacing="10" ClassId="{Binding content}" BackgroundColor="{DynamicResource Secondary}">
+                            <Grid RowSpacing="0" ClassId="{Binding content}" BackgroundColor="{DynamicResource Secondary}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="MessageTapped"/>
                                 </Grid.GestureRecognizers>
@@ -40,7 +40,7 @@
                                     <ColumnDefinition Width="1*"/>
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
-                                <BoxView Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="8" BackgroundColor="{DynamicResource Primary}" HeightRequest="1" VerticalOptions="Start" HorizontalOptions="FillAndExpand"/>
+                                
 
                                 <Label
                                         Text="{Binding content}"
@@ -53,6 +53,7 @@
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
+                <Label Text="The PAIN AHAHAHAHAHA  THE PAIN" TextColor="Black"/>
                 <Grid VerticalOptions="EndAndExpand" Padding="10,5,10,15" BackgroundColor="{DynamicResource Secondary}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="8*"/>

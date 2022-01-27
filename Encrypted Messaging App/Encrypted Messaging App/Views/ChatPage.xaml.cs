@@ -31,10 +31,12 @@ namespace Encrypted_Messaging_App.Views
 
             UpdateHeaders();
 
-            UpdateMessages(CurrentChat.messages);
+            UpdateMessages();
 
 
             CurrentChat.headerChangedAction += UpdateHeaders;
+
+            CurrentChat.contentChangedAction += UpdateMessages;
         }
 
         protected override void OnDisappearing()
@@ -55,14 +57,16 @@ namespace Encrypted_Messaging_App.Views
             Title = CurrentChat.title;
         }
 
-        private void UpdateMessages(Message[] messages)
+        private void UpdateMessages()
         {
             MessagesCollection.Clear();
 
-            for (int i=0; i<0; i++)
+            for (int i=0; i< CurrentChat.messages.Length; i++)
             {
-                MessagesCollection.Add(messages[i]);
+                MessagesCollection.Add(CurrentChat.messages[i]);
+                LoggerService.Log($"Added the {i}th message: {CurrentChat.messages[i].content}");
             }
+            LoggerService.Log($"Added {MessagesCollection.Count} items to the messagesCollection");
         }
 
         public async void MessageSent(object sender, EventArgs e)
