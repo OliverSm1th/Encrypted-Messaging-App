@@ -128,8 +128,8 @@ namespace Encrypted_Messaging_App
 
         private BigInteger encryptionKey;
 
-        public Action headerChangedAction;   // Changed Title/Id (refresh chatList + chatPage)
-        public Action contentChangedAction;  // Changed/Send messages (refresh chatPage)
+        public Action headerChangedAction;        // Changed Title/Id (refresh chatList + chatPage)
+        public Action<int[]> contentChangedAction;  // Changed/Send messages (refresh chatPage)    int[]- Messages index to update (empty if all)
 
 
 
@@ -165,8 +165,9 @@ namespace Encrypted_Messaging_App
             users.Add(result);
             return true;
         }
-        public async Task<bool> sendMessage(Message newMessage)
+        public async Task<bool> sendMessage(string content, User authorUser)
         {
+            Message newMessage = new Message(content, authorUser, userIDs);
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
             if (!result.success)
             {
@@ -284,11 +285,12 @@ namespace Encrypted_Messaging_App
         {
             bool headerChanged = false;
             bool contentChanged = false;
+            List<int> changedMessages = new List<int>();
 
             if (newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
             else if(messages != newChat.messages) { 
                 contentChanged = true; 
-                messages = newChat.messages; 
+                messages = newChat.messages;
             }
             
 
@@ -320,7 +322,7 @@ namespace Encrypted_Messaging_App
             }
             if (contentChanged && contentChangedAction != null)
             {
-                contentChangedAction.Invoke();
+                contentChangedAction.Invoke(changedMessages.ToArray());
             }
         }
         private bool propertiesDefined()

@@ -474,8 +474,9 @@ namespace Encrypted_Messaging_App.Droid
             HashMap map = new HashMap();
             foreach (PropertyInfo prop in obj.GetType().GetProperties())
             {
-                var propValue = prop.GetValue(obj, null);
-                if(propValue == null) { Error($"{prop} is not defined in {obj.GetType()}", 1); }
+                var propValue = GetValue(prop, obj);
+                
+                if(propValue == null) { Error($"{prop} is not defined in {obj.GetType()}", 1); continue; }
                 Type type = propValue.GetType();
 
                 // Contains other objects
@@ -524,6 +525,18 @@ namespace Encrypted_Messaging_App.Droid
                 Debug($"No properties found of object of type: {obj.GetType()}", 1);
             }
             return map;
+        }
+        private object GetValue(PropertyInfo prop, object obj)
+        {
+            try
+            {
+                var propValue = prop.GetValue(obj, null);
+                return propValue;
+            }
+            catch (TargetInvocationException)
+            {
+                return null;
+            }
         }
         private string PopFromList(ref List<string> path, int index)
         {

@@ -9,6 +9,22 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 
+namespace UsefulExtensions
+{
+    public static class Extensions
+    {
+        public static string[] Remove(this string[] arr, string item)
+        {
+            List<string> l_array = new List<string>(arr);
+            if (l_array.Remove(item))
+            {
+                return l_array.ToArray();
+            }
+            else { return null; }
+        }
+    }
+}
+
 
 
 

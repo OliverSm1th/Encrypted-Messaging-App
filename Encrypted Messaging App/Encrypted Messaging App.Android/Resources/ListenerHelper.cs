@@ -175,7 +175,19 @@ namespace Encrypted_Messaging_App.Droid.Resources
             return instance;
         }
 
+        private T[] ToObjectArr<T>(JavaList dict) where T : class, new()
+        {
+            List<T> result = new List<T>();
+            
 
+            for (int i = 0; i < dict.Count; i++)
+            {
+                JavaDictionary objectDict = (JavaDictionary)dict.Get(i);
+                object convertedObject = ToObject<T>(objectDict);
+                result.Add((T)convertedObject);
+            }
+            return result.ToArray();
+        }
 
         // User
         /*
@@ -481,7 +493,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if (doc.Get("messages") != null)
                 {
 
-
                     JavaList messagesObj = (JavaList)doc.Get("messages");
 
                     
@@ -532,15 +543,18 @@ namespace Encrypted_Messaging_App.Droid.Resources
         public Message ParseMessage(JavaDictionary data)
         {
 
-            if(data["author"] is JavaDictionary authorDict && data["content"] is string content && long.TryParse(data["createdTime"].ToString(), out long createdTime) && long.TryParse(data["deliveredTime"].ToString(), out long deliveredTime) && long.TryParse(data["readTime"].ToString(), out long readTime))
+            if(data["author"] is JavaDictionary authorDict && data["content"] is string content && long.TryParse(data["createdTime"].ToString(), out long createdTime) &&
+                long.TryParse(data["deliveredTime"].ToString(), out long deliveredTime) && long.TryParse(data["readTime"].ToString(), out long readTime) && data["pendingEvents"] is JavaList eventDict)
             {
                 User author = ToObject<User>(authorDict);
-                return new Message { author = author, content = content, createdTime = DateTime.FromBinary(createdTime), deliveredTime = DateTime.FromBinary(deliveredTime), readTime = DateTime.FromBinary(readTime) };
+                MessagePendingEvent[] pendingEvents = ToObjectArr<MessagePendingEvent>(eventDict);
+                return new Message { author = author, content = content, createdTime = DateTime.FromBinary(createdTime), deliveredTime = DateTime.FromBinary(deliveredTime), readTime = DateTime.FromBinary(readTime), pendingEvents = pendingEvents };
                 
             }
             Log(data["content"].ToString());
             return null;
         }
+
         public (ParseStatus, CUser) ParseCUser(DocumentSnapshot doc)
         {
             // Private user info: chatsID

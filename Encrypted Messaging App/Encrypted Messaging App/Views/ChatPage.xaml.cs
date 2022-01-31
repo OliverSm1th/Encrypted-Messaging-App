@@ -20,7 +20,8 @@ namespace Encrypted_Messaging_App.Views
         public ChatPage()
         {
             InitializeComponent();
-            
+            BindingContext = this;
+
         }
 
         protected override void OnAppearing()
@@ -31,7 +32,7 @@ namespace Encrypted_Messaging_App.Views
 
             UpdateHeaders();
 
-            UpdateMessages();
+            DisplayMessages();
 
 
             CurrentChat.headerChangedAction += UpdateHeaders;
@@ -43,6 +44,7 @@ namespace Encrypted_Messaging_App.Views
         {
             base.OnDisappearing();
             CurrentChat.headerChangedAction -= UpdateHeaders;
+            CurrentChat.contentChangedAction -= UpdateMessages;
 
             CurrentChat = null;
         }
@@ -57,7 +59,7 @@ namespace Encrypted_Messaging_App.Views
             Title = CurrentChat.title;
         }
 
-        private void UpdateMessages()
+        private void DisplayMessages()
         {
             MessagesCollection.Clear();
 
@@ -69,12 +71,17 @@ namespace Encrypted_Messaging_App.Views
             LoggerService.Log($"Added {MessagesCollection.Count} items to the messagesCollection");
         }
 
+        private void UpdateMessages(int[] indexToChange)
+        {
+
+        }
+
         public async void MessageSent(object sender, EventArgs e)
         {
             Entry MessageEntry = (Entry)Content.FindByName("TextEntry");
 
             if(MessageEntry == null || MessageEntry.Text.Length == 0) { return; }
-            bool result = await CurrentChat.sendMessage(new Message(MessageEntry.Text, CurrentUser.GetUser()));
+            bool result = await CurrentChat.sendMessage(MessageEntry.Text, CurrentUser.GetUser());
             if (!result) { LoggerService.Error("Unable to send message"); }
             else { LoggerService.Log("Sent message"); }
         }
