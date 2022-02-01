@@ -107,6 +107,14 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if (propName != null)
                 {
                     PropertyInfo prop = type.GetProperty(propName);
+                    if (prop.PropertyType.IsArray && valueEnumerator.Current is JavaList valueList)
+                    {
+                        object[] result = ParseEnumerator(valueList.GetEnumerator(), valueList.Count);
+                        if(prop.PropertyType == typeof(string[])) { prop.SetValue(instance, ConvertObjArr(result)); }
+                        else { Error($"Invalid array type: {prop.PropertyType.Name}"); }
+                        continue;
+                    }
+                    
                     string initialValue = (string)valueEnumerator.Current;
 
                     if (prop != null)
@@ -174,6 +182,8 @@ namespace Encrypted_Messaging_App.Droid.Resources
             }
             return instance;
         }
+
+
 
         private T[] ToObjectArr<T>(JavaList dict) where T : class, new()
         {

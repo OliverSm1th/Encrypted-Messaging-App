@@ -46,7 +46,6 @@ C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypt
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\R.txt
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\R.cs.flag
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\Encrypted Messaging App.Android.csproj.CoreCompileInputs.cache
-C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\Encrypted Messaging App.Android.csproj.CopyComplete
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\Encrypted Messaging App.Android.dll
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\Encrypted Messaging App.Android.pdb
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App.Android\obj\Debug\110\android\bin\com.oliverasmith123.encrypted_messaging_app.apk
