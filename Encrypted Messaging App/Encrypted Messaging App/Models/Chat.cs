@@ -205,6 +205,9 @@ namespace Encrypted_Messaging_App
             bool result = await initiliseListener();
             //bool result = await GetFromServer();
             if (!result) { Error($"Can't get chat from server: {id}"); return false; }
+
+
+
             //result = initiliseListener(true);
             return result;
         }
@@ -228,7 +231,8 @@ namespace Encrypted_Messaging_App
             if(id != null)
             {
                 TaskCompletionSource<bool> chatUpdatedTask = new TaskCompletionSource<bool>();
-                bool success = FirestoreService.ListenData<Chat>("Chat", async (result) => { await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true); }, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                bool success = FirestoreService.ListenData<Chat>("Chat", async (result) => { 
+                    await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true); }, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
                 await chatUpdatedTask.Task;
                 return success;
             }
@@ -313,6 +317,9 @@ namespace Encrypted_Messaging_App
                 }
                 headerChanged = true;
             }
+
+            if(encryptionInfo == null)  // Shouldn't be changed after chat creation
+            {  encryptionInfo = newChat.encryptionInfo; }
             
 
 

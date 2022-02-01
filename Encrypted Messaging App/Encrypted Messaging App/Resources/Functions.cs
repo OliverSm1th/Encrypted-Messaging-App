@@ -7,7 +7,8 @@ using System.Runtime.CompilerServices;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-
+using System.Reflection;
+using System.Numerics;
 
 namespace UsefulExtensions
 {
@@ -167,7 +168,69 @@ namespace Encrypted_Messaging_App.Views
             }
 
             LoggerService.Log("Set all colours");
+        }
 
+
+        private static int maxLength = 25;
+        public static void OutputProperties(object instance, int indentation = 0)
+        {
+            Type instanceType = instance.GetType();
+            string indent = new string(' ', indentation * 5);
+
+            foreach(PropertyInfo prop in instanceType.GetProperties())
+            {
+                string propName = prop.Name;
+                if (propName.Length >= maxLength - 2) { propName = propName.Substring(0, maxLength - 2) + ".."; }
+                else { propName = propName.PadRight(15); }
+
+                object instanceValue = prop.GetValue(instance);
+                if (prop.PropertyType.IsArray)
+                {
+                    if (instanceValue == null) { Console.WriteLine($"{indent}{propName} : Empty Array"); continue; }
+
+                    object[] instanceArr = (object[])instanceValue;
+                    Console.WriteLine($"{indent}{propName}:");
+                    for (int i = 0; i < instanceArr.Length; i++)
+                    {
+                        if (prop.PropertyType.Namespace == "Encrypted_Messaging_App" && indentation < 10) { OutputProperties(instanceArr[i], indentation + 1); }
+                        else { Console.WriteLine($"{indent}     {i} : {ConvertValue(instanceArr[i])}"); }
+                    }
+                } else if (prop.PropertyType.Namespace == "Encrypted_Messaging_App" && indentation < 10)
+                {
+                    if(instanceValue == null) { Console.WriteLine($"{indent}{propName}: null"); continue; }
+
+                    Console.WriteLine($"{indent}{propName}:");
+                    OutputProperties(instanceValue, indentation + 1);
+                }
+                else
+                {
+                    Console.WriteLine($"{indent}{propName} : {ConvertValue(instanceValue)}");
+                }
+            }
+        }
+        private static string ConvertValue(object value)
+        {
+            if(value == null) { return "null"; }
+            else if (value is string valueStr)
+            {
+                if(valueStr.Length >= maxLength - 2) { valueStr = valueStr.Substring(0, maxLength - 2) + ".."; }
+                return valueStr;
+            }
+            else if (value is DateTime dateTime)
+            {
+                return dateTime.ToString();
+            }
+            else if (value is BigInteger bigInt)
+            {
+                return bigInt.ToString().Substring(0, maxLength -2) + "..";
+            }
+            else if (value.GetType()== typeof(int))
+            {
+                return value.ToString();
+            }
+            else {
+                return null;
+            }
         }
 
     }

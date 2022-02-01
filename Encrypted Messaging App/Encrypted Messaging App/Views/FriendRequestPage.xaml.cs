@@ -8,6 +8,7 @@ using Xamarin.Forms.Xaml;
 using System.ComponentModel;
 using System.Numerics;
 
+using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using static Encrypted_Messaging_App.Views.Functions;
 using static Encrypted_Messaging_App.LoggerService;
@@ -128,7 +129,7 @@ namespace Encrypted_Messaging_App.Views
 
 
             // Create new DH session + calculate secret key
-            DiffieHellman userDH = new DiffieHellman();
+            DiffieHellman userDH = new DiffieHellman(SecurityLevel);
             requestKeyData = userDH.Respond(requestKeyData);
             BigInteger sharedKey = userDH.getSharedKey(requestKeyData);
 

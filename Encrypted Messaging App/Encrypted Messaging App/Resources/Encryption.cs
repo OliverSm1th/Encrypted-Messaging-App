@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 
 
-namespace Encrypted_Messaging_App.Views
+namespace Encrypted_Messaging_App.Encryption
 {
     public class DiffieHellman
     {
@@ -280,18 +280,12 @@ namespace Encrypted_Messaging_App.Views
         }
 
         // Main Encrypt Functions
-        public byte[] Encrypt(string s_key, string message, bool hexMessage = false, bool decrypt = false)
+        public byte[] Encrypt(byte[] sharedKey, string message, bool hexMessage = false, bool decrypt = false)
         {
             //   --- KEY ---
             // Hex Key -> Byte Key
             int x = 0;
-            byte[] sharedKey = new byte[s_key.Length / 2];
-            for (int i = 0; i < s_key.Length; i += 2)
-            {
-                int d_key = Convert.ToInt32(s_key.Substring(i, 2), 16);
-                sharedKey[x] = Convert.ToByte(d_key);
-                x++;
-            }
+            
 
             // Resize key
             if (sharedKey.Length < b_keyLength)
@@ -321,7 +315,6 @@ namespace Encrypted_Messaging_App.Views
             }
             else  // If it's given as a hex string
             {
-                x = 0;
                 b_message = new byte[message.Length / 2];
                 for (int i = 0; i < message.Length; i += 2)
                 {
@@ -371,6 +364,19 @@ namespace Encrypted_Messaging_App.Views
 
             return cipher;
         }
+        public byte[] Encrypt(string s_key, string message, bool hexMessage = false, bool decrypt = false)
+        {
+            int x = 0;
+            byte[] sharedKey = new byte[s_key.Length / 2];
+            for (int i = 0; i < s_key.Length; i += 2)
+            {
+                int d_key = Convert.ToInt32(s_key.Substring(i, 2), 16);
+                sharedKey[x] = Convert.ToByte(d_key);
+                x++;
+            }
+            return Encrypt(sharedKey, message, hexMessage, decrypt);
+        }
+        
         private byte[] EncryptByte(WordArr sharedKey, byte[] message) // Main Encryption Method
         {
             //WordArr sharedKey = new WordArr(l_sharedKey, this);

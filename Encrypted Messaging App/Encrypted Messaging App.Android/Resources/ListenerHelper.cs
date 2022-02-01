@@ -133,10 +133,12 @@ namespace Encrypted_Messaging_App.Droid.Resources
                             prop.SetValue(instance, initialValue, null);
                         }
                     }
+                    else { 
+                        Error($"Null property: {prop.Name}"); }
                 }
                 else
                 {
-                    Console.WriteLine("Can't convert property name to string");
+                    Error("Can't convert property name to string");
                 }
 
                 keyEnumerator.MoveNext();
@@ -497,6 +499,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             List<User> users = new List<User>();
             List<string> userIDs = new List<string>();
             string title = null;
+            KeyData encryptInfo = null;
 
             try
             {
@@ -539,8 +542,11 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 {
                     title = (string)doc.Get("title");
                 }
+                if(doc.Get("encryptionInfo") is JavaDictionary encryptionDict ){
+                    encryptInfo = ToObject<KeyData>(encryptionDict);
+                }
 
-                Chat chat = new Chat { messages = messages.ToArray(), userIDs = userIDs.ToArray(), title = title };
+                Chat chat = new Chat { messages = messages.ToArray(), userIDs = userIDs.ToArray(), title = title, encryptionInfo = encryptInfo };
 
                 return (new ParseStatus(true), chat);
             }

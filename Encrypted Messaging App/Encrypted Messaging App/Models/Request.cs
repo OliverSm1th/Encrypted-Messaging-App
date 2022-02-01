@@ -6,7 +6,7 @@ using System.Numerics;
 using Xamarin.Forms;
 using System.Threading.Tasks;
 
-using Encrypted_Messaging_App.Views;
+using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using static Encrypted_Messaging_App.LoggerService;
 using Encrypted_Messaging_App.Services;
@@ -94,7 +94,7 @@ namespace Encrypted_Messaging_App
         public KeyData EncryptionInfo { get; set; }
         // ----------
 
-        private DiffieHellman userDH = new DiffieHellman();
+        private DiffieHellman userDH = new DiffieHellman(SecurityLevel);
         private IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
 
 

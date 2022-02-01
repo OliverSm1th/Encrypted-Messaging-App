@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using UsefulExtensions;
+using Encrypted_Messaging_App.Encryption;
+using static Encrypted_Messaging_App.Views.GlobalVariables;
+using System.Numerics;
 
 namespace Encrypted_Messaging_App
 {
     public class Message
     {
-        public Message(string p_content, User p_author, string[] chatUserIDs)    // Creating the message
+        public Message(string p_content, User p_author, string[] chatUserIDs, BigInteger p_secretKey = null)    // Creating the message
         {
             content = p_content;
             createdTime = DateTime.Now;
             author = p_author;
+            secretKey = p_secretKey;
 
             string[] otherUserIDs = chatUserIDs.Remove(p_author.Id); // From Extensions
             if (otherUserIDs != null) { addEvent(PendingEventTypes.CREATED, otherUserIDs); }
@@ -23,6 +27,7 @@ namespace Encrypted_Messaging_App
         public DateTime deliveredTime { get; set; }
         public DateTime readTime { get; set; }
         public User author { get; set; }
+        private BigInteger secretKey;
 
 
         List<MessagePendingEvent> _pendingEvents = new List<MessagePendingEvent>();
@@ -64,6 +69,14 @@ namespace Encrypted_Messaging_App
 
             _pendingEvents.Add(new MessagePendingEvent { eventType = eventType, pendingUserIDs = pendingUserIDs });
             return true;
+        }
+
+        private string encryptContent(string content)
+        {
+            AES encryptAES = new AES(SecurityLevel);
+            byte[] byteEncrypted = encryptAES.Encrypt(secretKey.ToByteArray(), content);
+            string encryptedContent = Convert.ToBase64String(byteEncrypted);
+            return encryptedContent;
         }
     }
 

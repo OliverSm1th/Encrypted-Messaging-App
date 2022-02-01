@@ -15,7 +15,7 @@
                 />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-        <ToolbarItem Text="Encryption Info" Priority="0" Order="Secondary"/>
+        <ToolbarItem Text="Chat Info" Priority="0" Order="Secondary" Clicked="DisplayChatInfo"/>
         <ToolbarItem Text="Leave" Priority="0" Order="Secondary"/>
     </ContentPage.ToolbarItems>
     

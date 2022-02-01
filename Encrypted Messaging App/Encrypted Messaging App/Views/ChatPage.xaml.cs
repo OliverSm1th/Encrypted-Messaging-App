@@ -9,6 +9,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 
+
 namespace Encrypted_Messaging_App.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
@@ -85,5 +86,11 @@ namespace Encrypted_Messaging_App.Views
             if (!result) { LoggerService.Error("Unable to send message"); }
             else { LoggerService.Log("Sent message"); }
         }
+
+        public void DisplayChatInfo(object sender, EventArgs e)
+        {
+            Functions.OutputProperties(CurrentChat);
+        }
+
     }
 }
