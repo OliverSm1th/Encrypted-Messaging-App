@@ -503,30 +503,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             try
             {
-                if (doc.Get("messages") != null)
-                {
-
-                    JavaList messagesObj = (JavaList)doc.Get("messages");
-
-                    
-
-                    for(int i =0; i<messagesObj.Count; i++)
-                    {
-                        JavaDictionary messageObj = (JavaDictionary)messagesObj.Get(i);
-
-
-                        Message messageResult = ParseMessage(messageObj);
-
-                        if (messageResult != null) { messages.Add(messageResult); }
-                        else { Error("Unable to parse message"); }
-
-                        Log($"Done: {i}");
-
-                    }
-
-                    Log("Done!!");
-
-                }
                 if (doc.Get("userIDs") != null)
                 {
                     JavaList usersObj = (JavaList)doc.Get("userIDs");
@@ -545,6 +521,30 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if(doc.Get("encryptionInfo") is JavaDictionary encryptionDict ){
                     encryptInfo = ToObject<KeyData>(encryptionDict);
                 }
+                if (doc.Get("messages") != null)
+                {
+
+                    JavaList messagesObj = (JavaList)doc.Get("messages");
+
+
+
+                    for (int i = 0; i < messagesObj.Count; i++)
+                    {
+                        JavaDictionary messageObj = (JavaDictionary)messagesObj.Get(i);
+
+
+                        Message messageResult = ParseMessage(messageObj);
+
+                        if (messageResult != null) { messages.Add(messageResult); }
+                        else { Error("Unable to parse message"); }
+
+                        Log($"Done: {i}");
+
+                    }
+
+                    Log("Done!!");
+
+                }
 
                 Chat chat = new Chat { messages = messages.ToArray(), userIDs = userIDs.ToArray(), title = title, encryptionInfo = encryptInfo };
 
@@ -558,7 +558,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
         }
         public Message ParseMessage(JavaDictionary data)
         {
-
             if(data["author"] is JavaDictionary authorDict && data["content"] is string content && long.TryParse(data["createdTime"].ToString(), out long createdTime) &&
                 long.TryParse(data["deliveredTime"].ToString(), out long deliveredTime) && long.TryParse(data["readTime"].ToString(), out long readTime) && data["pendingEvents"] is JavaList eventDict)
             {

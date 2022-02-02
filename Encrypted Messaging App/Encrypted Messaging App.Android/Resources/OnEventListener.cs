@@ -42,7 +42,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             Debug($"Event Triggered: {EventType}");
 
-
             (bool success, object obj) response = (false, null);
 
 
@@ -51,6 +50,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if(doc.Data == null) { OnEventMethod(null); return; }
                 if(FieldName == null) {
                     response = Helper.ParseObject(doc, EventType);
+
                 }
                 else
                 {

@@ -614,3 +614,9 @@ Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/_Telemetry
 *.stamp
 *.stamp
 *.flat
+*.dll
+*.pdb
+*.cache
+Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/_TelemetryProps
+Encrypted Messaging App/Encrypted Messaging App.Android/bin/Debug/com.oliverasmith123.encrypted_messaging_app-Signed.apk
+.vs/Encrypted Messaging App/v16/.suo

@@ -183,15 +183,25 @@ namespace Encrypted_Messaging_App
         public async Task<bool> FetchFriendRequests()  // DEBUG: Refresh button
         {
             (bool success, object result) response = await FirestoreService.FetchData<Request[]>("Requests");
-            if (response.success)
+            
+            if (!response.success)
             {
-                friendRequests = (Request[])response.result;
-                return true;
+                if(response.result is string errorMessage && errorMessage.StartsWith("No docs found"))
+                {
+                    friendRequests = null;
+                    return true;
+                }
+                else
+                {
+                    Error($"Can`'t fetch request: {response.result}");
+                    return false;
+                }
+                
             }
             else
             {
-                Error($"Can`'t fetch request: {response.result}");
-                return false;
+                friendRequests = (Request[])response.result;
+                return true;
             }
         }
 

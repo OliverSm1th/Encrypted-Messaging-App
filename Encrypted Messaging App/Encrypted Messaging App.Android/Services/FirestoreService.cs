@@ -275,7 +275,7 @@ namespace Encrypted_Messaging_App.Droid
             if (!reference.success)
             {
                 return (false, $"Invalid path given: {path}");
-            } 
+            }
             /*else if(reference.document is null)
             {
                 return (false, "Invalid length of path given, must be odd to give document");

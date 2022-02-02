@@ -116,6 +116,7 @@ namespace Encrypted_Messaging_App
         public async Task<bool> accept(string chatID)     
         {
             EncryptionInfo = userDH.Respond(EncryptionInfo);
+            SQLiteService.ChatKeys.Set(chatID, userDH.getSharedKey(EncryptionInfo).ToString());
 
             (bool success, string message) result = await FirestoreService.SendAcceptedRequest(SourceUser.Id, new AcceptedRequest(chatID, EncryptionInfo));
 

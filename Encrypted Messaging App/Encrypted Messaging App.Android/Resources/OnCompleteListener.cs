@@ -25,19 +25,14 @@ namespace Encrypted_Messaging_App.Droid.Resources
     {
         private TaskCompletionSource<(bool, object)> _tcs;
         private Type ReturnType;
-        private CUser currentUser;
 
         ListenerHelper Helper = new ListenerHelper();
-      
+
 
         public OnCompleteListener(TaskCompletionSource<(bool, object)> tcs, Type returnType)
         {
             _tcs = tcs;
             ReturnType = returnType;
-            if(CurrentUser != null)
-            {
-                currentUser = CurrentUser;
-            }
         }
 
         // When get() request is completed
@@ -49,6 +44,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             if (result is DocumentSnapshot doc)
             {
+                
                 if(doc.Data == null) { _tcs.TrySetResult((false, "Invalid document path")); }
                 _tcs.TrySetResult(Helper.ParseObject(doc, ReturnType));
             } 

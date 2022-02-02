@@ -73,7 +73,7 @@ namespace Encrypted_Messaging_App.Views
         {
             Label noRequestLabel = (Label)Content.FindByName("NoRequests");
 
-            if (requests == currentRequests) { noRequestLabel.IsVisible = true; return; }
+            if (requests == currentRequests) { noRequestLabel.Opacity = 1; return; }
             else { currentRequests = requests; }
 
             Console.WriteLine("Displaying Requests");

@@ -10,7 +10,7 @@ namespace Encrypted_Messaging_App
 {
     public class Message
     {
-        public Message(string p_content, User p_author, string[] chatUserIDs, BigInteger p_secretKey = null)    // Creating the message
+        public Message(string p_content, User p_author, string[] chatUserIDs, BigInteger p_secretKey)    // Creating the message
         {
             content = p_content;
             createdTime = DateTime.Now;

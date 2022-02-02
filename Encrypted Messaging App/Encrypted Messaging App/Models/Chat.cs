@@ -124,7 +124,13 @@ namespace Encrypted_Messaging_App
         }
         private string[] _userIDs = new string[0]; 
         public Message[] messages { get; set; }
-        public string id { get; set; }
+        public string id { get { return _id; } 
+            set {
+                _id = value;
+                if (encryptionKey.Equals(default(BigInteger))) { getSecretKey(); }    // If encryption key is not set yet, fetch it
+            } 
+        }
+        private string _id;
 
         private BigInteger encryptionKey;
 
@@ -167,7 +173,7 @@ namespace Encrypted_Messaging_App
         }
         public async Task<bool> sendMessage(string content, User authorUser)
         {
-            Message newMessage = new Message(content, authorUser, userIDs);
+            Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
             if (!result.success)
             {
@@ -362,7 +368,18 @@ namespace Encrypted_Messaging_App
             }
             
         }
+        private BigInteger getSecretKey()
+        {
+            if(id == null) { return BigInteger.Zero; }
 
+            string keyString = SQLiteService.ChatKeys.Get(id);
+            if(keyString.Length == 0) { return BigInteger.Zero; }
+
+            bool resultBool = BigInteger.TryParse(keyString, out BigInteger resultInt);
+
+            if (resultBool) { return BigInteger.Zero; }
+            else { return resultInt; }
+        }
         
     }
 }
