@@ -72,7 +72,7 @@ namespace Encrypted_Messaging_App.Views
             LoggerService.Log($"Added {MessagesCollection.Count} items to the messagesCollection");
         }
 
-        private void UpdateMessages(int[] indexToChange)
+        private void UpdateMessages(int[] deletedIndex, int[] editedIndex)  
         {
 
         }

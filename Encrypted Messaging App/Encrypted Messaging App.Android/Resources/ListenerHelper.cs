@@ -102,7 +102,8 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             for (int i = 0; i < dict.Keys.Count; i++)
             {
-                string propName = keyEnumerator.Current as string;
+                if(keyEnumerator.Current == null) { continue; }
+                string propName = keyEnumerator.Current.ToString();
                 Console.WriteLine(keyEnumerator.Current);
                 if (propName != null)
                 {
@@ -115,7 +116,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                         continue;
                     }
                     
-                    string initialValue = (string)valueEnumerator.Current;
+                    string initialValue = valueEnumerator.Current.ToString();
 
                     if (prop != null)
                     {
@@ -558,7 +559,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
         }
         public Message ParseMessage(JavaDictionary data)
         {
-            if(data["author"] is JavaDictionary authorDict && data["content"] is string content && long.TryParse(data["createdTime"].ToString(), out long createdTime) &&
+            if(data["author"] is JavaDictionary authorDict && data["content"].ToString() is string content && long.TryParse(data["createdTime"].ToString(), out long createdTime) &&
                 long.TryParse(data["deliveredTime"].ToString(), out long deliveredTime) && long.TryParse(data["readTime"].ToString(), out long readTime) && data["pendingEvents"] is JavaList eventDict)
             {
                 User author = ToObject<User>(authorDict);
