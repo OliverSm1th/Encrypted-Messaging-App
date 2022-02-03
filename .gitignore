@@ -620,3 +620,6 @@ Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/_Telemetry
 Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/_TelemetryProps
 Encrypted Messaging App/Encrypted Messaging App.Android/bin/Debug/com.oliverasmith123.encrypted_messaging_app-Signed.apk
 .vs/Encrypted Messaging App/v16/.suo
+*.cache
+Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/designtime/build.props
+Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/DesignTimeResolveAssemblyReferencesInput.cache

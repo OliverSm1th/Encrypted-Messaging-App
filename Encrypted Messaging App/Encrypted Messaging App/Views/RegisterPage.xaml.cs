@@ -152,7 +152,7 @@ namespace Encrypted_Messaging_App.Views
                 }
 
                 RegisterBtn.IsEnabled = false;
-                RegisterBtn.BackgroundColor = Color.FromHex("#E74C3C");
+                RegisterBtn.BackgroundColor = (Color)Resources["Invalid"];
 
             }
             else

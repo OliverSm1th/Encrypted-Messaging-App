@@ -73,6 +73,7 @@
                         VerticalOptions ="Center"
                         HorizontalOptions ="Center"
                         Grid.Column="1"
+                        x:Name="MessageSend"
                         Clicked="MessageSent"/>
                 </Grid>
             </StackLayout>

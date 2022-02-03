@@ -74,17 +74,36 @@ namespace Encrypted_Messaging_App.Views
 
         private void UpdateMessages(int[] deletedIndex, int[] editedIndex)  
         {
-
+            foreach(int index in deletedIndex)
+            {
+                MessagesCollection.Remove(MessagesCollection[index]);
+            }
+            foreach(int index in editedIndex)
+            {
+                if(index < MessagesCollection.Count)
+                {
+                    MessagesCollection[index] = CurrentChat.messages[index];
+                }
+                else
+                {
+                    MessagesCollection.Add(CurrentChat.messages[index]);
+                }
+                
+            }
         }
 
         public async void MessageSent(object sender, EventArgs e)
         {
             Entry MessageEntry = (Entry)Content.FindByName("TextEntry");
+            Button MessageSendButton = (Button)Content.FindByName("MessageSend");
 
             if(MessageEntry == null || MessageEntry.Text.Length == 0) { return; }
+            MessageSendButton.IsEnabled = false;
             bool result = await CurrentChat.sendMessage(MessageEntry.Text, CurrentUser.GetUser());
-            if (!result) { LoggerService.Error("Unable to send message"); }
+            MessageSendButton.IsEnabled = true;
+            if (!result) { LoggerService.Error("Unable to send message"); MessageSendButton.BackgroundColor = ; }
             else { LoggerService.Log("Sent message"); }
+            MessageEntry.Text = "";
         }
 
         public void DisplayChatInfo(object sender, EventArgs e)

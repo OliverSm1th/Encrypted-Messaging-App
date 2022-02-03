@@ -135,7 +135,7 @@ namespace Encrypted_Messaging_App
         private BigInteger encryptionKey;
 
         public Action headerChangedAction;        // Changed Title/Id (refresh chatList + chatPage)
-        public Action<int[]> contentChangedAction;  // Changed/Send messages (refresh chatPage)    int[]- Messages index to update (empty if all)
+        public Action<int[], int[]> contentChangedAction;  // Changed/Send messages (refresh chatPage)    int[]- Messages index to update (empty if all)
 
 
 
@@ -295,14 +295,47 @@ namespace Encrypted_Messaging_App
         {
             bool headerChanged = false;
             bool contentChanged = false;
-            List<int> changedMessages = new List<int>();
+            List<int> editedMessages = new List<int>();
+            List<int> deletedMessages = new List<int>();
 
             if (newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
-            else if(messages != newChat.messages) { 
-                contentChanged = true; 
+            else if(messages != newChat.messages && messages != null) { 
+                contentChanged = true;
+                
+                for(int i=0; i< newChat.messages.Length; i++)
+                {
+                    if(messages == null || i > messages.Length-1)
+                    {
+                        editedMessages.Add(i);
+                        continue;
+                    }
+
+                    if(messages[i].content != newChat.messages[i].content) 
+                    {
+                        if(messages[i].createdTime == newChat.messages[i].createdTime && messages[i].author == messages[i].author)  // Edited
+                        {
+                            editedMessages.Add(i);
+                        }
+                        else  // Deleted
+                        {
+                            deletedMessages.Add(i);
+                        }
+                    }
+                }
+                //int addedMessages = newChat.messages.Length + deletedMessages.Count - (messages == null ? 0 : messages.Length);
+                for(int i=messages.Length-deletedMessages.Count; i<newChat.messages.Length; i++)
+                {
+                    editedMessages.Add(i);
+                }
                 messages = newChat.messages;
             }
-            
+            else if (messages != newChat.messages)
+            {
+                contentChanged = true;
+                for(int i=0; i<newChat.messages.Length; i++) { editedMessages.Add(i); }
+                messages = newChat.messages;
+            }
+
 
             if (newChat.userIDs == null || newChat.userIDs.Length < 2) { Error($"Invalid user IDs retrieved for: {id}"); }
             else { await setUserIDsAndUsers(newChat.userIDs); }
@@ -335,7 +368,7 @@ namespace Encrypted_Messaging_App
             }
             if (contentChanged && contentChangedAction != null)
             {
-                contentChangedAction.Invoke(changedMessages.ToArray());
+                contentChangedAction.Invoke(deletedMessages.ToArray(), editedMessages.ToArray());
             }
         }
         private bool propertiesDefined()

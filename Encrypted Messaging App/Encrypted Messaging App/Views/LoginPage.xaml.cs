@@ -66,7 +66,7 @@ namespace Encrypted_Messaging_App.Views
                     Label InvalidIcon = (Label)Content.FindByName($"{type}Icon");
                     IconInvalid(InvalidIcon);
                 }
-                LoginBtn.BackgroundColor = Color.FromHex("#E74C3C");
+                LoginBtn.BackgroundColor = (Color)Resources["Invalid"];
                 LoginBtn.IsEnabled = false;
                 
                 
@@ -129,12 +129,12 @@ namespace Encrypted_Messaging_App.Views
 
             if (filled) // && emailValid
             {
-                if(LoginBtn.BackgroundColor == Color.FromHex("#E74C3C"))
+                if(LoginBtn.BackgroundColor == (Color)Resources["Invalid"])
                 {
                     Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
                     InvalidMsg.IsVisible = false;
                 }
-                LoginBtn.BackgroundColor = Color.FromHex("#2196F3"); //Primary
+                LoginBtn.BackgroundColor = (Color)Resources["Primary"];
                 LoginBtn.IsEnabled = true;
             }
             else

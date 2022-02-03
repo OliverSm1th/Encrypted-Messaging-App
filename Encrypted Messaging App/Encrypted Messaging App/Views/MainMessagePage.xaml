@@ -42,7 +42,7 @@
                 <StackLayout x:Name="UserList" BindableLayout.ItemsSource="{Binding ChatsCollection}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Grid RowSpacing="0" ClassId="{Binding id}" BackgroundColor="{DynamicResource PrimaryLight}">
+                            <Grid RowSpacing="0" ClassId="{Binding id}" BackgroundColor="{DynamicResource Secondary}">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="ChatTapped"/>
                                 </Grid.GestureRecognizers>

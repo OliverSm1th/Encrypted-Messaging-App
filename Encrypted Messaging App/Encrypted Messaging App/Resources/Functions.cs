@@ -34,10 +34,9 @@ namespace Encrypted_Messaging_App.Views
     class Functions
     {
         static Dictionary<string, string[]> colourDict = new Dictionary<string, string[]>(){
-            {"Values", new string [] {"Primary", "PrimaryLight", "Secondary", "SecondaryLight"} },
-            {"Blue",   new string [] {"2196F3",  "6ec5ff",       "77BEF5",    "acf2ff" } },
-            //{"Red",    new string [] {"b71c1c",  "f05545",       "f44336",    "ff7961", } }
-            {"Red",    new string [] { "d32f2f",  "f05545",       "f44336",    "ff7961", } }
+            {"Values", new string [] {"Primary", "Secondary", "Invalid",   "MessageSent",   "MessageReceived"} },
+            {"Blue",   new string [] {"2196F3",  "77BEF5",    "E74C3C" ,   "FFFFFF", "FFFFFF" } },
+            {"Red",    new string [] { "d32f2f",  "f44336",   "E74C3C",    "FFFFFF", "FFFFFF"} }
         };
 
 
@@ -94,7 +93,7 @@ namespace Encrypted_Messaging_App.Views
             main.SetValue(Grid.ColumnSpanProperty, 1);
             Icon.Text = "\uf057";
             Icon.FontFamily = "Icons-R";
-            Icon.TextColor = Color.FromHex("#E74C3C");
+            Icon.TextColor = (Color)App.Current.Resources["Invalid"];
             Icon.VerticalTextAlignment = TextAlignment.Center;
             Icon.HorizontalTextAlignment = TextAlignment.Center;
             Grid grid = (Grid)main.Parent;
@@ -117,17 +116,17 @@ namespace Encrypted_Messaging_App.Views
     
         public static void IconInvalid(Label Icon)
         {
-            Icon.TextColor = Color.FromHex("#E74C3C");
+            Icon.TextColor = (Color)App.Current.Resources["Invalid"];
         }
         public static void IconInvalid(Button Icon)
         {
-            Icon.TextColor = Color.FromHex("#E74C3C");
+            Icon.TextColor = (Color)App.Current.Resources["Invalid"];
         }
 
         private static void ObjInvalidReset(Object[] Icons)
         {
             Color black = Color.FromHex("#000000");
-            Color red = Color.FromHex("#E74C3C");
+            Color red = (Color)App.Current.Resources["Invalid"];
             foreach (object Icon in Icons)
             {
                 if ((Color)Icon.GetType().GetProperty("TextColor").GetValue(Icon, null) == red)
