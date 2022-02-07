@@ -10,6 +10,7 @@ using Encrypted_Messaging_App.Services;
 using System.Linq;
 using System.Reflection;
 using static Encrypted_Messaging_App.LoggerService;
+using System.Security.Cryptography;
 
 namespace Encrypted_Messaging_App
 {
@@ -122,12 +123,30 @@ namespace Encrypted_Messaging_App
                 _userIDs = value;
             }
         }
-        private string[] _userIDs = new string[0]; 
-        public Message[] messages { get; set; }
+        private string[] _userIDs = new string[0];
+
+        Message[] _messages = new Message[] { };
+        public Message[] messages { get => _messages; 
+            set {
+                Message[] diff = value.Except(_messages).ToArray();
+                foreach(Message addedMessage in diff)
+                {
+                    if(addedMessage.secretKey == default(BigInteger))
+                    {
+                        addedMessage.secretKey = encryptionKey;
+                    }
+                    if(addedMessage.content == null)
+                    {
+                        addedMessage.DecryptContent();
+                    }
+                }
+                _messages = value;
+            } 
+        }
         public string id { get { return _id; } 
             set {
                 _id = value;
-                if (encryptionKey.Equals(default(BigInteger))) { getSecretKey(); }    // If encryption key is not set yet, fetch it
+                if (encryptionKey.Equals(default(BigInteger))) { encryptionKey = getSecretKey(); }    // If encryption key is not set yet, fetch it
             } 
         }
         private string _id;
@@ -137,6 +156,7 @@ namespace Encrypted_Messaging_App
         public Action headerChangedAction;        // Changed Title/Id (refresh chatList + chatPage)
         public Action<int[], int[]> contentChangedAction;  // Changed/Send messages (refresh chatPage)    int[]- Messages index to update (empty if all)
 
+        public bool showDecryptedMessages = true;
 
 
         IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
@@ -173,7 +193,9 @@ namespace Encrypted_Messaging_App
         }
         public async Task<bool> sendMessage(string content, User authorUser)
         {
-            Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);
+            Message newMessage = new Message(content, authorUser, userIDs);
+            bool encryptSuccess = newMessage.EncryptContent();
+            if (!encryptSuccess) { return false; }
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
             if (!result.success)
             {
@@ -203,7 +225,17 @@ namespace Encrypted_Messaging_App
             id = chatID;
         }
         
-        
+        public string GetPrivateKeyStr(int keyLength)
+        {
+            byte[] sharedKey = SHA256.Create().ComputeHash(encryptionKey.ToByteArray());
+            Array.Resize(ref sharedKey, keyLength/8);
+
+            return BitConverter.ToString(sharedKey).Replace("-", "");
+        }
+        public string GetUsersStr()
+        {
+            return generateDefaultTitle();
+        }
         
         // Firestore Fetch:
         public async Task<bool> FetchAndListen()
@@ -403,16 +435,17 @@ namespace Encrypted_Messaging_App
         }
         private BigInteger getSecretKey()
         {
-            if(id == null) { return BigInteger.Zero; }
+            if(id == null) { return default; }
 
             string keyString = SQLiteService.ChatKeys.Get(id);
-            if(keyString.Length == 0) { return BigInteger.Zero; }
+            if(keyString.Length == 0) { return default; }
 
             bool resultBool = BigInteger.TryParse(keyString, out BigInteger resultInt);
 
-            if (resultBool) { return BigInteger.Zero; }
+            if (!resultBool) { return default; }
             else { return resultInt; }
         }
         
     }
+
 }

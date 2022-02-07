@@ -253,6 +253,21 @@
           "lib/monoandroid10.0/Plugin.CloudFirestore.dll": {}
         }
       },
+      "Rg.Plugins.Popup/2.1.0": {
+        "type": "package",
+        "dependencies": {
+          "Xamarin.Forms": "5.0.0.2012"
+        },
+        "frameworkAssemblies": [
+          "Java.Interop"
+        ],
+        "compile": {
+          "lib/monoandroid10.0/Rg.Plugins.Popup.dll": {}
+        },
+        "runtime": {
+          "lib/monoandroid10.0/Rg.Plugins.Popup.dll": {}
+        }
+      },
       "sqlite-net-pcl/1.7.335": {
         "type": "package",
         "dependencies": {
@@ -2287,6 +2302,7 @@
           "Google.Cloud.Firestore": "2.4.0",
           "PCLStorage": "1.0.2",
           "Plugin.CloudFirestore": "4.1.0",
+          "Rg.Plugins.Popup": "2.1.0",
           "Xamarin.Essentials": "1.7.0",
           "Xamarin.Forms": "5.0.0.2083",
           "sqlite-net-pcl": "1.7.335"
@@ -2708,6 +2724,51 @@
         "lib/xamarinios10/Plugin.CloudFirestore.xml",
         "plugin.cloudfirestore.4.1.0.nupkg.sha512",
         "plugin.cloudfirestore.nuspec"
+      ]
+    },
+    "Rg.Plugins.Popup/2.1.0": {
+      "sha512": "caKjkvimzpUqk4pO/WSFn3uOX43uZNW5rPWCx7eXkOlGG9Br90MTwNVS1nxhtyypB69uUe/0GQPEC3rz+kscbA==",
+      "type": "package",
+      "path": "rg.plugins.popup/2.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.md",
+        "icon.png",
+        "lib/monoandroid10.0/Rg.Plugins.Popup.dll",
+        "lib/monoandroid10.0/Rg.Plugins.Popup.pdb",
+        "lib/monoandroid10.0/Rg.Plugins.Popup.xml",
+        "lib/net472/Rg.Plugins.Popup.dll",
+        "lib/net472/Rg.Plugins.Popup.pdb",
+        "lib/net472/Rg.Plugins.Popup.xml",
+        "lib/netcoreapp3.1/Rg.Plugins.Popup.dll",
+        "lib/netcoreapp3.1/Rg.Plugins.Popup.pdb",
+        "lib/netcoreapp3.1/Rg.Plugins.Popup.xml",
+        "lib/netstandard2.0/Rg.Plugins.Popup.dll",
+        "lib/netstandard2.0/Rg.Plugins.Popup.pdb",
+        "lib/netstandard2.0/Rg.Plugins.Popup.xml",
+        "lib/tizen80/Rg.Plugins.Popup.dll",
+        "lib/tizen80/Rg.Plugins.Popup.pdb",
+        "lib/tizen80/Rg.Plugins.Popup.xml",
+        "lib/uap10.0.18362/Rg.Plugins.Popup.dll",
+        "lib/uap10.0.18362/Rg.Plugins.Popup.pdb",
+        "lib/uap10.0.18362/Rg.Plugins.Popup.pri",
+        "lib/uap10.0.18362/Rg.Plugins.Popup.xml",
+        "lib/xamarinios10/Rg.Plugins.Popup.dll",
+        "lib/xamarinios10/Rg.Plugins.Popup.pdb",
+        "lib/xamarinios10/Rg.Plugins.Popup.xml",
+        "lib/xamarinmac20/Rg.Plugins.Popup.dll",
+        "lib/xamarinmac20/Rg.Plugins.Popup.pdb",
+        "lib/xamarinmac20/Rg.Plugins.Popup.xml",
+        "lib/xamarintvos10/Rg.Plugins.Popup.dll",
+        "lib/xamarintvos10/Rg.Plugins.Popup.pdb",
+        "lib/xamarintvos10/Rg.Plugins.Popup.xml",
+        "lib/xamarinwatchos10/Rg.Plugins.Popup.dll",
+        "lib/xamarinwatchos10/Rg.Plugins.Popup.pdb",
+        "lib/xamarinwatchos10/Rg.Plugins.Popup.xml",
+        "readme.txt",
+        "rg.plugins.popup.2.1.0.nupkg.sha512",
+        "rg.plugins.popup.nuspec"
       ]
     },
     "sqlite-net-pcl/1.7.335": {
@@ -4873,6 +4934,7 @@
   "projectFileDependencyGroups": {
     "MonoAndroid,Version=v11.0": [
       "Encrypted Messaging App >= 1.0.0",
+      "Rg.Plugins.Popup >= 2.1.0",
       "Xamarin.Essentials >= 1.7.0",
       "Xamarin.Firebase.Auth >= 121.0.1.1",
       "Xamarin.Firebase.Core >= 119.0.0",
@@ -4926,6 +4988,10 @@
     "frameworks": {
       "monoandroid11.0": {
         "dependencies": {
+          "Rg.Plugins.Popup": {
+            "target": "Package",
+            "version": "[2.1.0, )"
+          },
           "Xamarin.Essentials": {
             "target": "Package",
             "version": "[1.7.0, )"

@@ -97,7 +97,7 @@
                 
                 <!--Forgot Password-->
                 <Label Text="Forgot Password?" 
-                       TextColor="{DynamicResource Primary}" 
+                       TextColor="{DynamicResource Secondary}" 
                        FontFamily="Roboto-Black"
                        FontSize="Small"
                        Grid.Row="3" 
@@ -116,7 +116,7 @@
                         Grid.Row="4"
                         x:Name="LoginButton"
                         Clicked="LoginButton_Clicked" />
-                <Label Text="Invalid username or password"
+                <!--<Label Text="Invalid username or password"
                        TextColor="Red"
                        FontFamily="Roboto-Black"
                        FontSize="Small"
@@ -125,7 +125,7 @@
                        HorizontalOptions="Center"
                        IsVisible="false"
                        x:Name="InvalidLabel"
-                       />
+                       />-->
 
             </Grid>
             <Label

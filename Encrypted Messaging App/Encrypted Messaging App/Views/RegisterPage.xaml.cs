@@ -82,14 +82,12 @@ namespace Encrypted_Messaging_App.Views
                 RegisterBtn.IsEnabled = false;
                 RegisterBtn.BackgroundColor = Color.FromHex("#FF778899"); //Gray
             }
-            if (!emailValid)
+            if (!emailValid && !String.IsNullOrEmpty(EmailEntry.Text))
             {
                 invalidEmailIcon = EntryInvalid(EmailEntry, invalidEmailIcon, 2);
-                //invalidEmail = true;
             } else if (invalidEmailIcon != null)
             {
                 invalidEmailIcon = EntryInvalidReset(EmailEntry, invalidEmailIcon);
-                //invalidEmail = false;
             }
             if (!passwordValid) { invalidPasswordIcon = EntryInvalid(PasswordEntry, invalidPasswordIcon, 3); }
             else if(invalidPasswordIcon != null) { invalidPasswordIcon = EntryInvalidReset(EmailEntry, invalidPasswordIcon); }
@@ -102,7 +100,7 @@ namespace Encrypted_Messaging_App.Views
         {
             Label Icon = (Label)Content.FindByName($"{name}Icon");
             IconInvalidReset(Icon);
-            Color newColor = Color.FromHex("#2196F3"); // Primary
+            Color newColor = (Color)App.Current.Resources["Primary"]; // Primary
             Color defaultColor = Color.FromHex("#000000"); // Black
             if (Icon.TextColor == newColor) { Icon.TextColor = defaultColor; }
             else { Icon.TextColor = newColor; }
@@ -152,7 +150,7 @@ namespace Encrypted_Messaging_App.Views
                 }
 
                 RegisterBtn.IsEnabled = false;
-                RegisterBtn.BackgroundColor = (Color)Resources["Invalid"];
+                RegisterBtn.BackgroundColor = (Color)App.Current.Resources["Invalid"];
 
             }
             else

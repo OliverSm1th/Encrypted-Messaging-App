@@ -43,6 +43,7 @@
     <PackageReference Include="Google.Cloud.Firestore" Version="2.4.0" />
     <PackageReference Include="PCLStorage" Version="1.0.2" />
     <PackageReference Include="Plugin.CloudFirestore" Version="4.1.0" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="2.1.0" />
     <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
     <!--<PackageReference Include="System.Runtime.WindowsRuntime.UI.Xaml" Version="4.7.0" />-->
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2083" />  
@@ -51,6 +52,9 @@
 
   <ItemGroup>
     <EmbeddedResource Update="Views\ChatPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\ChatPopup.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\ForgotPasswordPage.xaml">
@@ -81,5 +85,11 @@
 
   <ItemGroup>
     <Folder Include="ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\ChatPopup.xaml.cs">
+      <DependentUpon>ChatPopup.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

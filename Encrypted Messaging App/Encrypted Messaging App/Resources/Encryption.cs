@@ -2,12 +2,14 @@
 using System.Linq;
 using System.Numerics;
 using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 
 
 namespace Encrypted_Messaging_App.Encryption
 {
+
     public class DiffieHellman
     {
         private BigInteger prime;
@@ -112,7 +114,7 @@ namespace Encrypted_Messaging_App.Encryption
             BigInteger publicKey = BigInteger.ModPow(global, userKey, prime);
             return publicKey;
         }
-        
+
         public BigInteger getPrivateKey()        // Get private key for storing locally on device
         {
             return userKey;
@@ -280,12 +282,11 @@ namespace Encrypted_Messaging_App.Encryption
         }
 
         // Main Encrypt Functions
-        public byte[] Encrypt(byte[] sharedKey, string message, bool hexMessage = false, bool decrypt = false)
+        public byte[] Encrypt(byte[] sharedKey, byte[] b_message, bool decrypt = false)
         {
             //   --- KEY ---
             // Hex Key -> Byte Key
-            int x = 0;
-            
+
 
             // Resize key
             if (sharedKey.Length < b_keyLength)
@@ -305,27 +306,18 @@ namespace Encrypted_Messaging_App.Encryption
             WordArr l_sharedKey = ScheduleKey(sharedKey);
 
 
+            // Resize message
+
+            if (b_message.Length % 16 > 0)
+            {
+                Array.Resize(ref b_message, ((b_message.Length / 16) + 1) * 16);
+            }
+
 
             //  --- MESSAGE ---
-            // Convert message to byte
-            byte[] b_message;
-            if (!hexMessage) // If it's given as a normal string:
-            {
-                b_message = Encoding.Unicode.GetBytes(message);
-            }
-            else  // If it's given as a hex string
-            {
-                b_message = new byte[message.Length / 2];
-                for (int i = 0; i < message.Length; i += 2)
-                {
-                    int d_message = Convert.ToInt32(message.Substring(i, 2), 16);
-                    b_message[x] = Convert.ToByte(d_message);
-                    x++;
-                }
-            }
 
             // Split the message into 128-bit blocks (16-byte)
-            byte[] cipher = new byte[b_message.Length];
+            byte[] cipher = new byte[Math.Max(b_message.Length, 16)];
             byte[] message_128 = new byte[16];
             for (int i = 0; i < b_message.Length; i++)
             {
@@ -345,38 +337,27 @@ namespace Encrypted_Messaging_App.Encryption
 
                     message_128 = new byte[16];
                 }
+                debug($"{i}");
             }
-            if (b_message.Length % 16 > 0)
+            debug($"All 128-bit segments added: {ConvertByteArr(cipher)}");
+            /*if (b_message.Length % 16 > 0)
             {
-                EncryptByte(l_sharedKey, message_128).Take((b_message.Length % 16)).ToArray().CopyTo(cipher, cipher.Length - 15);
                 if (decrypt)
                 {
-                    DecryptByte(l_sharedKey, message_128).Take((b_message.Length % 16)).ToArray().CopyTo(cipher, cipher.Length - 15);
+                    DecryptByte(l_sharedKey, message_128).Take((b_message.Length % 16)).ToArray().CopyTo(cipher, cipher.Length - 16);
                 }
                 else
                 {
-                    EncryptByte(l_sharedKey, message_128).Take((b_message.Length % 16)).ToArray().CopyTo(cipher, cipher.Length - 15);
+                    EncryptByte(l_sharedKey, message_128).CopyTo(cipher, cipher.Length - 16);   //.Take((b_message.Length % 16)).ToArray()
                 }
 
                 debug($"Sub-Message {b_message.Length / 16}:");
-            }
+            }*/
 
 
             return cipher;
         }
-        public byte[] Encrypt(string s_key, string message, bool hexMessage = false, bool decrypt = false)
-        {
-            int x = 0;
-            byte[] sharedKey = new byte[s_key.Length / 2];
-            for (int i = 0; i < s_key.Length; i += 2)
-            {
-                int d_key = Convert.ToInt32(s_key.Substring(i, 2), 16);
-                sharedKey[x] = Convert.ToByte(d_key);
-                x++;
-            }
-            return Encrypt(sharedKey, message, hexMessage, decrypt);
-        }
-        
+
         private byte[] EncryptByte(WordArr sharedKey, byte[] message) // Main Encryption Method
         {
             //WordArr sharedKey = new WordArr(l_sharedKey, this);
@@ -397,7 +378,6 @@ namespace Encrypted_Messaging_App.Encryption
                 currentKey = sharedKey.GetWords(4 * roundNum, 4 * (roundNum + 1));
 
                 SubBytes(ref message);
-                //debug($"  SubBytes: {ConvertByteArr(oldmessage)} -> {ConvertByteArr(message)}");
                 debug($"  SubBytes:\n{OutputMessageArr(message)}");
 
                 ShiftRows(ref message);
@@ -416,26 +396,14 @@ namespace Encrypted_Messaging_App.Encryption
         }
 
         // Main Decrypt Functions
-        public string Decrypt(string s_key, string cipher, bool hexCipher = false)
+        public byte[] Decrypt(byte[] sharedKey, byte[] cipher)
         {
             // As the decrypt function is so simular to the encrypt function just with a different function called at the end,
             // I call the Encrypt function, with the bool at the end signifying it's decrypt
-            byte[] result = Encrypt(s_key, cipher, hexCipher, true);
-
-            string message;
-
-            if (!hexCipher) // If it's given as a normal string:
-            {
-                message = Encoding.Unicode.GetString(result);
-            }
-            else  // If it's given as a hex string
-            {
-                message = ByteToHex(result);
-            }
-
-            return message;
+            return Encrypt(sharedKey, cipher, true);
         }
-        public string Decrypt(string s_key, byte[] cipher, bool hexCipher = false)
+
+        public byte[] DecryptOld(string s_key, byte[] cipher, bool hexCipher = false)
         {
             //   --- KEY ---
             // Hex Key -> Byte Key
@@ -452,7 +420,7 @@ namespace Encrypted_Messaging_App.Encryption
             if (sharedKey.Length < b_keyLength)
             {
                 debug("Error: Shared Key is too small");
-                return "";
+                return new byte[0];
             }
             else if (sharedKey.Length > b_keyLength)
             {
@@ -489,22 +457,7 @@ namespace Encrypted_Messaging_App.Encryption
 
 
 
-            byte[] result = DecryptByte(l_sharedKey, cipher);
-
-
-
-            string message;
-
-            if (!hexCipher) // If it's given as a normal string:
-            {
-                message = Encoding.Unicode.GetString(result);
-            }
-            else  // If it's given as a hex string
-            {
-                message = ByteToHex(result);
-            }
-
-            return message;
+            return DecryptByte(l_sharedKey, cipher);
         }
         private byte[] DecryptByte(WordArr sharedKey, byte[] cipher)
         {
@@ -820,14 +773,14 @@ namespace Encrypted_Messaging_App.Encryption
             }
             return result;
         }
-        private void debug(string message, bool ignoreConcat = false)
+        private void debug(string message, bool ignoreConcat = false, [CallerMemberName] string method = null)
         {
-            string method = (new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name;
+            // string method = (new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name;
             if (b_debug && !debug_Blacklist.Contains(method))
             {
-                if (message.Length > (Console.WindowWidth - 3) && !ignoreConcat)
+                if (false && message.Length > 80 && !ignoreConcat)
                 {
-                    message = message.Remove(Console.WindowWidth - 3) + "..."; ;
+                    message = message.Remove(30 - 3) + "..."; ;
                 }
                 Console.WriteLine(message);
             }

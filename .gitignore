@@ -623,3 +623,6 @@ Encrypted Messaging App/Encrypted Messaging App.Android/bin/Debug/com.oliverasmi
 *.cache
 Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/designtime/build.props
 Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/DesignTimeResolveAssemblyReferencesInput.cache
+*.pdb
+*.cache
+*.cache

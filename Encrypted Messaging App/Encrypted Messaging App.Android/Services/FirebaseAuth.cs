@@ -44,10 +44,10 @@ namespace Encrypted_Messaging_App.Droid
             catch(Exception e)
             {
                 string target = "";
-                string[] emailErrors = new string[] { "The email address is badly formatted.", "There is no user record corresponding to this identifier. The user may have been deleted." };
-                string[] emailPasswordErrors = new string[] { "The password is invalid or the user does not have a password.", "There is no user record corresponding to this identifier. The user may have been deleted." };
+                string[] emailErrors = new string[] { "The email address is badly formatted.", "There is no user record corresponding to this identifier. The user may have been deleted.", "There is no user record corresponding to this identifier. The user may have been deleted." };
+                string[] passwordErrors = new string[] { "The password is invalid or the user does not have a password." };
 
-                if(emailPasswordErrors.Contains(e.Message)) { target = "emailOrPassword"; }
+                if(passwordErrors.Contains(e.Message)) { target = "Password"; }
                 else if (emailErrors.Contains(e.Message)) { target = "Username"; }
 
                 Console.WriteLine($"LogIn Error: {e.Message}");

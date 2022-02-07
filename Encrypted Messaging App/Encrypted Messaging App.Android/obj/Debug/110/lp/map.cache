@@ -1,6 +1,7 @@
 FormsViewGroup.dll
 PCLStorage.dll
 Plugin.CloudFirestore.dll
+Rg.Plugins.Popup.dll
 SQLitePCLRaw.lib.e_sqlite3.android.dll
 Square.OkHttp.dll
 Square.OkIO.dll

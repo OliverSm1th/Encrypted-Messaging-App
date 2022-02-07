@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<pages:PopupPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+    x:Class="Encrypted_Messaging_App.Views.ChatPopup">
+    <Frame VerticalOptions="Center"
+        HorizontalOptions="Center"
+        Padding="10, 10, 10, 10"
+           BorderColor="{DynamicResource Primary}">
+        <StackLayout BackgroundColor="White" >
+            <Label 
+                Text="Chat Info" 
+                TextColor="{DynamicResource Secondary}"
+                FontSize="20"
+                HorizontalOptions="Center"
+                FontFamily="Roboto-Black"/>
+            <Label
+                TextColor="Black"
+                FontFamily="Roboto"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Title: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="chatTitle"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <Label
+                TextColor="Black"
+                FontFamily="Roboto"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Messages: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="chatMessageNum"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            
+            <Label
+                TextColor="Black"
+                FontFamily="Roboto"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Users: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="chatUsers"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            
+            <Label
+                TextColor="Black"
+                FontFamily="Roboto"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Encryption Key: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="chatKey"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            
+            <Label
+                        TextColor="Black"
+                        FontFamily="Roboto"
+                        HorizontalOptions="Center"
+                        Padding="0,0,0,30" >
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Decryption: "/>
+                        <Span Text="Enabled" FontAttributes="Bold" TextColor="Green" x:Name="chatDecryptionStatus"/>
+                    </FormattedString>
+                </Label.FormattedText>
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="Decryption_Tap"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
+    </Frame>
+    
+</pages:PopupPage>

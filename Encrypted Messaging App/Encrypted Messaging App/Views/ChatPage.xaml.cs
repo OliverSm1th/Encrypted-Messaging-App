@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Rg.Plugins.Popup.Extensions;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
-
+using System.ComponentModel;
 
 namespace Encrypted_Messaging_App.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ChatPage : ContentPage
     {
-        public ObservableCollection<Message> MessagesCollection { get; } = new ObservableCollection<Message>();
+        public ObservableCollection<MessageView> MessagesCollection { get; } = new ObservableCollection<MessageView>();
+        // This is a list of messageView so that I can combine content and encryptedContent to visibleContent, so I can change it when you disable/enable decryption (can't be done otherwise)
 
 
         public ChatPage()
@@ -27,7 +30,6 @@ namespace Encrypted_Messaging_App.Views
 
         protected override void OnAppearing()
         {
-            base.OnAppearing();
             Console.WriteLine($"~~ ChatPage: {CurrentChat.id} ~~");
 
 
@@ -36,9 +38,15 @@ namespace Encrypted_Messaging_App.Views
             DisplayMessages();
 
 
+
             CurrentChat.headerChangedAction += UpdateHeaders;
 
             CurrentChat.contentChangedAction += UpdateMessages;
+
+
+
+
+            base.OnAppearing();
         }
 
         protected override void OnDisappearing()
@@ -66,11 +74,12 @@ namespace Encrypted_Messaging_App.Views
 
             for (int i=0; i< CurrentChat.messages.Length; i++)
             {
-                MessagesCollection.Add(CurrentChat.messages[i]);
+                MessagesCollection.Add(CurrentChat.messages[i].GetMessageView());
                 LoggerService.Log($"Added the {i}th message: {CurrentChat.messages[i].content}");
             }
             LoggerService.Log($"Added {MessagesCollection.Count} items to the messagesCollection");
         }
+
 
         private void UpdateMessages(int[] deletedIndex, int[] editedIndex)  
         {
@@ -82,15 +91,16 @@ namespace Encrypted_Messaging_App.Views
             {
                 if(index < MessagesCollection.Count)
                 {
-                    MessagesCollection[index] = CurrentChat.messages[index];
+                    MessagesCollection[index] = CurrentChat.messages[index].GetMessageView();
                 }
                 else
                 {
-                    MessagesCollection.Add(CurrentChat.messages[index]);
+                    MessagesCollection.Add(CurrentChat.messages[index].GetMessageView());
                 }
                 
             }
         }
+
 
         public async void MessageSent(object sender, EventArgs e)
         {
@@ -101,15 +111,27 @@ namespace Encrypted_Messaging_App.Views
             MessageSendButton.IsEnabled = false;
             bool result = await CurrentChat.sendMessage(MessageEntry.Text, CurrentUser.GetUser());
             MessageSendButton.IsEnabled = true;
-            if (!result) { LoggerService.Error("Unable to send message"); MessageSendButton.BackgroundColor = ; }
+            if (!result) { 
+                LoggerService.Error("Unable to send message"); 
+                MessageSendButton.TextColor = (Color)App.Current.Resources["Invalid"]; 
+                Thread.Sleep(2000);
+                MessageSendButton.TextColor = (Color)App.Current.Resources["Secondary"];
+            }
             else { LoggerService.Log("Sent message"); }
             MessageEntry.Text = "";
         }
 
+        private Action decryptChanged; 
+
         public void DisplayChatInfo(object sender, EventArgs e)
         {
+            decryptChanged = DisplayMessages;
             Functions.OutputProperties(CurrentChat);
+            Navigation.PushPopupAsync(new ChatPopup(decryptChanged));
         }
+
+        
+        
 
     }
 }

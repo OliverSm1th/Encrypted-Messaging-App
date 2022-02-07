@@ -44,6 +44,10 @@
       "frameworks": {
         "xamarinios10": {
           "dependencies": {
+            "Rg.Plugins.Popup": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
             "Xamarin.Essentials": {
               "target": "Package",
               "version": "[1.7.0, )"
@@ -127,6 +131,10 @@
             "Plugin.CloudFirestore": {
               "target": "Package",
               "version": "[4.1.0, )"
+            },
+            "Rg.Plugins.Popup": {
+              "target": "Package",
+              "version": "[2.1.0, )"
             },
             "Xamarin.Essentials": {
               "target": "Package",

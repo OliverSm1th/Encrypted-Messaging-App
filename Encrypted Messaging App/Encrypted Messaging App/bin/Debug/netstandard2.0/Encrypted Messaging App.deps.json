@@ -13,6 +13,7 @@
           "NETStandard.Library": "2.0.3",
           "PCLStorage": "1.0.2",
           "Plugin.CloudFirestore": "4.1.0",
+          "Rg.Plugins.Popup": "2.1.0",
           "Xamarin.Essentials": "1.7.0",
           "Xamarin.Forms": "5.0.0.2083",
           "sqlite-net-pcl": "1.7.335"
@@ -266,6 +267,17 @@
           "lib/netstandard2.0/Plugin.CloudFirestore.dll": {
             "assemblyVersion": "4.1.0.0",
             "fileVersion": "4.1.0.0"
+          }
+        }
+      },
+      "Rg.Plugins.Popup/2.1.0": {
+        "dependencies": {
+          "Xamarin.Forms": "5.0.0.2083"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Rg.Plugins.Popup.dll": {
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.1.0.0"
           }
         }
       },
@@ -614,6 +626,13 @@
       "sha512": "sha512-OZm6aRxDGFjItnfvREk/WvZ0IDNE68bYqzfEK+aeOg7uuG3aiMcMR+vkG6CuLFFgi7C175Eh7jk4ckNfSwRsnA==",
       "path": "plugin.cloudfirestore/4.1.0",
       "hashPath": "plugin.cloudfirestore.4.1.0.nupkg.sha512"
+    },
+    "Rg.Plugins.Popup/2.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-caKjkvimzpUqk4pO/WSFn3uOX43uZNW5rPWCx7eXkOlGG9Br90MTwNVS1nxhtyypB69uUe/0GQPEC3rz+kscbA==",
+      "path": "rg.plugins.popup/2.1.0",
+      "hashPath": "rg.plugins.popup.2.1.0.nupkg.sha512"
     },
     "sqlite-net-pcl/1.7.335": {
       "type": "package",

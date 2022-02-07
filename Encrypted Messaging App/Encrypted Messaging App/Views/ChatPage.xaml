@@ -26,21 +26,24 @@
                 <StackLayout x:Name="MessageList" BindableLayout.ItemsSource="{Binding MessagesCollection}"  Padding="5, 10, 0, 0"  VerticalOptions="EndAndExpand">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <Grid>
+
+                            <Grid >
+                                <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{DynamicResource Secondary}" HorizontalOptions="Start" VerticalOptions="End" />
                                 <Frame 
                                 CornerRadius="15" 
                                 BackgroundColor="{DynamicResource Secondary}"
                                 Padding="0" HorizontalOptions="Start"
+                                x:Name="MessageFrame"
                                 >
-                                    <Label Text="{Binding content}"
+                                    <Label Text="{Binding visibleContent}"
                                    TextColor="Black"
                                    FontSize="Medium"
                                    FontFamily="Roboto"
                                    Padding="10,10,10,5" 
                                    HorizontalOptions="Start"
+                                   x:Name="messageContent"
                                    />
                                 </Frame>
-                                <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{DynamicResource Secondary}" HorizontalOptions="Start" VerticalOptions="End" />
                             </Grid>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>

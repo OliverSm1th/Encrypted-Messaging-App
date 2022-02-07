@@ -53,20 +53,16 @@ namespace Encrypted_Messaging_App.Views
             }
             else
             {
-                Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
+                //Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
                 Button LoginBtn = (Button)sender;
 
                 string type = result.errorMsg;
-                if(type == "emailOrPassword")
-                {
-                    InvalidMsg.IsVisible = true;
-                }
-                else if(type != "")
+                if(type != "")
                 {
                     Label InvalidIcon = (Label)Content.FindByName($"{type}Icon");
                     IconInvalid(InvalidIcon);
                 }
-                LoginBtn.BackgroundColor = (Color)Resources["Invalid"];
+                LoginBtn.BackgroundColor = (Color)App.Current.Resources["Invalid"];
                 LoginBtn.IsEnabled = false;
                 
                 
@@ -129,12 +125,12 @@ namespace Encrypted_Messaging_App.Views
 
             if (filled) // && emailValid
             {
-                if(LoginBtn.BackgroundColor == (Color)Resources["Invalid"])
-                {
-                    Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
-                    InvalidMsg.IsVisible = false;
-                }
-                LoginBtn.BackgroundColor = (Color)Resources["Primary"];
+                //if(LoginBtn.BackgroundColor == (Color)App.Current.Resources["Invalid"])
+                //{
+                    //Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
+                    //InvalidMsg.IsVisible = false;
+                //}
+                LoginBtn.BackgroundColor = (Color)App.Current.Resources["Primary"];
                 LoginBtn.IsEnabled = true;
             }
             else
@@ -159,7 +155,7 @@ namespace Encrypted_Messaging_App.Views
         private void UsernameFocused(object sender, FocusEventArgs e)
         {
             Label UserIcon = (Label)Content.FindByName("UsernameIcon");
-            Color newColor = Color.FromHex("#2196F3"); // Primary
+            Color newColor = (Color)App.Current.Resources["Primary"]; // Primary
             Color defaultColor = Color.FromHex("#000000"); // Black
             if (UserIcon.TextColor == newColor) { UserIcon.TextColor = defaultColor; }
             else { UserIcon.TextColor = newColor; } 
@@ -167,7 +163,7 @@ namespace Encrypted_Messaging_App.Views
         private void PasswordFocused(object sender, FocusEventArgs e)
         {
             Label PasswordIcon = (Label)Content.FindByName("PasswordIcon");
-            Color newColor = Color.FromHex("#2196F3"); // Primary
+            Color newColor = (Color)App.Current.Resources["Primary"]; // Primary
             Color defaultColor = Color.FromHex("#000000"); // Black
             if (PasswordIcon.TextColor == newColor) { PasswordIcon.TextColor = defaultColor; }
             else { PasswordIcon.TextColor = newColor; }

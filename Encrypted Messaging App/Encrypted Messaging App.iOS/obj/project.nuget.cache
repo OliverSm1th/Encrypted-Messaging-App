@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "WWJ2oWexNSKfdPbY6iGZHeHs09vq1pgOI7AiFBaD18Ugookv0QShDFVxmd+4VIxNpPYv2fvSwbJc+SxPEbZpwA==",
+  "dgSpecHash": "eLBKYVmERXH2O8bt5msu19B3VQfy1KGQIGewt+LILBAqPz8mgGhPsGj+iWqDqTTOjXHiRCGGdS4mpIbuklpykA==",
   "success": true,
   "projectFilePath": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.iOS\\Encrypted Messaging App.iOS.csproj",
   "expectedPackageFiles": [
@@ -22,6 +22,7 @@
     "C:\\Users\\olive\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\olive\\.nuget\\packages\\pclstorage\\1.0.2\\pclstorage.1.0.2.nupkg.sha512",
     "C:\\Users\\olive\\.nuget\\packages\\plugin.cloudfirestore\\4.1.0\\plugin.cloudfirestore.4.1.0.nupkg.sha512",
+    "C:\\Users\\olive\\.nuget\\packages\\rg.plugins.popup\\2.1.0\\rg.plugins.popup.2.1.0.nupkg.sha512",
     "C:\\Users\\olive\\.nuget\\packages\\sqlite-net-pcl\\1.7.335\\sqlite-net-pcl.1.7.335.nupkg.sha512",
     "C:\\Users\\olive\\.nuget\\packages\\sqlitepclraw.bundle_green\\2.0.3\\sqlitepclraw.bundle_green.2.0.3.nupkg.sha512",
     "C:\\Users\\olive\\.nuget\\packages\\sqlitepclraw.core\\2.0.3\\sqlitepclraw.core.2.0.3.nupkg.sha512",

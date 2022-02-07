@@ -55,7 +55,8 @@ namespace Encrypted_Messaging_App.Views
             }
             else
             {
-                Console.WriteLine("Error!!");
+                Button LoginBtn = (Button)Content.FindByName("SubmitButton");
+                LoginBtn.BackgroundColor = (Color)App.Current.Resources["Invalid"];
             }
         }
 

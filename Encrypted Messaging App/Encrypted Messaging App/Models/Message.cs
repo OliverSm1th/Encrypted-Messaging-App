@@ -10,24 +10,29 @@ namespace Encrypted_Messaging_App
 {
     public class Message
     {
-        public Message(string p_content, User p_author, string[] chatUserIDs, BigInteger p_secretKey)    // Creating the message
+        public Message(string p_content, User p_author, string[] chatUserIDs)    // Creating the message
         {
             content = p_content;
             createdTime = DateTime.Now;
             author = p_author;
-            secretKey = p_secretKey;
 
             string[] otherUserIDs = chatUserIDs.Remove(p_author.Id); // From Extensions
             if (otherUserIDs != null) { addEvent(PendingEventTypes.CREATED, otherUserIDs); }
         }
 
         public Message() { }   // Defining the message from the server
-        public string content { get; set; }
+        public string content;
+
+        string _encryptedcontent;
+        public string encryptedContent { 
+            get => _encryptedcontent;
+            set { _encryptedcontent = value; DecryptContent(); }
+        }
         public DateTime createdTime { get; set; }
         public DateTime deliveredTime { get; set; }
         public DateTime readTime { get; set; }
         public User author { get; set; }
-        private BigInteger secretKey;
+        public BigInteger secretKey; // Set by chat when added to Message[] messages
 
 
         List<MessagePendingEvent> _pendingEvents = new List<MessagePendingEvent>();
@@ -41,8 +46,26 @@ namespace Encrypted_Messaging_App
             }
         }
 
+        public bool EncryptContent()
+        {
+            if(secretKey.IsZero || content == null || content.Length == 0) { return false; }
+            AES encryptAES = new AES(SecurityLevel, true);
+            byte[] byteEncrypted = encryptAES.Encrypt(secretKey.ToByteArray(), UnicodeToByteArr(content));
+            encryptedContent = ByteArrToBase64(byteEncrypted);
+            return true;
+        }
 
-        public bool edit(string p_newContent, User p_editor, string[] chatUserIDs)
+        public bool DecryptContent()
+        {
+            if (secretKey.IsZero || encryptedContent == null || encryptedContent.Length == 0) { return false; }
+            AES decryptAES = new AES(SecurityLevel);
+            byte[] byteContent = decryptAES.Decrypt(secretKey.ToByteArray(), Base64ToByteArr(encryptedContent));
+            content = ByteArrToUnicode(byteContent);
+            return true;
+        }
+
+
+        public bool Edit(string p_newContent, User p_editor, string[] chatUserIDs)
         {
             if(author == null || author != p_editor) { return false; }
 
@@ -51,7 +74,7 @@ namespace Encrypted_Messaging_App
 
             return addEvent(PendingEventTypes.EDITED, otherUserIDs);
         }
-        public bool delete(User p_deleter, string[] chatUserIDs)
+        public bool Delete(User p_deleter, string[] chatUserIDs)
         {
             if(author == null || author != p_deleter) { return false; }
 
@@ -62,6 +85,11 @@ namespace Encrypted_Messaging_App
         }
 
 
+        public MessageView GetMessageView()
+        {
+            return new MessageView { content = content, encryptedContent = encryptedContent };
+        }
+
 
         private bool addEvent(string eventType, string[] pendingUserIDs)
         {
@@ -71,15 +99,27 @@ namespace Encrypted_Messaging_App
             return true;
         }
 
-        private string encryptContent(string content)
+        // Encryption Conversions:
+        private static byte[] UnicodeToByteArr(string unicode)
         {
-            AES encryptAES = new AES(SecurityLevel);
-            byte[] byteEncrypted = encryptAES.Encrypt(secretKey.ToByteArray(), content);
-            string encryptedContent = Convert.ToBase64String(byteEncrypted);
-            return encryptedContent;
+            return Encoding.Unicode.GetBytes(unicode);
         }
+        private static string ByteArrToUnicode(Byte[] result)
+        {
+            return Encoding.Unicode.GetString(result);
+        }
+        private static string ByteArrToBase64(Byte[] result)
+        {
+            return Convert.ToBase64String(result);
+        }
+        private static byte[] Base64ToByteArr(string base64)
+        {
+            return Convert.FromBase64String(base64);
+        }
+
     }
 
+    // Pending Events:
     public class MessagePendingEvent
     {
         public MessagePendingEvent() {}
@@ -88,9 +128,6 @@ namespace Encrypted_Messaging_App
         public string[] pendingUserIDs { get; set; }
 
     }
-
-
-
     public static class PendingEventTypes
     {
         
@@ -104,6 +141,17 @@ namespace Encrypted_Messaging_App
         {
             return Array.IndexOf(validEventTypes, eventType) != -1;
         }
+    }
+
+    //Message View:    (for messageList)
+    public class MessageView
+    {
+        public MessageView() { }
+
+        public string encryptedContent;
+        public string content;
+
+        public string visibleContent { get => (CurrentChat.showDecryptedMessages ? content : encryptedContent); }
     }
 
 }
