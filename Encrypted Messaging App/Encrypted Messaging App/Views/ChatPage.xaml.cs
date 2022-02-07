@@ -44,8 +44,6 @@ namespace Encrypted_Messaging_App.Views
             CurrentChat.contentChangedAction += UpdateMessages;
 
 
-
-
             base.OnAppearing();
         }
 

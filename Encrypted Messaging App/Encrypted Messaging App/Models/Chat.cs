@@ -193,7 +193,7 @@ namespace Encrypted_Messaging_App
         }
         public async Task<bool> sendMessage(string content, User authorUser)
         {
-            Message newMessage = new Message(content, authorUser, userIDs);
+            Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);
             bool encryptSuccess = newMessage.EncryptContent();
             if (!encryptSuccess) { return false; }
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);

@@ -5,16 +5,18 @@ using UsefulExtensions;
 using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using System.Numerics;
+using Xamarin.Forms;
 
 namespace Encrypted_Messaging_App
 {
     public class Message
     {
-        public Message(string p_content, User p_author, string[] chatUserIDs)    // Creating the message
+        public Message(string p_content, User p_author, string[] chatUserIDs, BigInteger p_secretKey)    // Creating the message
         {
             content = p_content;
             createdTime = DateTime.Now;
             author = p_author;
+            secretKey = p_secretKey;
 
             string[] otherUserIDs = chatUserIDs.Remove(p_author.Id); // From Extensions
             if (otherUserIDs != null) { addEvent(PendingEventTypes.CREATED, otherUserIDs); }
@@ -87,7 +89,7 @@ namespace Encrypted_Messaging_App
 
         public MessageView GetMessageView()
         {
-            return new MessageView { content = content, encryptedContent = encryptedContent };
+            return new MessageView { content = content, encryptedContent = encryptedContent, author = author };
         }
 
 
@@ -150,8 +152,13 @@ namespace Encrypted_Messaging_App
 
         public string encryptedContent;
         public string content;
+        public User author;
+        string currentUserId = CurrentUser.GetUser().Id;
 
         public string visibleContent { get => (CurrentChat.showDecryptedMessages ? content : encryptedContent); }
+        public LayoutOptions horizontalOption { 
+            get =>  (author.Id == currentUserId ? LayoutOptions.End : LayoutOptions.Start);
+        }
     }
 
 }
