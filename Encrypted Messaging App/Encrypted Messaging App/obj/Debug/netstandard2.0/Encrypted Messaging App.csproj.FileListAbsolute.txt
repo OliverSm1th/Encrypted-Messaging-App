@@ -43,3 +43,4 @@ D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Mes
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ChatPage.xaml.g.cs
 D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ChatPopup.xaml.g.cs
 C:\Users\Student\Encrypted-Messaging-App-Xamarin\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\ChatPopup.xaml.g.cs
+D:\Documents\Computing\NEA A-Level Project\Encrypted Messaging App\Encrypted Messaging App\Encrypted Messaging App\obj\Debug\netstandard2.0\Views\SettingsPopup.xaml.g.cs

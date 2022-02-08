@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using Rg.Plugins.Popup.Extensions;
 using static Encrypted_Messaging_App.LoggerService;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 
@@ -110,6 +111,10 @@ namespace Encrypted_Messaging_App.Views
             Functions.setColour(action.Split(' ')[1]);
         }
 
+        public void SettingsPopOut(object sender, EventArgs e)
+        {
+            Navigation.PushPopupAsync(new SettingsPopup());
+        }
 
         public void LogOut(object sender, EventArgs e)
         {

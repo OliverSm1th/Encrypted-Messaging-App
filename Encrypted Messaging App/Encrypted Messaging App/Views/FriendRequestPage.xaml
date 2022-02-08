@@ -36,39 +36,38 @@
                                     <ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
                                 <Label
-                           Text="{Binding Username}"
-                           TextColor="Black"
-                                FontSize="Medium"
-                                FontFamily="Roboto"
-                           />
+                                    Text="{Binding Username}"
+                                    TextColor="Black"
+                                    FontSize="Medium"
+                                    FontFamily="Roboto"/>
                                 <Label
-                                Text="{Binding Id}"
-                                TextColor="Gray"
-                                FontSize="Caption"
-                                FontFamily="Roboto"
-                                Grid.Row="1"
-                           />
+                                    Text="{Binding Id}"
+                                    TextColor="Gray"
+                                    FontSize="Caption"
+                                    FontFamily="Roboto"
+                                    Grid.Row="1"/>
                                 <Label Text="check-circle"
-                                ClassId="{Binding Id}"
-                                TextColor="Green"
-                                FontSize="22"
-                                FontFamily="Icons-R"
-                                
-                                Grid.Column="1"
-                                Grid.RowSpan="1" 
-                            >
+                                       ClassId="{Binding Id}"
+                                       TextColor="Green"
+                                       FontSize="22"
+                                       FontFamily="Icons-R"
+                                       Grid.Column="1"
+                                       Grid.RowSpan="1">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="AcceptRequest"/>
                                     </Label.GestureRecognizers>
                                 </Label>
                                 <Label Text="times-circle"
-                                ClassId="{Binding Id}"
-                                TextColor="Red"
-                                FontSize="22"
-                                FontFamily="Icons-R"
-                                Grid.Column="2"
-                                Grid.RowSpan="1"
-                           />
+                                       ClassId="{Binding Id}"
+                                       TextColor="Red"
+                                       FontSize="22"
+                                       FontFamily="Icons-R"
+                                       Grid.Column="2"
+                                       Grid.RowSpan="1">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="DenyRequest"/>
+                                    </Label.GestureRecognizers>
+                                </Label>
                             </Grid>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
@@ -122,6 +121,7 @@
                        Grid.ColumnSpan="1"
                        Grid.Row="1"
                        TextChanged="EditedEntry"
+                       Completed="SendRequest"
                        x:Name="UsernameEntry"/>
                        <!--TextChanged="EditedEntry"
                        Focused="UsernameFocused"
@@ -139,22 +139,6 @@
                     Grid.Column="2"
                     Clicked="SendRequest"
                     x:Name="RequestButton"/>
-
-
-
-            <!--<Label Text="arrow-alt-circle-right"
-                   FontFamily="Icons-R"
-                   FontSize="Medium"
-                   TextColor="Black"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center"
-                    Grid.Row="1"
-                    Grid.Column="2"
-                    >
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="SendRequest"/>
-                </Label.GestureRecognizers>
-            </Label>-->
         </Grid>
     </StackLayout>
 </ContentPage>

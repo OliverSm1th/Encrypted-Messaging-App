@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<pages:PopupPage xmlns="http://xamarin.com/schemas/2014/forms"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                 xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
+                 x:Class="Encrypted_Messaging_App.Views.SettingsPopup">
+    <Frame VerticalOptions="Center" HorizontalOptions="Center" Padding="20,0,20,20" BorderColor="{DynamicResource Primary}">
+        <StackLayout BackgroundColor="White">
+            <Label 
+                Text="Settings" 
+                TextColor="{DynamicResource Secondary}"
+                FontSize="25"
+                HorizontalOptions="Center">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="{StaticResource IconSettings}" FontFamily="Icons-S"/>
+                        <Span Text=" Settings" FontFamily="Roboto-Black"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label
+                FontFamily="Roboto"
+                TextColor="Black"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Username: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="settingUsername"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label  
+                FontFamily="Roboto"
+                TextColor="Black"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Chats: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="settingChats"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label 
+                FontFamily="Roboto"
+                TextColor="Black"
+                HorizontalOptions="Start">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Friend Requests: "  FontAttributes="Bold"/>
+                        <Span Text="" x:Name="settingRequests"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <Picker Title="Choose Theme" HorizontalOptions="Start" FontFamily="Roboto" TextColor="Black">
+                <Picker.Items>
+                    <x:String>🟥 Red</x:String>
+                    <x:String>🟦 Blue</x:String>
+                </Picker.Items>
+            </Picker>
+            
+        </StackLayout>
+    </Frame>
+</pages:PopupPage>

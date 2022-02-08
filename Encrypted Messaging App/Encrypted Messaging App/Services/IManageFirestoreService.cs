@@ -7,8 +7,6 @@ namespace Encrypted_Messaging_App
 {
     public interface IManageFirestoreService
     {
-        string GetPath(string type, params (string, string)[] arguments);
-
         Task<(bool, string)> InitiliseUser(string Username);
 
         Task<(bool, string)> InitiliseChat(Chat chat);
@@ -26,6 +24,12 @@ namespace Encrypted_Messaging_App
 
         bool ListenData<ReturnType>(string type, Action<object> action, string changeType = null, params (string, string)[] arguments);
         Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, params (string, string)[] arguments);
+
+        Task<(bool, string)> WriteObject(object obj, string pathInfo, params (string, string)[] arguments);
+
+        Task<(bool, string)> DeleteObject(string pathInfo, params (string, string)[] arguments);
+
+
 
         Task<User> UserFromId(string id);
         Task<User> UserFromUsername(string username);

@@ -41,38 +41,11 @@ namespace Encrypted_Messaging_App.Droid
         };
 
         private Dictionary<string, TaskCompletionSource<bool>> uncompletedFetchTasks = new Dictionary<string, TaskCompletionSource<bool>>();
-
-        private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string[] pathLevels)
-        {
-            if (pathLevels == null || pathLevels.Length == 0) { return (false, null, null); }
+        private List<IListenerRegistration> Listeners = new List<IListenerRegistration>();
 
 
-            CollectionReference collection = FirebaseFirestore.Instance.Collection(pathLevels[0]);
-            DocumentReference document = null;
 
-            foreach(string currPathLevel in pathLevels.Skip(1))
-            {
-                if(currPathLevel.Length == 0) { break; }
-                if(document is null)
-                {
-                    document = collection.Document(currPathLevel);
-                    collection = null;
-                }
-                else
-                {
-                    collection = document.Collection(currPathLevel);
-                    document = null;
-                }
-            }
-            return (true, document, collection);
-        }
-        private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string path)
-        {
-            return GetReferenceFromPath(path.Split('/'));
-        }
-
-
-        public string GetPath(string pathInfo, params (string, string)[] arguments)
+        private string GetPath(string pathInfo, params (string, string)[] arguments)
         {            
             if (pathInfo.Split("/").Length > 1)   // Allows you to do:  CUser/chatsID
             {
@@ -137,11 +110,62 @@ namespace Encrypted_Messaging_App.Droid
             }
             return levelName;
         }
+        private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string[] pathLevels)
+        {
+            if (pathLevels == null || pathLevels.Length == 0) { return (false, null, null); }
+
+
+            CollectionReference collection = FirebaseFirestore.Instance.Collection(pathLevels[0]);
+            DocumentReference document = null;
+
+            foreach (string currPathLevel in pathLevels.Skip(1))
+            {
+                if (currPathLevel.Length == 0) { break; }
+                if (document is null)
+                {
+                    document = collection.Document(currPathLevel);
+                    collection = null;
+                }
+                else
+                {
+                    collection = document.Collection(currPathLevel);
+                    document = null;
+                }
+            }
+            return (true, document, collection);
+        }
+        private (bool success, DocumentReference docRef, CollectionReference collectRef) GetReferenceFromPath(string path)
+        {
+            return GetReferenceFromPath(path.Split('/'));
+        }
+        private DocumentChange.Type GetDocChangeType(string changeType)
+        {
+            if (changeType == "added") { return DocumentChange.Type.Added; }
+            else if (changeType == "modified") { return DocumentChange.Type.Modified; }
+            else if (changeType == "removed") { return DocumentChange.Type.Removed; }
+            return null;
+        }
+        private bool isFieldType(Type returnType)          // Checks if a type is a field (e.g string, int)
+        {
+            return returnType.Namespace.StartsWith("System") || (returnType.IsArray && returnType.GetElementType().Namespace.StartsWith("System"));
+        }
+        private string popFieldName(ref string inputPath)  // Removes + returns last item from path
+        {
+            string[] inputArray = inputPath.Split("/");
+
+
+            List<string> inputList = inputArray.ToList();
+            string removedValue = inputArray[inputArray.Length - 1];
+            inputList.RemoveAt(inputArray.Length - 1);
+            inputPath = string.Join('/', inputList.ToArray());
+
+            return removedValue;
+        }
 
 
 
-        //   GET:
-        public Task<(bool, object)> FetchData<returnType>(string pathInfo, params (string, string)[] arguments)
+        //       General Functions:
+        public Task<(bool, object)> FetchData<returnType>(string pathInfo, params (string, string)[] arguments)                                   // GET     
         {
             Debug($"Fetching Data for {pathInfo}:", 0, true);
             var tcs = new TaskCompletionSource<(bool, object)>();
@@ -165,33 +189,13 @@ namespace Encrypted_Messaging_App.Droid
             }
             else
             {
-                if (reference.document != null) { reference.document.Get().AddOnCompleteListener(new OnCompleteListener(tcs, typeof(returnType)));   }
-                else                              { reference.collection.Get().AddOnCompleteListener(new OnCompleteListener(tcs, typeof(returnType))); }
+                if (reference.document != null) { reference.document.Get().AddOnCompleteListener(new OnCompleteListener(tcs, typeof(returnType))); }
+                else { reference.collection.Get().AddOnCompleteListener(new OnCompleteListener(tcs, typeof(returnType))); }
             }
             return tcs.Task;
 
         }
-
-        // Common:
-        public async Task<User> UserFromId(string id) 
-        {
-            (bool success, object user) response = await FetchData<User>("UserFromId", ("USERID", id));  //new Dictionary<string, string> { { "USERID", id } }
-
-            return response.success ? (User)response.user : null;
-        }
-        public async Task<User> UserFromUsername(string username)
-        {
-            (bool success, object user) response = await FetchData<User>("UserFromUsername", ("USERNAME", username)); //new Dictionary<string, string> { { "USERID", username } }
-
-            return response.success ? (User)response.user : null;
-        }
-
-
-
-
-        // Listeners:
-        private List<IListenerRegistration> Listeners = new List<IListenerRegistration>();
-        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, params (string, string)[] arguments) //Dictionary<string, string> arguments = null
+        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, params (string, string)[] arguments) // LISTEN  
         {
             Debug($"Listening Data for {pathInfo}:", 0, true);
             string path = GetPath(pathInfo, arguments);
@@ -201,8 +205,8 @@ namespace Encrypted_Messaging_App.Droid
             {
                 fieldName = popFieldName(ref path);
             }
-            if(path is null) { return false; }
-            DocumentChange.Type ChangeType = getDocChangeType(changeType);
+            if (path is null) { return false; }
+            DocumentChange.Type ChangeType = GetDocChangeType(changeType);
 
             (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
 
@@ -210,67 +214,24 @@ namespace Encrypted_Messaging_App.Droid
             if (reference.success)
             {
                 IListenerRegistration currListenerReg;
-                if (reference.document != null) { currListenerReg = reference.document.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName));
-                } else {                          currListenerReg = reference.collection.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName)); }
+                if (reference.document != null)
+                {
+                    currListenerReg = reference.document.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName));
+                }
+                else { currListenerReg = reference.collection.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName)); }
                 Listeners.Add(currListenerReg);
                 return true;
-            } else 
+            }
+            else
             {
                 Error($"Invalid path: {path}");
                 return false;
             }
         }
-        public Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial =true , params (string, string)[] arguments)
+        public async Task<(bool, string)> WriteObject(object obj, string pathInfo, params (string, string)[] arguments)                           // WRITE   
         {
-            TaskCompletionSource<bool> fetchDataCompletion = new TaskCompletionSource<bool>();
-
-
-            bool result = ListenData<returnType>(pathInfo, (object result) => { Console.WriteLine("Resolved Listener!!"); action.Invoke(result); fetchDataCompletion.TrySetResult(true); }, changeType, arguments);
-            if (!result) { fetchDataCompletion.TrySetResult(false); }
-
-            return fetchDataCompletion.Task;
-        }
-
-
-
-        private DocumentChange.Type getDocChangeType(string changeType)
-        {
-            if (changeType == "added") { return DocumentChange.Type.Added; }
-            else if (changeType == "modified") { return DocumentChange.Type.Modified; }
-            else if (changeType == "removed") { return DocumentChange .Type.Removed; }
-            return null;
-        }
-
-        public void RemoveListeners()
-        {
-            foreach(IListenerRegistration listener in Listeners)
-            {
-                listener.Remove();
-            }
-        }
-
-
-
-        private bool isFieldType(Type returnType)
-        {
-            return returnType.Namespace.StartsWith("System") || (returnType.IsArray && returnType.GetElementType().Namespace.StartsWith("System"));
-        }
-        private string popFieldName(ref string inputPath)
-        {
-            string[] inputArray = inputPath.Split("/");
-
-            List<string> inputList = inputArray.ToList();
-            string removedValue = inputArray[inputArray.Length - 1];
-            inputList.RemoveAt(inputArray.Length - 1);
-            inputPath = string.Join('/', inputList.ToArray());
-
-            return removedValue;
-        }
-
-           //   SET:
-        // TODO: Improve WriteObject with the new path system
-        public async Task<(bool, string)> WriteObject(object obj, string path)
-        {
+            string path = GetPath(pathInfo, arguments);
+            if(path is null) { return (false, "Invalid path info"); }
             (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
             if (!reference.success)
             {
@@ -284,9 +245,9 @@ namespace Encrypted_Messaging_App.Droid
             HashMap objHashMap = GetMap(obj);
             try
             {
-                if(reference.document is null)
+                if (reference.document is null)
                 {
-                    DocumentReference newDocumentRef = (DocumentReference) await reference.collection.Add(objHashMap);
+                    DocumentReference newDocumentRef = (DocumentReference)await reference.collection.Add(objHashMap);
                     return (true, newDocumentRef.Id);
                 }
                 else
@@ -295,13 +256,119 @@ namespace Encrypted_Messaging_App.Droid
                     return (true, "");
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return (false, e.Message);
             }
 
-            
+
         }
+        public async Task<(bool, string)> DeleteObject(string pathInfo, params (string, string)[] arguments)                                      // DELETE  
+        {
+            string path = GetPath(pathInfo, arguments);
+            if(path is null) { return (false, $"Invalid path info"); }
+            (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(path);
+            if (!reference.success) { return (false, $"Invalid path given: {path}"); }
+
+            if (reference.collection != null)
+            {
+                QuerySnapshot snap = (QuerySnapshot)await reference.collection.Get();
+                try
+                {
+                    foreach (DocumentSnapshot doc in snap.Documents)
+                    {
+                        await doc.Reference.Delete();
+                    }
+                }
+                catch (Exception e)
+                {
+                    return (false, $"Unable to delete collection: {path}  ({e.Message})");
+                }
+
+            }
+            else if (reference.collection != null)
+            {
+                try
+                {
+                    await reference.document.Delete();
+                }
+                catch (Exception e)
+                {
+                    return (false, $"Unable to delete document: {path}  ({e.Message}");
+                }
+            }
+            return (true, "");
+        }
+        private async Task<(bool, string)> UpdateField(Java.Lang.Object obj, string path)                                                         // UPDATE  
+        {
+            string fieldLevel = popFieldName(ref path);
+            string[] pathLevels = path.Split('/');
+            (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(pathLevels);
+
+            if (!reference.success)
+            {
+                return (false, $"Invalid path given: {path}");
+            }
+            else if (reference.document == null)
+            {
+                return (false, "Invalid length of path given, must be odd");
+            }
+            else
+            {
+                try
+                {
+                    await reference.document.Update(fieldLevel, obj);
+                    return (true, "");
+                }
+                catch (Exception e)
+                {
+                    return (false, e.Message);
+                }
+            }
+        }
+        // UpdateField methods:
+        public async Task<(bool, string)> AddToArray(string newItem, string pathInfo, params (string, string)[] arguments)
+        {
+            string path = GetPath(pathInfo, arguments);
+            return await UpdateField(FieldValue.ArrayUnion(newItem), path);
+        }
+        public async Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments)
+        {
+            string path = GetPath(pathInfo, arguments);
+            return await UpdateField(FieldValue.ArrayRemove(oldItem), path);
+        }
+        public async Task<(bool, string)> UpdateString(string newString, string pathInfo, params (string, string)[] arguments)
+        {
+            string path = GetPath(pathInfo, arguments);
+            return await UpdateField(newString, path);
+        }
+
+        public void RemoveListeners()
+        {
+            foreach (IListenerRegistration listener in Listeners)
+            {
+                listener.Remove();
+            }
+        }
+
+
+
+        // Common GET Requests:
+        public async Task<User> UserFromId(string id) // (GET)
+        {
+            (bool success, object user) response = await FetchData<User>("UserFromId", ("USERID", id));  //new Dictionary<string, string> { { "USERID", id } }
+
+            return response.success ? (User)response.user : null;
+        }
+        public async Task<User> UserFromUsername(string username)  // (GET)
+        {
+            (bool success, object user) response = await FetchData<User>("UserFromUsername", ("USERNAME", username)); //new Dictionary<string, string> { { "USERID", username } }
+
+            return response.success ? (User)response.user : null;
+        }
+
+
+        // WRITE Requests:
 
         public async Task<(bool, string)> InitiliseUser(string username)
         {
@@ -337,8 +404,8 @@ namespace Encrypted_Messaging_App.Droid
         // Test to see if the WriteObject function works, will be implemented in the actual classes if works.
         public async Task<(bool, string)> InitiliseChat(Chat chat)
         {
-            (bool success, string newChatID) result = await WriteObject(chat, GetPath("Chat", ("CHATID", "")));
-            return result;  // Check if success=True
+            (bool success, string newChatID) result = await WriteObject(chat, "Chat", ("CHATID", ""));
+            return result;
         }
 
         public async Task<(bool, string)> SendAcceptedRequest(string requestUserID, AcceptedRequest ARequest)
@@ -413,56 +480,9 @@ namespace Encrypted_Messaging_App.Droid
         }
 
         
-        // Update Field:
-        private async Task<(bool, string)> UpdateField(Java.Lang.Object obj, string path)
-        {
-            List<string> pathLevels = path.Split('/').ToList();
-            string fieldLevel = PopFromList(ref pathLevels, -1);
-            (bool success, DocumentReference document, CollectionReference collection) reference = GetReferenceFromPath(pathLevels.ToArray());
-
-            if (!reference.success)
-            {
-                return (false, $"Invalid path given: {path}");
-            }
-            else if (reference.document == null)
-            {
-                return (false, "Invalid length of path given, must be odd");
-            }
-            else
-            {
-                try
-                {
-                    await reference.document.Update(fieldLevel, obj);
-                    return (true, "");
-                }
-                catch (Exception e)
-                {
-                    return (false, e.Message);
-                }
-            }
-        }
-
-        public async Task<(bool, string)> AddToArray(string newItem, string pathInfo, params (string, string)[] arguments)
-        {
-            string path = GetPath(pathInfo, arguments);
-            return await UpdateField(FieldValue.ArrayUnion(newItem), path);
-        }
-
-        public async Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments)
-        {
-            string path = GetPath(pathInfo, arguments);
-            return await UpdateField(FieldValue.ArrayRemove(oldItem), path);
-        }
-
-        public async Task<(bool, string)> UpdateString(string newString, string pathInfo, params (string, string)[] arguments)
-        {
-            string path = GetPath(pathInfo, arguments);
-            return await UpdateField(newString, path);
-        }
-
         
         // Utility functions
-        private HashMap GetMap(object obj) // Converts any object into a hashmap for saving to firestore
+        private HashMap GetMap(object obj) // Object -> HashMap    (for WRITE/LISTEN)
         {
             // Organising Output Logs
             string parentMethodName = (new System.Diagnostics.StackTrace()).GetFrame(1).GetMethod().Name;
@@ -537,6 +557,20 @@ namespace Encrypted_Messaging_App.Droid
             {
                 return null;
             }
+        }
+        
+
+
+
+        // Deprecated:
+        public Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, params (string, string)[] arguments)  // Not used
+        {
+            TaskCompletionSource<bool> fetchDataCompletion = new TaskCompletionSource<bool>();
+
+            bool result = ListenData<returnType>(pathInfo, (object result) => { Console.WriteLine("Resolved Listener!!"); action.Invoke(result); fetchDataCompletion.TrySetResult(true); }, changeType, arguments);
+            if (!result) { fetchDataCompletion.TrySetResult(false); }
+
+            return fetchDataCompletion.Task;
         }
         private string PopFromList(ref List<string> path, int index)
         {

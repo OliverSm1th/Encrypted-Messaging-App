@@ -4,7 +4,8 @@
              x:Class="Encrypted_Messaging_App.Views.MainMessagePage">
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Change Theme" Clicked="ChangeThemePopOut" Order="Secondary" Priority="0"/>
-        <ToolbarItem Text="Log Out" Clicked="LogOut" Order="Secondary" Priority="1">
+        <ToolbarItem Text="Settings" Clicked="SettingsPopOut" Order="Secondary" Priority="1"/>
+        <ToolbarItem Text="Log Out" Clicked="LogOut" Order="Secondary" Priority="2">
             <ToolbarItem.IconImageSource>
                 <FontImageSource
                 FontFamily="Icons-S"

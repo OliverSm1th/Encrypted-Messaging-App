@@ -195,7 +195,7 @@ namespace Encrypted_Messaging_App
         {
             Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);
             bool encryptSuccess = newMessage.EncryptContent();
-            if (!encryptSuccess) { return false; }
+            if (!encryptSuccess) {Error("Unable to encrypt message content"); return false; }
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
             if (!result.success)
             {

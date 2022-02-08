@@ -148,20 +148,32 @@ namespace Encrypted_Messaging_App.Views
             if (!success) { ErrorToast("Unable to create new chat"); return; }
 
 
-            success = await request.accept(newChat.id);
+            success = await request.Accept(newChat.id);
             if (!success) { ErrorToast("Unable to accept request"); }
+
+            success = await request.Delete();
+            if (!success) { ErrorToast("Unable to delete request"); }
         }
         public void DenyRequest(object sender, EventArgs e)
         {
             Label denyLabel = (Label)sender;
             string id = denyLabel.ClassId;
+            User denyUser = null;
+
             foreach (User user in Users)
             {
                 if (user.Id == id)
                 {
                     Console.WriteLine($"Denying {user.Username}");
+                    denyUser = user;
                 }
             }
+            if(denyUser == null) { ErrorToast("Couldn't find friend request"); return; }
+
+            Request request = Requests[denyUser.Id];
+            request.Delete();
+
+
         }
 
         // When the submit button is pressed to send request
@@ -185,7 +197,7 @@ namespace Encrypted_Messaging_App.Views
 
             // Set up Request Object:
             Request request = new Request();
-            bool send_result = await request.send(targetUser.Id);
+            bool send_result = await request.Send(targetUser.Id);
 
             if (send_result)
             {

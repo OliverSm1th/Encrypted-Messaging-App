@@ -113,12 +113,12 @@ namespace Encrypted_Messaging_App
 
 
         // Accept Request: Respond to DH + send AcceptedRequest obj to SourceUser
-        public async Task<bool> accept(string chatID)     
+        public async Task<bool> Accept(string newChatID)     
         {
             EncryptionInfo = userDH.Respond(EncryptionInfo);
-            SQLiteService.ChatKeys.Set(chatID, userDH.getSharedKey(EncryptionInfo).ToString());
+            SQLiteService.ChatKeys.Set(newChatID, userDH.getSharedKey(EncryptionInfo).ToString());
 
-            (bool success, string message) result = await FirestoreService.SendAcceptedRequest(SourceUser.Id, new AcceptedRequest(chatID, EncryptionInfo));
+            (bool success, string message) result = await FirestoreService.SendAcceptedRequest(SourceUser.Id, new AcceptedRequest(newChatID, EncryptionInfo));
 
             if (!result.success)
             {
@@ -127,9 +127,15 @@ namespace Encrypted_Messaging_App
 
             return result.success;
         }
+        public async Task<bool> Delete()
+        {
+            (bool success, string message) result = await FirestoreService.DeleteObject("Requests");
+            if (!result.success) { Error($"Failed to delete request: {result.message}"); }
+            return result.success;
+        }
 
         // Send Request:  Send Request obj to TargetUser + save DH
-        public async Task<bool> send(string targetUserID) 
+        public async Task<bool> Send(string targetUserID) 
         {
             (bool success, string message) result = await FirestoreService.SendRequest(this, targetUserID);
 
@@ -140,6 +146,9 @@ namespace Encrypted_Messaging_App
             if (!SQLresult) { Error($"Send Request Failed: {result.message} (Couldn't save SQL)"); return false; }
             return true;
         }
+    
+    
+        
     }
 
 }

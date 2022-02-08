@@ -171,7 +171,7 @@ namespace Encrypted_Messaging_App
                 }
             }
         }
-        private Request[] _friendRequests;
+        private Request[] _friendRequests = new Request[0];
         public Action<object> friendRequestAction; // When friendRequests is changed
 
 

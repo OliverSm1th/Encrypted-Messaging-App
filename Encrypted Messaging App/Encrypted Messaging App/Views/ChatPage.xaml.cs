@@ -118,10 +118,10 @@ namespace Encrypted_Messaging_App.Views
         private async void SendingFailed()
         {
             Button MessageSendButton = (Button)Content.FindByName("MessageSend");
-            MessageSendButton.TextColor = (Color)App.Current.Resources["Invalid"];
-            await Task.Delay(20000);
-            MessageSendButton.TextColor = (Color)App.Current.Resources["Secondary"];
             ErrorToast("Failed to send message");
+            MessageSendButton.TextColor = (Color)App.Current.Resources["Invalid"];
+            await Task.Delay(2000);
+            MessageSendButton.TextColor = (Color)App.Current.Resources["Secondary"];
             Error("Unable to send message");
         }
 

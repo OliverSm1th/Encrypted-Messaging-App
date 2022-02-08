@@ -34,9 +34,9 @@ namespace Encrypted_Messaging_App.Views
     class Functions
     {
         static Dictionary<string, string[]> colourDict = new Dictionary<string, string[]>(){
-            {"Values", new string [] {"Primary", "Secondary", "Invalid",   "MessageSent",   "MessageReceived"} },
-            {"Blue",   new string [] {"2196F3",  "77BEF5",    "E74C3C" ,   "FFFFFF", "FFFFFF" } },
-            {"Red",    new string [] { "d32f2f",  "f44336",   "E74C3C",    "FFFFFF", "FFFFFF"} }
+            {"Values", new string [] {"Primary", "Secondary", "Invalid",    "MessageSent",  "MessageReceived"} },
+            {"Blue",   new string [] {"2196F3",  "77BEF5",    "E74C3C" ,    "77DD77",       "72d3fe" } },
+            {"Red",    new string [] { "d32f2f",  "f44336",   "E74C3C",     "77DD77",       "72d3fe" } }
         };
 
 
