@@ -1,26 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj": {}
+    "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj": {}
   },
   "projects": {
-    "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj": {
+    "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj",
+        "projectUniqueName": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj",
         "projectName": "Encrypted Messaging App.Android",
-        "projectPath": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj",
-        "packagesPath": "C:\\Users\\olive\\.nuget\\packages\\",
-        "outputPath": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.Android\\obj\\",
+        "projectPath": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App.Android\\Encrypted Messaging App.Android.csproj",
+        "packagesPath": "C:\\Users\\Student\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App.Android\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
           "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\olive\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Student\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -34,8 +32,8 @@
         "frameworks": {
           "monoandroid11.0": {
             "projectReferences": {
-              "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj": {
-                "projectPath": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj"
+              "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj": {
+                "projectPath": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj"
               }
             }
           }
@@ -76,23 +74,20 @@
         }
       }
     },
-    "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj": {
+    "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj",
+        "projectUniqueName": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj",
         "projectName": "Encrypted Messaging App",
-        "projectPath": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj",
-        "packagesPath": "C:\\Users\\olive\\.nuget\\packages\\",
-        "outputPath": "D:\\Documents\\Computing\\NEA A-Level Project\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App\\obj\\",
+        "projectPath": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App\\Encrypted Messaging App.csproj",
+        "packagesPath": "C:\\Users\\Student\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Student\\Encrypted-Messaging-App-Xamarin\\Encrypted Messaging App\\Encrypted Messaging App\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
-          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\olive\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Student\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -164,7 +159,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.402\\RuntimeIdentifierGraph.json"
         }
       }
     }

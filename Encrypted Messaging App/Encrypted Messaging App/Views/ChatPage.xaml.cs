@@ -10,6 +10,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Rg.Plugins.Popup.Extensions;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
+using static Encrypted_Messaging_App.LoggerService;
 using System.ComponentModel;
 
 namespace Encrypted_Messaging_App.Views
@@ -109,14 +110,19 @@ namespace Encrypted_Messaging_App.Views
             MessageSendButton.IsEnabled = false;
             bool result = await CurrentChat.sendMessage(MessageEntry.Text, CurrentUser.GetUser());
             MessageSendButton.IsEnabled = true;
-            if (!result) { 
-                LoggerService.Error("Unable to send message"); 
-                MessageSendButton.TextColor = (Color)App.Current.Resources["Invalid"]; 
-                Thread.Sleep(2000);
-                MessageSendButton.TextColor = (Color)App.Current.Resources["Secondary"];
-            }
+            if (!result) { SendingFailed(); }
             else { LoggerService.Log("Sent message"); }
             MessageEntry.Text = "";
+        }
+
+        private async void SendingFailed()
+        {
+            Button MessageSendButton = (Button)Content.FindByName("MessageSend");
+            MessageSendButton.TextColor = (Color)App.Current.Resources["Invalid"];
+            await Task.Delay(20000);
+            MessageSendButton.TextColor = (Color)App.Current.Resources["Secondary"];
+            ErrorToast("Failed to send message");
+            Error("Unable to send message");
         }
 
         private Action decryptChanged; 

@@ -32,7 +32,7 @@
                                     <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{DynamicResource Secondary}" HorizontalOptions="{Binding horizontalOption}" VerticalOptions="End" />
                                 <Frame 
                                 CornerRadius="15" 
-                                BackgroundColor="{DynamicResource Secondary}"
+                                BackgroundColor="{Binding messageColour}"
                                 Padding="0" HorizontalOptions="{Binding horizontalOption}"
                                 x:Name="MessageFrame"
                                 >

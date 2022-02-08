@@ -89,6 +89,7 @@ namespace Encrypted_Messaging_App
 
         public MessageView GetMessageView()
         {
+            Console.WriteLine($"Encrypted Content: {encryptedContent}");
             return new MessageView { content = content, encryptedContent = encryptedContent, author = author };
         }
 
@@ -155,9 +156,13 @@ namespace Encrypted_Messaging_App
         public User author;
         string currentUserId = CurrentUser.GetUser().Id;
 
-        public string visibleContent { get => (CurrentChat.showDecryptedMessages ? content : encryptedContent); }
+        public string visibleContent { get => (CurrentChat.showDecryptedMessages ? (content != null ? content : encryptedContent) : encryptedContent); }
         public LayoutOptions horizontalOption { 
             get =>  (author.Id == currentUserId ? LayoutOptions.End : LayoutOptions.Start);
+        }
+        public Color messageColour
+        {
+            get => (author.Id == currentUserId ? (Color)App.Current.Resources["MessageSent"] : (Color)App.Current.Resources["MessageReceived"]);
         }
     }
 

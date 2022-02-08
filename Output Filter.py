@@ -1,5 +1,3 @@
-from colorama import Fore, Back, Style, init
-
 startBlacklist = ["[d_messaging_ap]", "Thread started: ","[ForceDarkHelper]", "[monodroid-assembly]", "[chatty]", "[Looper]", "[AdrenoGLES]", "[DynamiteModule]", "[ProviderInstaller]", "[FeatureParser]",
                   "Resolved pending breakpoint", "[Perf]", "[Activity]", "[TabLayout]", "[NativeCrypto]", "[NetworkSecurityConfig]", "[AdrenoUtils]", "[RenderThread]", "[Gralloc3]", "[LB]", "[OpenGLRenderer]", "[Choreographer]",
                   "[Toast]"]
