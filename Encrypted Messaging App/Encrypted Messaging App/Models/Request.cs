@@ -65,7 +65,7 @@ namespace Encrypted_Messaging_App
                 
                 Chat newChat = new Chat();
                 newChat.SetID(newChatID);
-                bool result = await newChat.addToUserFirestore(CurrentUser.Id);
+                bool result = await newChat.AddToUserFirestore(CurrentUser.Id);
                 if (!result)
                 {
                     ErrorToast($"Can\'t initilise chat with {requestUser.Username}");

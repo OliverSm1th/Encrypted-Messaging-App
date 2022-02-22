@@ -108,7 +108,7 @@ namespace Encrypted_Messaging_App.Views
 
             if(MessageEntry == null || MessageEntry.Text.Length == 0) { return; }
             MessageSendButton.IsEnabled = false;
-            bool result = await CurrentChat.sendMessage(MessageEntry.Text, CurrentUser.GetUser());
+            bool result = await CurrentChat.SendMessage(MessageEntry.Text, CurrentUser.GetUser());
             MessageSendButton.IsEnabled = true;
             if (!result) { SendingFailed(); }
             else { LoggerService.Log("Sent message"); }

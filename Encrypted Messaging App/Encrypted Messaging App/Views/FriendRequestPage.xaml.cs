@@ -135,16 +135,20 @@ namespace Encrypted_Messaging_App.Views
 
 
             // Create new Chat session with keyData
-            Chat newChat = new Chat();
-            newChat.CreateFromData(requestKeyData, sharedKey, new User[] { request.SourceUser, CurrentUser.GetUser() });
+            //Chat newChat = new Chat();
+            string[] userIDs = new string[] { request.SourceUser.Id, CurrentUser.Id };
+            User[] users = new User[] { request.SourceUser, CurrentUser.GetUser() };
+            Chat newChat = new Chat { userIDs = userIDs, users = users.ToList(), encryptionInfo = requestKeyData };
+            newChat.SetEncryptKey(sharedKey);
+            //newChat.CreateFromData(requestKeyData, sharedKey, new User[] { request.SourceUser, CurrentUser.GetUser() });
             
 
             // Add new Chat to firestore
-            bool success = await newChat.initiliseChatFirestore();
+            bool success = await newChat.InitiliseFirestore();
             if (!success) { ErrorToast("Unable to create new chat"); return; }
 
 
-            success = await newChat.addToUserFirestore(CurrentUser.Id);
+            success = await newChat.AddToUserFirestore(CurrentUser.Id);
             if (!success) { ErrorToast("Unable to create new chat"); return; }
 
 

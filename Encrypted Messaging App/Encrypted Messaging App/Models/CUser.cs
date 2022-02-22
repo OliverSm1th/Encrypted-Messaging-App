@@ -1,21 +1,16 @@
-﻿using Encrypted_Messaging_App.Services;
-using Encrypted_Messaging_App.Views;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
-using System.Numerics;
 using System.Linq;
 using static Encrypted_Messaging_App.LoggerService;
 
 
 namespace Encrypted_Messaging_App
 {
-    public class CUser : User   // The Current User for the device
+    public class CUser : User   // The Current User for the device, extends User
     {
-        private IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
+        private IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>(); // Initilise Firetore Service
 
         User user;
 
@@ -35,46 +30,30 @@ namespace Encrypted_Messaging_App
 
 
 
-        //   --- Chats ---
+        //   --- Chats ---   \\
 
         public List<Chat> chats = new List<Chat>();
         public Action<object, int> chatsChangedAction;  //chats, index (optional)
         private async Task addChat(string chatID)
         {
-            if (chats.Where(chat => chat.id == chatID).ToArray().Length == 0)
-            {
-                Chat newChat = new Chat();
-                newChat.SetID(chatID);
-                //bool result = await newChat.GetFromServer();
-                //if (result)
-                //{
-                //    newChat.initiliseListener(true);
-                //    chats.Add(newChat);
-                //}
-                //else
-                //{
-                //    Error($"Can't add Chat {chatID} to Chats: Can't get info from server");
-                //}
-                bool result = await newChat.FetchAndListen();
-                Log("Finished fetching the chat");
-                if (result) { 
-                    chats.Add(newChat);
-
-                    // Add listener to trigger chatsChangedAction when it's edited
-                    newChat.headerChangedAction = () => chatsChangedAction(chats.ToArray(), chats.IndexOf((Chat)newChat));
-                }
-                
-            }
-            else
+            if (chats.Where(chat => chat.id == chatID).ToArray().Length != 0)
             {
                 Error($"Can't add Chat {chatID} to Chats: Already Exists");
+            }
+
+            Chat newChat = new Chat();
+            newChat.SetID(chatID);
+            bool result = await newChat.FetchAndListen();
+            if (result) {
+                chats.Add(newChat);
+
+                // Add listener to trigger chatsChangedAction when the new chat's edited
+                newChat.headerChangedAction = () => chatsChangedAction(chats.ToArray(), chats.IndexOf((Chat)newChat));
             }
         }
         private void removeChat(string chatID)
         {
-            int removedNum = chats.RemoveAll(chat => { if (chat.id == chatID) { chat.removeListener(); return true; } return false; });
-
-
+            int removedNum = chats.RemoveAll(chat => { if (chat.id == chatID) { chat.RemoveListener();} return (chat.id == chatID); });
             if (removedNum == 0) { Error($"Can't remove Chat {chatID} from Chats: Doesn't exist"); }
         }
         
@@ -87,7 +66,6 @@ namespace Encrypted_Messaging_App
             {
                 // Syncs the chats to chatID, adds or removes chats accordingly
                 chatsIDSet(value);
-
             }
         }
         private string[] _chatsID = new string[0];
@@ -229,7 +207,7 @@ namespace Encrypted_Messaging_App
             FirestoreService.RemoveListeners();
             foreach(Chat chat in chats)
             {
-                chat.removeListener();
+                chat.RemoveListener();
             }
         }
 
