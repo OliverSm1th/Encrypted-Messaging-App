@@ -33,12 +33,12 @@ namespace Encrypted_Messaging_App.Views
 {
     class Functions
     {
-        static Dictionary<string, string[]> colourDict = new Dictionary<string, string[]>(){
+        public static Dictionary<string, string[]> colourDict = new Dictionary<string, string[]>(){
             {"Values", new string [] {"Primary", "Secondary", "Invalid",    "MessageSent",  "MessageReceived"} },
             {"Blue",   new string [] {"2196F3",  "77BEF5",    "E74C3C" ,    "77DD77",       "72d3fe" } },
             {"Red",    new string [] { "d32f2f",  "f44336",   "E74C3C",     "77DD77",       "72d3fe" } }
         };
-
+        public static string defaultThemeName = "Blue";
 
 
 
@@ -165,7 +165,7 @@ namespace Encrypted_Messaging_App.Views
                 App.Current.Resources[currentColourKey] = Color.FromHex(currentColourValue);
                 LoggerService.Log($"Saved {currentColourValue} to value {currentColourKey}");
             }
-
+            GlobalVariables.CurrentTheme = colourName;
             LoggerService.Log("Set all colours");
         }
 

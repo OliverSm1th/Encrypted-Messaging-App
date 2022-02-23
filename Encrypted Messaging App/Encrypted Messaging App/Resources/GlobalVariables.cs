@@ -14,5 +14,7 @@ namespace Encrypted_Messaging_App.Views
         public static bool DeveloperMode = true;
         public static Chat CurrentChat;
         public static int SecurityLevel = 192;   //128 or 192 or 256    -Length used in AES and DH
+
+        public static string CurrentTheme = Functions.defaultThemeName;
     }
 }

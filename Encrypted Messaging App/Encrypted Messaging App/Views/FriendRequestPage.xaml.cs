@@ -138,7 +138,7 @@ namespace Encrypted_Messaging_App.Views
             //Chat newChat = new Chat();
             string[] userIDs = new string[] { request.SourceUser.Id, CurrentUser.Id };
             User[] users = new User[] { request.SourceUser, CurrentUser.GetUser() };
-            Chat newChat = new Chat { userIDs = userIDs, users = users.ToList(), encryptionInfo = requestKeyData };
+            Chat newChat = new Chat { userIDs = userIDs, users = users.ToList(), encryptionInfo = requestKeyData, title="" };
             newChat.SetEncryptKey(sharedKey);
             //newChat.CreateFromData(requestKeyData, sharedKey, new User[] { request.SourceUser, CurrentUser.GetUser() });
             

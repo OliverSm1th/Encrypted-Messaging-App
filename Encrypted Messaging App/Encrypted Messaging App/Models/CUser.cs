@@ -34,16 +34,49 @@ namespace Encrypted_Messaging_App
 
         public List<Chat> chats = new List<Chat>();
         public Action<object, int> chatsChangedAction;  //chats, index (optional)
+
+        public string[] chatsID
+        {
+            get { return _chatsID; }
+            set {    // Syncs the chats to chatID, adds or removes chats accordingly
+                onChatsIDSet(value);
+            }
+        }
+        private string[] _chatsID = new string[0];
+
+        private async void onChatsIDSet(string[] newChatsID)   // Fired when chatsID is edited
+        {
+            string[] addedChatsID = newChatsID.Except(_chatsID).ToArray();
+            string[] removedChatsID = _chatsID.Except(newChatsID).ToArray();
+
+            if (addedChatsID.Length == 0 && removedChatsID.Length == 0) { return; }
+
+            _chatsID = newChatsID;
+
+            foreach (string chatID in removedChatsID)
+            {
+                removeChat(chatID);     // Remove any deleted chats
+            }
+            foreach (string chatID in addedChatsID)
+            {
+                await addChat(chatID);    // Fetch any new chat object from their ID
+            }
+
+            if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
+            {
+                chatsChangedAction(chats.ToArray(), -1);
+            }
+        }
         private async Task addChat(string chatID)
         {
-            if (chats.Where(chat => chat.id == chatID).ToArray().Length != 0)
-            {
+            if (chats.Where(chat => chat.id == chatID).ToArray().Length != 0) {
                 Error($"Can't add Chat {chatID} to Chats: Already Exists");
+                return;
             }
 
             Chat newChat = new Chat();
-            newChat.SetID(chatID);
-            bool result = await newChat.FetchAndListen();
+            newChat.SetID(chatID);                       // Creates empty chat with the chatID
+            bool result = await newChat.FetchAndListen();// Gets the chat from firestore
             if (result) {
                 chats.Add(newChat);
 
@@ -57,85 +90,13 @@ namespace Encrypted_Messaging_App
             if (removedNum == 0) { Error($"Can't remove Chat {chatID} from Chats: Doesn't exist"); }
         }
         
-
-
-        public string[] chatsID
-        {
-            get { return _chatsID; }
-            set
-            {
-                // Syncs the chats to chatID, adds or removes chats accordingly
-                chatsIDSet(value);
-            }
-        }
-        private string[] _chatsID = new string[0];
-        private async void chatsIDSet(string[] newChatsID)
-        {
-            string[] addedChatsID = newChatsID.Except(_chatsID).ToArray();
-            string[] removedChatsID = _chatsID.Except(newChatsID).ToArray();
-
-            if(addedChatsID.Length == 0 && removedChatsID.Length == 0) { return; }
-
-            _chatsID = newChatsID;
-
-            foreach (string chatID in removedChatsID)
-            {
-                removeChat(chatID);
-            }
-            foreach (string chatID in addedChatsID)
-            {
-                await addChat(chatID);
-            }
-
-            if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
-            {
-                chatsChangedAction(chats.ToArray(), -1);
-            }
-        }
-
-        public void ChatsIDListenerInit()
+        public void ChatsIDListenerInit()     // Sync local chatsID with server
         {
             FirestoreService.ListenData<string[]>("ChatsID", (newchatsID) => chatsID = (string[])newchatsID);
         }
 
 
-        // Initial setup:
-        /*public void SetChats(string[] new_chats)
-        {
-            chatsID = new ObservableCollection<string>(new_chats);
-            chatsIDAction = (string[] chats) => FirestoreService.UpdateChatsID(Id, chats);
-            chatsID.CollectionChanged += chatIDChanged;
-        }/*
-        private async void chatIDChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-            {
-                if(e.NewItems.Count != 1) { DebugManager.ErrorSilent($"Can't add {e.NewItems.Count} chats at once"); }
-                (bool success, string message) result = await FirestoreService.AddChatID(Id, (string)e.NewItems[0]);
-                if (!result.success) { DebugManager.ErrorSilent($"Can't add chatID to server: {result.message}"); }
-            }
-            else if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-            {
-                if (e.OldItems.Count != 1) { DebugManager.ErrorSilent($"Can't remove {e.OldItems.Count} chats at once"); }
-                (bool success, string message) result = await FirestoreService.RemoveChatID(Id, (string)e.OldItems[0]);
-                if (!result.success) { DebugManager.ErrorSilent($"Can't remove chatID from server: {result.message}"); }
-            }
-            else
-            {
-                
-                DebugManager.ErrorSilent($"Not able to handle chatsID Action: {e.Action}");
-            }
-        }
-
-        public void AddChat(Chat new_chat)
-        {
-            chats.Add(new_chat);
-            chatsID.Add(new_chat.Id);
-        }*/
-
-
-
-        //   --- Pending Friend Requests (sent to user) ---
+        //   --- Pending Friend Requests (sent to user) ---   \\
 
         public Request[] friendRequests { 
             get { return _friendRequests; }
@@ -150,7 +111,7 @@ namespace Encrypted_Messaging_App
             }
         }
         private Request[] _friendRequests = new Request[0];
-        public Action<object> friendRequestAction; // When friendRequests is changed
+        public Action<object> friendRequestAction; // Fired when friendRequests is changed
 
 
         public void PendingRequestListenerInit()          // When Requests (Server) is changed -> Update friendRequests

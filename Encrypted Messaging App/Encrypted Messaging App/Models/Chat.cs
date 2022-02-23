@@ -18,9 +18,9 @@ namespace Encrypted_Messaging_App
 
         // Public Attributes:
         public KeyData encryptionInfo { get; set; }
-        public string title { get; set; }
+        public string title { get; set; } = "  ";
         public List<User> users = new List<User>();
-        public string[] userIDs { get; set; }
+        public string[] userIDs { get; set; } = new string[0];
         
         public Message[] messages { get => _messages; 
             set {
@@ -40,7 +40,7 @@ namespace Encrypted_Messaging_App
                 _messages = value;
             } 
         }
-        private Message[] _messages = new Message[] { };
+        private Message[] _messages = new Message[0];
 
         public string id { get { return _id; } 
             set {
@@ -160,6 +160,16 @@ namespace Encrypted_Messaging_App
             if (!encryptSuccess) { Error("Unable to encrypt message content"); return false; }
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
             if (!result.success) { Error($"Unable to add message- to chat{id}:   {result.message}"); }
+            return result.success;
+        }
+
+        // --Firestore Delete--  \\
+        public async Task<bool> DeleteFirestore()
+        {
+            (bool success, string message) result = await FirestoreService.DeleteObject("Chat", ("CHATID", id));
+            if (!result.success) { Error($"Couldn't delete chat:    {result.message}"); return false; }
+            result = await FirestoreService.RemoveFromArray(id, "CUser/chatsID");
+            if (!result.success) { Error($"Couldn't remove user from chat:    {result.message}");}
             return result.success;
         }
 

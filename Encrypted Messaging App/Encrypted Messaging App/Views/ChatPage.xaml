@@ -29,7 +29,7 @@
                         <DataTemplate>
 
                             <Grid >
-                                    <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{DynamicResource Secondary}" HorizontalOptions="{Binding horizontalOption}" VerticalOptions="End" />
+                                    <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{Binding messageColour}" HorizontalOptions="{Binding horizontalOption}" VerticalOptions="End" />
                                 <Frame 
                                 CornerRadius="15" 
                                 BackgroundColor="{Binding messageColour}"

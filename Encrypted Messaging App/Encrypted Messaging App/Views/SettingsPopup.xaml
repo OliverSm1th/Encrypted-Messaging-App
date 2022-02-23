@@ -3,13 +3,14 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                  xmlns:pages="clr-namespace:Rg.Plugins.Popup.Pages;assembly=Rg.Plugins.Popup"
                  x:Class="Encrypted_Messaging_App.Views.SettingsPopup">
-    <Frame VerticalOptions="Center" HorizontalOptions="Center" Padding="20,0,20,20" BorderColor="{DynamicResource Primary}">
+    <Frame VerticalOptions="Center" HorizontalOptions="Center" Padding="20,10,20,20" BorderColor="{DynamicResource Primary}">
         <StackLayout BackgroundColor="White">
             <Label 
                 Text="Settings" 
                 TextColor="{DynamicResource Secondary}"
-                FontSize="25"
-                HorizontalOptions="Center">
+                FontSize="Title"
+                HorizontalOptions="Center"
+                Padding="0,5,0,10">
                 <Label.FormattedText>
                     <FormattedString>
                         <Span Text="{StaticResource IconSettings}" FontFamily="Icons-S"/>
@@ -51,13 +52,24 @@
                 </Label.FormattedText>
             </Label>
 
-            <Picker Title="Choose Theme" HorizontalOptions="Start" FontFamily="Roboto" TextColor="Black">
-                <Picker.Items>
-                    <x:String>🟥 Red</x:String>
-                    <x:String>🟦 Blue</x:String>
-                </Picker.Items>
-            </Picker>
-            
+            <StackLayout Orientation="Horizontal">
+                <Label 
+                    Text="Theme: "
+                    FontFamily="Roboto"
+                    TextColor="Black"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="Theme: "  FontAttributes="Bold"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
+                <Picker Title="Theme: " HorizontalOptions="StartAndExpand" VerticalOptions="Center" FontFamily="Roboto" TextColor="Black" x:Name="settingThemePicker" FontSize="15" HorizontalTextAlignment="Center" SelectedIndexChanged="OnThemeChanged">
+                </Picker>
+            </StackLayout>
+
         </StackLayout>
     </Frame>
 </pages:PopupPage>

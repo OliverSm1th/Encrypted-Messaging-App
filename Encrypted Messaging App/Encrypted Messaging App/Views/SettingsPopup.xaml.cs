@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Rg.Plugins.Popup.Extensions;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
+using static Encrypted_Messaging_App.Views.Functions;
 
 namespace Encrypted_Messaging_App.Views
 {
@@ -36,6 +37,22 @@ namespace Encrypted_Messaging_App.Views
             {
                 entry.Key.Text = entry.Value;
             }
+
+            // Themes:
+            for(int i=1; i< colourDict.Count; i++)
+            {
+                string themeName = colourDict.Keys.ToArray()[i];
+                settingThemePicker.Items.Add(themeName);
+            }
+
+            Color currentThemeColour = Color.FromHex(colourDict[CurrentTheme][0]);
+            Console.WriteLine(currentThemeColour);
+            settingThemePicker.SelectedItem = CurrentTheme;
+        }
+
+        public void OnThemeChanged(object sender, EventArgs e)
+        {
+            setColour((string)settingThemePicker.SelectedItem);
         }
     }
 }

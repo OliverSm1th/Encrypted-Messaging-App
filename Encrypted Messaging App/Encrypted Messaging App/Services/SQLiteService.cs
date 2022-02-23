@@ -118,6 +118,11 @@ namespace Encrypted_Messaging_App.Services
                 SQLiteConnection db = new SQLiteConnection(pendingDbPath);
                 db.CreateTable<ChatKey>();
 
+                if (Get(chatId) != "")
+                {
+                    Delete(chatId);
+                }
+
                 ChatKey request = new ChatKey { Id = chatId, privateKey = encryptKey };
                 db.Insert(request);
 
