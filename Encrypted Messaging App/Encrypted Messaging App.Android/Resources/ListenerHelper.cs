@@ -525,7 +525,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 }
                 if (doc.Get("title") != null)
                 {
-                    title = (string)doc.Get("Title");
+                    title = (string)doc.Get("title");
                 }
                 if(doc.Get("encryptionInfo") is JavaDictionary encryptionDict ){
                     encryptInfo = ToObject<KeyData>(encryptionDict);

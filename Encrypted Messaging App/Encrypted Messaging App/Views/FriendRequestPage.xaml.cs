@@ -139,9 +139,11 @@ namespace Encrypted_Messaging_App.Views
             string[] userIDs = new string[] { request.SourceUser.Id, CurrentUser.Id };
             User[] users = new User[] { request.SourceUser, CurrentUser.GetUser() };
             Chat newChat = new Chat { userIDs = userIDs, users = users.ToList(), encryptionInfo = requestKeyData, title="" };
-            newChat.SetEncryptKey(sharedKey);
+
+            // TODO: Check that commenting out setEncryptKey doesn't break it
+            //newChat.SetEncryptKey(sharedKey);
             //newChat.CreateFromData(requestKeyData, sharedKey, new User[] { request.SourceUser, CurrentUser.GetUser() });
-            
+
 
             // Add new Chat to firestore
             bool success = await newChat.InitiliseFirestore();

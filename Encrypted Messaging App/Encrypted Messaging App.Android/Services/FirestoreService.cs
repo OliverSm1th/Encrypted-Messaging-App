@@ -414,7 +414,7 @@ namespace Encrypted_Messaging_App.Droid
             {
                 await docRef.Set(privateMap);
                 await publicDocRef.Set(publicMap);
-                await publicDocRef2.Set(username);
+                await publicDocRef2.Set(publicMap2);
                 return (true, "");
             }
             catch (Exception e)

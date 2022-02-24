@@ -151,12 +151,14 @@ namespace Encrypted_Messaging_App
         }
         public async Task<bool> UpdateTitle(string newTitle)
         {
-            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, "Chat/Title", ("CHATID", id));   //FirestoreService.GetPath("Chat", arguments: ("CHATID", id)) + "/Title"
+            (bool success, string message) result = await FirestoreService.UpdateString(newTitle, "Chat/title", ("CHATID", id));   //FirestoreService.GetPath("Chat", arguments: ("CHATID", id)) + "/Title"
             if (!result.success) { Error($"Can\'t change title of {id} to: {newTitle}      {result.message}"); }
             return result.success;
         }
         public async Task<bool> SendMessage(string content, User authorUser)
         {
+            if (encryptionKey.Equals(default(BigInteger))) { encryptionKey = getSecretKey(); }
+
             Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);      // Initilises message + encrypts it
             bool encryptSuccess = newMessage.EncryptContent();
             if (!encryptSuccess) { Error("Unable to encrypt message content"); return false; }

@@ -155,8 +155,8 @@ namespace Encrypted_Messaging_App.Views
             }
             else
             {
-                IManageFirestoreService UserService = DependencyService.Resolve<IManageFirestoreService>();
-                (bool success, string message) registerResult = await UserService.InitiliseUser(username);
+                IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
+                (bool success, string message) registerResult = await FirestoreService.InitiliseUser(username);
                 if (registerResult.success)
                 {
                     await Shell.Current.GoToAsync($"//{nameof(LoadingPage)}");
