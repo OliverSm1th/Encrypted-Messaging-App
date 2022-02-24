@@ -15,16 +15,16 @@ namespace Encrypted_Messaging_App
         Task<(bool, string)> SendRequest(Request request, string requestUserID);
 
         Task<(bool, string)> AddToArray(string newString, string pathInfo, params (string, string)[] arguments);
-        Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments)
+        Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments);
 
         Task<(bool, string)> UpdateString(string newString, string pathInfo, params (string, string)[] arguments);
         Task<(bool, string)> AddMessageToChat(Message message, string chatID);
 
 
-        Task<(bool, object)> FetchData<ReturnType>(string type, params (string, string)[] arguments);
+        Task<(bool, object)> FetchData<ReturnType>(string pathInfo, params (string, string)[] arguments);
 
-        bool ListenData<ReturnType>(string type, Action<object> action, string changeType = null, params (string, string)[] arguments);
-        Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, params (string, string)[] arguments);
+        bool ListenData<ReturnType>(string type, Action<object> action, string changeType = null,string listenerKey = "", params (string, string)[] arguments);
+        Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, string listenerKey = "", params (string, string)[] arguments);
 
         Task<(bool, string)> WriteObject(object obj, string pathInfo, params (string, string)[] arguments);
 
@@ -35,6 +35,7 @@ namespace Encrypted_Messaging_App
         Task<User> UserFromId(string id);
         Task<User> UserFromUsername(string username);
 
-        void RemoveListeners();
+        void RemoveAllListeners();
+        void RemoveListenersByKey(string key);
     }
 }

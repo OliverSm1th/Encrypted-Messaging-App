@@ -3,9 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Encrypted_Messaging_App.Views.MainMessagePage">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Change Theme" Clicked="ChangeThemePopOut" Order="Secondary" Priority="0"/>
-        <ToolbarItem Text="Settings" Clicked="SettingsPopOut" Order="Secondary" Priority="1"/>
-        <ToolbarItem Text="Log Out" Clicked="LogOut" Order="Secondary" Priority="2">
+        <ToolbarItem Text="Settings" Clicked="SettingsPopOut" Order="Primary" Priority="1">
+            <ToolbarItem.IconImageSource>
+                <FontImageSource
+                FontFamily="Icons-S"
+                Glyph="{StaticResource IconSettings}"
+                Color="Black"
+                    Size="20"
+                />
+            </ToolbarItem.IconImageSource>
+        </ToolbarItem>
+        <ToolbarItem Text="Log Out" Clicked="LogOut" Order="Primary" Priority="2">
             <ToolbarItem.IconImageSource>
                 <FontImageSource
                 FontFamily="Icons-S"
@@ -20,13 +28,13 @@
 
 
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout VerticalOptions="FillAndExpand">
             <Label Text="Chats"
                    TextColor="Black"
                    FontSize="Title"
                    FontFamily="Roboto-Black"
                    HorizontalOptions="CenterAndExpand"/>
-            <Label Text="{StaticResource IconSync}" 
+            <!--<Label Text="{StaticResource IconSync}" 
                        TextColor="Black" 
                        FontSize="22" 
                        HorizontalTextAlignment="Start"
@@ -34,58 +42,62 @@
                        FontFamily="Icons-S"
                        x:Name="SyncIcon">
 
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="Refresh"/>
-                </Label.GestureRecognizers>
-            </Label>
+                
+            </Label>-->
 
-            <StackLayout>
-                <StackLayout x:Name="UserList" BindableLayout.ItemsSource="{Binding ChatsCollection}">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <Grid RowSpacing="0" ClassId="{Binding id}" BackgroundColor="{DynamicResource Secondary}">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="ChatTapped"/>
-                                </Grid.GestureRecognizers>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="1*"/>
-                                    <RowDefinition Height="30*"/>
-                                    <RowDefinition Height="20*"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="9*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                </Grid.ColumnDefinitions>
+            <StackLayout VerticalOptions="FillAndExpand">
+                <RefreshView Command="{Binding MessageRefreshCommand}" VerticalOptions="FillAndExpand" x:Name="MessageRefresh">  <ScrollView VerticalOptions="Fill">
+                        <StackLayout VerticalOptions="Start">
+                            <StackLayout x:Name="UserList" BackgroundColor="Blue" BindableLayout.ItemsSource="{Binding ChatsCollection}" VerticalOptions="Start">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid RowSpacing="0" ClassId="{Binding id}" BackgroundColor="{DynamicResource Secondary}">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="ChatTapped"/>
+                                            </Grid.GestureRecognizers>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="30*"/>
+                                                <RowDefinition Height="20*"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="9*"/>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="1*"/>
+                                            </Grid.ColumnDefinitions>
 
-                                <Label
-                                        Text="{Binding title}"
-                                        TextColor="Black"
-                                        FontSize="Medium"
-                                        FontFamily="Roboto"
-                                        Grid.Row="1"
-                                        Padding="20,10,0,0"/>
-                                <Label
-                                        Text="{Binding id}"
-                                        TextColor="Gray"
-                                        FontSize="Caption"
-                                        FontFamily="Roboto"
-                                        Grid.Row="2"
-                                        Padding="20,0,0,0"
-                                        />
-                            </Grid>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
-                </StackLayout>
-                <Label Text="No current chats" 
-                       IsVisible="false" 
-                       TextColor="{StaticResource Gray}"
-                       HorizontalOptions="CenterAndExpand"
-                       Padding="0,20,0,0"
-                       FontFamily="Roboto-Italic"
-                       FontSize="16"
-                       x:Name="NoChats"
-                       />
+                                            <Label
+                                    Text="{Binding title}"
+                                    TextColor="Black"
+                                    FontSize="Medium"
+                                    FontFamily="Roboto"
+                                    Grid.Row="1"
+                                    Padding="20,10,0,0"/>
+                                            <Label
+                                    Text="{Binding id}"
+                                    TextColor="Gray"
+                                    FontSize="Caption"
+                                    FontFamily="Roboto"
+                                    Grid.Row="2"
+                                    Padding="20,0,0,0"
+                                    />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </StackLayout>
+                            <Label Text="No current chats"
+                               IsVisible="false"
+                               TextColor="{StaticResource Gray}"
+                               HorizontalOptions="CenterAndExpand"
+                               VerticalOptions="Start"
+                               Padding="0,20,0,0"
+                               FontFamily="Roboto-Italic"
+                               FontSize="16"
+                               x:Name="NoChats" />
+                        </StackLayout>
+                    
+                </ScrollView> </RefreshView>
+                
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

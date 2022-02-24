@@ -186,8 +186,8 @@ namespace Encrypted_Messaging_App.Views
             if (!RequestBtnEnabled) { return; }
             Entry usernameEntry = (Entry)Content.FindByName("UsernameEntry"); // Username of target user
 
+            if(CurrentUser.Username == usernameEntry.Text) { InvalidSendRequest(); return; }
 
-            //(bool success, object user) user_result = await DependencyService.Resolve<IManageFirestoreService>().GetUserFromUsername(usernameEntry.Text);
             Console.WriteLine($"Fetching UserID of: {usernameEntry.Text}");
             (bool success, object user) user_result = await FirestoreService.FetchData<User>("UserFromUsername", ("USERNAME", usernameEntry.Text)); //new Dictionary<string, string>{ { "USERNAME", usernameEntry.Text } }
             if (!user_result.success)
@@ -197,6 +197,10 @@ namespace Encrypted_Messaging_App.Views
                 return;
             } 
             User targetUser = (User)user_result.user;
+
+            // Check if you've already made a request:
+            (bool success, object obj) result = await FirestoreService.FetchData<Request>("Requests/[CUSERID]", ("CUSERID", targetUser.Id));
+            if(result.success) { ErrorToast("Request already sent"); InvalidSendRequest(); return; }
 
 
             // Set up Request Object:
@@ -209,8 +213,16 @@ namespace Encrypted_Messaging_App.Views
             }
             else
             {
-                IconInvalid((Button)sender);
+                InvalidSendRequest();
             }
+        }
+        public async void InvalidSendRequest()
+        {
+            Button RequestSendButton = (Button)Content.FindByName("RequestButton");
+
+            RequestSendButton.TextColor = (Color)App.Current.Resources["Invalid"];
+            await Task.Delay(2000);
+            RequestSendButton.TextColor = Color.Black;
         }
 
 

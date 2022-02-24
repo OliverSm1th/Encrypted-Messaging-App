@@ -16,7 +16,7 @@ namespace Encrypted_Messaging_App
 
 
 
-        public CUser(string id, string username) : base(id, username) 
+        public CUser(string id, string username) : base(id, username)
         {
             user = new User(id, username);
 
@@ -165,7 +165,7 @@ namespace Encrypted_Messaging_App
         public void LogOut()
         {
             // Remove All listeners:
-            FirestoreService.RemoveListeners();
+            FirestoreService.RemoveAllListeners();
             foreach(Chat chat in chats)
             {
                 chat.RemoveListener();

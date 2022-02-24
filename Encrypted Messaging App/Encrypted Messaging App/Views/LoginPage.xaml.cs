@@ -33,6 +33,16 @@ namespace Encrypted_Messaging_App.Views
                 await Shell.Current.GoToAsync($"//{nameof(LoadingPage)}");
             }
         }
+        protected override void OnDisappearing()
+        {
+            base.OnDisappearing();
+
+            // Reset Entries:
+            Entry UsernameEntry = (Entry)Content.FindByName("UsernameEntry");
+            Entry PasswordEntry = (Entry)Content.FindByName("PasswordEntry");
+            UsernameEntry.Text = "";
+            PasswordEntry.Text = "";
+        }
         // Login
         private async void LoginButton_Clicked(object sender, EventArgs e)
         {

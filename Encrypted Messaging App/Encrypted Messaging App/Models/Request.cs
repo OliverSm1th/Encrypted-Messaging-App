@@ -40,6 +40,7 @@ namespace Encrypted_Messaging_App
         public string newChatID { get; set; }
         public string requestUserID { get; set; }
         public KeyData EncryptionInfo { get; set; }
+        private IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
         // ----------
 
         public AcceptedRequest(string chatID, KeyData encryptionInfo)
@@ -62,7 +63,12 @@ namespace Encrypted_Messaging_App
 
                 DiffieHellman DH = new DiffieHellman(BigInteger.Parse(privateKey));
                 SQLiteService.ChatKeys.Set(newChatID, DH.getSharedKey(EncryptionInfo).ToString());
-                
+
+                // Check the chat still exists
+                (bool success, object obj) fetchResult = await FirestoreService.FetchData<Chat>("Chat", ("CHATID", newChatID));
+
+                if (!fetchResult.success) { ErrorToast($"{requestUser.Username} deleted the chat"); return; }
+
                 Chat newChat = new Chat();
                 newChat.SetID(newChatID);
                 bool result = await newChat.AddToUserFirestore(CurrentUser.Id);

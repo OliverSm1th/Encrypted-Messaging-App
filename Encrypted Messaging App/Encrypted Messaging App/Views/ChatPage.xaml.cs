@@ -11,6 +11,7 @@ using Xamarin.Forms.Xaml;
 using Rg.Plugins.Popup.Extensions;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using static Encrypted_Messaging_App.LoggerService;
+using static Encrypted_Messaging_App.Views.Functions;
 using System.ComponentModel;
 
 namespace Encrypted_Messaging_App.Views
@@ -100,8 +101,22 @@ namespace Encrypted_Messaging_App.Views
             }
         }
 
+        public async void EditTitle(object sender, EventArgs e)
+        {
+            string newTitle = await DisplayPromptAsync("Enter Title:", null, "Done", null, null, CurrentChat.titleMaxLength, Keyboard.Text, CurrentChat.title);
+            if(newTitle == null || newTitle == CurrentChat.title) { return; }
+            Debug(CurrentChat.title);
+            bool result = await CurrentChat.UpdateTitle(newTitle);
+            if (!result) { ErrorToast("Unable to edit title"); }
+        }
+        public async void LeaveChat(object sender, EventArgs e)
+        {
+            bool result = await CurrentChat.Leave();
+            if (!result) { ErrorToast("Unable to leave chat"); }
+            await Shell.Current.GoToAsync($"//{nameof(MainMessagePage)}");
+        }
 
-        public async void MessageSent(object sender, EventArgs e)
+        public async void SendMessage(object sender, EventArgs e)
         {
             Entry MessageEntry = (Entry)Content.FindByName("TextEntry");
             Button MessageSendButton = (Button)Content.FindByName("MessageSend");

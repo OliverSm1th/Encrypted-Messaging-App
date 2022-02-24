@@ -31,17 +31,19 @@ namespace Encrypted_Messaging_App.Droid
 
         private Dictionary<string, string> firestorePaths = new Dictionary<string, string>
         {
-            {"Requests", $"requests/pending/[USERID]" },
-            {"AcceptRequests", $"requests/accepted/[USERID]" },
-            {"CUser", $"users/[USERID]" },
+            {"Requests", $"requests/pending/[CUSERID]" },
+            {"AcceptRequests", $"requests/accepted/[CUSERID]" },
+            {"CUser", $"users/[CUSERID]" },
             {"UserFromUsername", $"usersPublic/<USERNAME>" },
             {"UserFromId", $"usersPublicID/<USERID>" },
             {"Chat", $"chats/<CHATID>" },
-            {"ChatsID", $"users/[USERID]/chatsID" }
+            {"ChatsID", $"users/[CUSERID]/chatsID" }
         };
 
         private Dictionary<string, TaskCompletionSource<bool>> uncompletedFetchTasks = new Dictionary<string, TaskCompletionSource<bool>>();
         private List<IListenerRegistration> Listeners = new List<IListenerRegistration>();
+        private Dictionary<string, List<IListenerRegistration>> ListenerDict = new Dictionary<string, List<IListenerRegistration>>(); 
+        private int randomNum = new System.Random().Next();
 
 
 
@@ -99,8 +101,9 @@ namespace Encrypted_Messaging_App.Droid
             else if (levelName.StartsWith("[") && levelName.EndsWith("]"))
             {
                 levelName = levelName.TrimStart('[').TrimEnd(']');
-                if (levelName == "USERID")
+                if (levelName == "CUSERID")
                 {
+                    if (arguments.ContainsKey("CUSERID")) { return parseLevelArgument("<CUSERID>", arguments); }
                     levelName = FirebaseAuth.Instance.CurrentUser.Uid;
                 }
                 else
@@ -195,11 +198,12 @@ namespace Encrypted_Messaging_App.Droid
             return tcs.Task;
 
         }
-        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, params (string, string)[] arguments) // LISTEN  
-        {
+        public bool ListenData<returnType>(string pathInfo, Action<object> action, string changeType = null, string listenerKey=" ", params (string, string)[] arguments) // LISTEN  
+        {  // listenerKey = key used to bulk remove listeners (all listeners with the same key)
             Debug($"Listening Data for {pathInfo}:", 0, true);
             string path = GetPath(pathInfo, arguments);
             string fieldName = null;
+
 
             if (isFieldType(typeof(returnType)))
             {
@@ -220,6 +224,9 @@ namespace Encrypted_Messaging_App.Droid
                 }
                 else { currListenerReg = reference.collection.AddSnapshotListener(new OnEventListener(typeof(returnType), action, ChangeType, fieldName)); }
                 Listeners.Add(currListenerReg);
+                if (ListenerDict.ContainsKey(listenerKey)) { ListenerDict[listenerKey].Add(currListenerReg); }
+                else { ListenerDict[listenerKey] = new List<IListenerRegistration> { currListenerReg }; }
+                
                 return true;
             }
             else
@@ -286,7 +293,7 @@ namespace Encrypted_Messaging_App.Droid
                 }
 
             }
-            else if (reference.collection != null)
+            else if (reference.document != null)
             {
                 try
                 {
@@ -343,14 +350,30 @@ namespace Encrypted_Messaging_App.Droid
             return await UpdateField(newString, path);
         }
 
-        public void RemoveListeners()
+        public void RemoveAllListeners()
         {
-            foreach (IListenerRegistration listener in Listeners)
+            foreach (KeyValuePair<string, List<IListenerRegistration>> KeyValue in ListenerDict){
+                foreach (IListenerRegistration listener in KeyValue.Value)
+                {
+                    listener.Remove();
+                }
+            }
+
+
+            //foreach (IListenerRegistration listener in Listeners)
+            //{
+            //    listener.Remove();
+            //}
+        }
+        public void RemoveListenersByKey(string key)
+        {
+            if (!ListenerDict.ContainsKey(key)) { return; }
+
+            foreach (IListenerRegistration listener in ListenerDict[key])
             {
                 listener.Remove();
             }
         }
-
 
 
         // Common GET Requests:
@@ -563,11 +586,11 @@ namespace Encrypted_Messaging_App.Droid
 
 
         // Deprecated:
-        public Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, params (string, string)[] arguments)  // Not used
+        public Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, string listenerKey = " ", params (string, string)[] arguments)  // Not used
         {
             TaskCompletionSource<bool> fetchDataCompletion = new TaskCompletionSource<bool>();
 
-            bool result = ListenData<returnType>(pathInfo, (object result) => { Console.WriteLine("Resolved Listener!!"); action.Invoke(result); fetchDataCompletion.TrySetResult(true); }, changeType, arguments);
+            bool result = ListenData<returnType>(pathInfo, (object result) => { Console.WriteLine("Resolved Listener!!"); action.Invoke(result); fetchDataCompletion.TrySetResult(true); }, changeType, listenerKey, arguments);
             if (!result) { fetchDataCompletion.TrySetResult(false); }
 
             return fetchDataCompletion.Task;

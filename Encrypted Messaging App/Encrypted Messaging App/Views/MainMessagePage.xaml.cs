@@ -45,27 +45,24 @@ namespace Encrypted_Messaging_App.Views
         Chat[] currentChats;
         private void DisplayChats(Chat[] chats)
         {
-           
-            if (chats == currentChats) { return; }
-            else { currentChats = chats; }
-            LoggerService.Log($"Displaying chats: length: {chats.Length}");
-
             Label noChatLabel = (Label)Content.FindByName("NoChats");
 
-            ChatsCollection.Clear();
+            if (chats == null || chats.Length == 0) { noChatLabel.IsVisible = true; }
+            else { noChatLabel.IsVisible = false; }
+            if (chats == currentChats) {  return;  }
 
-            if (chats != null && chats.Length > 0)
+            currentChats = chats;
+
+            Debug($"Displaying chats: length: {chats.Length}");
+
+            ChatsCollection.Clear();
+            if (chats == null || chats.Length == 0)  { return; }
+
+
+            for (int i = 0; i < chats.Length; i++)
             {
-                for (int i = 0; i < chats.Length; i++)
-                {
-                    ChatsCollection.Add(chats[i]);
-                    Console.WriteLine($"{chats[i].id} chat has been added to list");
-                }
-                noChatLabel.IsVisible = false;
-            }
-            else
-            {
-                noChatLabel.IsVisible = true;
+                ChatsCollection.Add(chats[i]);
+                Debug($"{chats[i].id} chat has been added to list");
             }
         }
 
@@ -80,12 +77,29 @@ namespace Encrypted_Messaging_App.Views
             }
         }
 
-        public void Refresh(object sender, EventArgs e)
+        
+        public Command MessageRefreshCommand
+        {
+            get
+            {  
+                return _messageRefreshCommand ?? (_messageRefreshCommand = new Command(() =>
+                {
+                    Refresh();
+                }));
+            }
+        } // From: https://xamarinmonkeys.blogspot.com/2020/01/xamarinforms-working-with-refreshview.html
+        private Command _messageRefreshCommand;
+
+        public void Refresh()
         {
             Log("Refreshing");
             CurrentUser.Output();
             DisplayChats(CurrentUser.chats.ToArray());
+            RefreshView messageRefresh = (RefreshView)Content.FindByName("MessageRefresh");
+            messageRefresh.IsRefreshing = false;
         }
+
+        
 
 
         public void ChatTapped(object sender, EventArgs e)
@@ -104,12 +118,7 @@ namespace Encrypted_Messaging_App.Views
 
 
 
-        public async void ChangeThemePopOut(object sender, EventArgs e)
-        {
-            string action = await DisplayActionSheet("Change Theme:", "Cancel", null, "🟦 Blue", "🟥 Red");
-            if(action == null || action == "Cancel") { return; }
-            Functions.setColour(action.Split(' ')[1]);
-        }
+        
 
         public void SettingsPopOut(object sender, EventArgs e)
         {
@@ -125,6 +134,14 @@ namespace Encrypted_Messaging_App.Views
                 CurrentUser.LogOut();
                 Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
             }
+        }
+
+        // Depracted: 
+        public async void ChangeThemePopOut(object sender, EventArgs e)
+        {
+            string action = await DisplayActionSheet("Change Theme:", "Cancel", null, "🟦 Blue", "🟥 Red");
+            if (action == null || action == "Cancel") { return; }
+            Functions.setColour(action.Split(' ')[1]);
         }
     }
 }

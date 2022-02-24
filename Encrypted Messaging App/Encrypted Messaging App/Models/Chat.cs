@@ -53,9 +53,11 @@ namespace Encrypted_Messaging_App
         public Action headerChangedAction;                 // Fired when you change Title/Id      -> refresh chatList + chatPage
         public Action<int[], int[]> contentChangedAction;  // Fired when you change/send messages -> refresh chatPage  int[]- Messages index to update (empty if all)
         public bool showDecryptedMessages = true;
+        public int titleMaxLength = 25;
 
         // Private Attributes
         private BigInteger encryptionKey;
+        
 
 
         public Chat() { }
@@ -100,9 +102,9 @@ namespace Encrypted_Messaging_App
             if (id != null)
             {
                 TaskCompletionSource<bool> chatUpdatedTask = new TaskCompletionSource<bool>();
-                bool success = FirestoreService.ListenData<Chat>("Chat", async (result) => {
+                bool success = FirestoreService.ListenData<Chat>("Chat", async (result) => { if(result == null) { return; }
                     await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true);
-                }, arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                }, listenerKey:"Chat", arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
                 await chatUpdatedTask.Task;
                 return success;
             }
@@ -117,7 +119,7 @@ namespace Encrypted_Messaging_App
         }
         public void RemoveListener()
         {
-            FirestoreService.RemoveListeners();   // Removes all listeners added using this instance of FirestoreService
+            FirestoreService.RemoveListenersByKey("Chat");   // Removes all listeners added for the chat
         }
 
 
@@ -164,12 +166,12 @@ namespace Encrypted_Messaging_App
         }
 
         // --Firestore Delete--  \\
-        public async Task<bool> DeleteFirestore()
+        public async Task<bool> Leave()
         {
-            (bool success, string message) result = await FirestoreService.DeleteObject("Chat", ("CHATID", id));
+            (bool success, string message) result = await FirestoreService.RemoveFromArray(id, "CUser/chatsID");
+            if (!result.success) { Error($"Couldn't remove user from chat:    {result.message}"); }
+            result = await FirestoreService.DeleteObject("Chat", ("CHATID", id));
             if (!result.success) { Error($"Couldn't delete chat:    {result.message}"); return false; }
-            result = await FirestoreService.RemoveFromArray(id, "CUser/chatsID");
-            if (!result.success) { Error($"Couldn't remove user from chat:    {result.message}");}
             return result.success;
         }
 
@@ -279,7 +281,12 @@ namespace Encrypted_Messaging_App
             }
             if(users.Count > 0)
             {
-                return title.Remove(title.Length - 2);
+                title = title.Remove(title.Length - 2);
+                if(title.Length > titleMaxLength-2)
+                {
+                    title = title.Substring(0, titleMaxLength - 2) + "..";
+                }
+                return title;
             }
             else
             {

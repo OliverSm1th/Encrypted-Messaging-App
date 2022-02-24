@@ -5,18 +5,18 @@
              Title="Untitled Chat" >
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Untitled Chat" Priority="0" Order="Primary" Grid.Column="0">
+        <ToolbarItem Text="Untitled Chat" Priority="0" Order="Primary" Grid.Column="0" Clicked="EditTitle">
             <ToolbarItem.IconImageSource>
                 <FontImageSource
                 FontFamily="Icons-S"
-                Glyph="{StaticResource IconUser}"
+                Glyph="{StaticResource IconEdit}"
                 Color="Black"
                     Size="20"
                 />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Chat Info" Priority="0" Order="Secondary" Clicked="DisplayChatInfo"/>
-        <ToolbarItem Text="Leave" Priority="0" Order="Secondary"/>
+        <ToolbarItem Text="Leave" Priority="0" Order="Secondary" Clicked="LeaveChat"/>
     </ContentPage.ToolbarItems>
     
     <ContentPage.Content>
@@ -78,7 +78,7 @@
                         HorizontalOptions ="Center"
                         Grid.Column="1"
                         x:Name="MessageSend"
-                        Clicked="MessageSent"/>
+                        Clicked="SendMessage"/>
                 </Grid>
             </StackLayout>
         </StackLayout>

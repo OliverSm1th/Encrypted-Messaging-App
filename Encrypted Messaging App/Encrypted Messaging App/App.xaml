@@ -27,6 +27,7 @@
             <x:String x:Key="IconSync">&#xf2f1;</x:String>
             <x:String x:Key="IconSend">&#xf1d8;</x:String>
             <x:String x:Key="IconSettings">&#xf013;</x:String>
+            <x:String x:Key="IconEdit">&#xf303;</x:String>
         </ResourceDictionary>
         
         

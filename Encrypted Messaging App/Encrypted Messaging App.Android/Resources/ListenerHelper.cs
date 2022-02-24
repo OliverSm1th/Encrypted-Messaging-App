@@ -444,6 +444,13 @@ namespace Encrypted_Messaging_App.Droid.Resources
             }
             return (new ParseStatus(true), requests.ToArray());
         }
+        public (ParseStatus, Request) ParseRequest (DocumentSnapshot doc)
+        {
+            JavaDictionary data = (JavaDictionary)doc.Data;
+            Request request = ParseRequest(data);
+            if(request != null) { return (new ParseStatus(true), request); }
+            else { return (new ParseStatus(false), null); }
+        }
         private Request ParseRequest(JavaDictionary data)
         {
             if (data != null)
@@ -464,6 +471,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             return null;
         }
 
+        
 
         public (ParseStatus, AcceptedRequest[]) ParseAcceptRequests(DocumentSnapshot[] docs)
         {
@@ -517,7 +525,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 }
                 if (doc.Get("title") != null)
                 {
-                    title = (string)doc.Get("title");
+                    title = (string)doc.Get("Title");
                 }
                 if(doc.Get("encryptionInfo") is JavaDictionary encryptionDict ){
                     encryptInfo = ToObject<KeyData>(encryptionDict);
@@ -642,7 +650,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             for (int i = 0; i < length; i++)
             {
                 Debug($"{i}: {enumerator.Current}",1);
-                Debug($"{enumerator.Current.GetType()}",2);
+                //Debug($"{enumerator.Current.GetType()}",2);
                 if (enumerator.Current is JavaDictionary currentDict)
                 {
                     array[i] = JavaDictToDict(currentDict);
