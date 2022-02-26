@@ -34,7 +34,7 @@ namespace Encrypted_Messaging_App
 
         public static void Debug(string message, int indentationLvl = 0, bool includeMethod = false, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller=null, [CallerFilePathAttribute] string filePath=null)
         {           
-            Console.WriteLine($"{new string('ㅤ', indentationLvl*2)}{message}" +  (includeMethod ? $"    ({caller}:{lineNumber})".PadLeft(45-message.Length- indentationLvl*2) : "") );
+            Console.WriteLine($"{new string('ㅤ', indentationLvl*2)}{message}" +  (includeMethod ? $"    ({caller}:{lineNumber})".PadLeft(Math.Max((45-message.Length- indentationLvl*2), 0)) : "") );
         }
 
         //public static void Debug(string message, bool includeMethod, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null) { Debug(message, 0, includeMethod, lineNumber, caller); }

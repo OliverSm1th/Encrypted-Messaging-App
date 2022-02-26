@@ -542,7 +542,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                         JavaDictionary messageObj = (JavaDictionary)messagesObj.Get(i);
 
 
-                        Message messageResult = ParseMessage(messageObj);
+                        Message messageResult = ParseMessage(messageObj, i);
 
                         if (messageResult != null) { messages.Add(messageResult); }
                         else { Error("Unable to parse message"); }
@@ -565,7 +565,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 return (new ParseStatus(false, "Failed to get chats"), null);
             }
         }
-        public Message ParseMessage(JavaDictionary data)
+        public Message ParseMessage(JavaDictionary data, int messageIndex)
         {
             if(data["author"] is JavaDictionary authorDict 
                 && data["encryptedContent"].ToString() is string content
@@ -575,7 +575,7 @@ namespace Encrypted_Messaging_App.Droid.Resources
             {
                 User author = ToObject<User>(authorDict);
                 MessagePendingEvent[] pendingEvents = ToObjectArr<MessagePendingEvent>(eventDict);
-                return new Message { author = author, encryptedContent = content, createdTime = DateTime.FromBinary(createdTime), pendingEvents = pendingEvents };
+                return new Message { author = author, encryptedContent = content, createdTime = DateTime.FromBinary(createdTime), pendingEvents = pendingEvents, index= messageIndex };
                 
             }
             Log(data["encryptedContent"].ToString());

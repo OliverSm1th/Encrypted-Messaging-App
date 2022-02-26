@@ -40,10 +40,8 @@ namespace Encrypted_Messaging_App.Droid
             {"ChatsID", $"users/[CUSERID]/chatsID" }
         };
 
-        private Dictionary<string, TaskCompletionSource<bool>> uncompletedFetchTasks = new Dictionary<string, TaskCompletionSource<bool>>();
         private List<IListenerRegistration> Listeners = new List<IListenerRegistration>();
         private Dictionary<string, List<IListenerRegistration>> ListenerDict = new Dictionary<string, List<IListenerRegistration>>(); 
-        private int randomNum = new System.Random().Next();
 
 
 
@@ -320,26 +318,31 @@ namespace Encrypted_Messaging_App.Droid
             {
                 return (false, "Invalid length of path given, must be odd");
             }
-            else
+            
+            try
             {
-                try
-                {
-                    await reference.document.Update(fieldLevel, obj);
-                    return (true, "");
-                }
-                catch (Exception e)
-                {
-                    return (false, e.Message);
-                }
+                await reference.document.Update(fieldLevel, obj);
+                return (true, "");
             }
-        }
+            catch (Exception e)
+            {
+                return (false, e.Message);
+            }
         // UpdateField methods:
-        public async Task<(bool, string)> AddToArray(string newItem, string pathInfo, params (string, string)[] arguments)
+        }
+        
+
+        public async Task<(bool, string)> AddToArray(object newItem, string pathInfo, params (string, string)[] arguments)
         {
             string path = GetPath(pathInfo, arguments);
+            
 
+            Java.Lang.Object newJItem = GetMap(newItem);
 
-            return await UpdateField(FieldValue.ArrayUnion(newItem), path);
+            if(newItem is string newString) {  newJItem = newString;  }
+            else  {  newJItem = GetMap(newItem);  }
+
+            return await UpdateField(FieldValue.ArrayUnion(newJItem), path);
         }
         public async Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments)
         {

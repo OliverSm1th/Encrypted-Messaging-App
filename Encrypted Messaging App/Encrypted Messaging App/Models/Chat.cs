@@ -24,17 +24,21 @@ namespace Encrypted_Messaging_App
         
         public Message[] messages { get => _messages; 
             set {
-                // Get all new messages, give them the secret key and decrypt the content
-                Message[] diff = value.Except(_messages).ToArray();
-                foreach(Message addedMessage in diff)
-                {
-                    if(addedMessage.secretKey == default(BigInteger))
+
+                if (id != null) { // If server instance:
+                    // Get all new messages, give them the secret key and decrypt the content
+                    Message[] diff = value.Except(_messages).ToArray();
+                    foreach (Message addedMessage in diff)
                     {
-                        addedMessage.secretKey = encryptionKey;
-                    }
-                    if(addedMessage.content == null)
-                    {
-                        addedMessage.DecryptContent();
+                        if (addedMessage.secretKey == default(BigInteger))
+                        {
+                            addedMessage.secretKey = encryptionKey;
+                        }
+                        if (addedMessage.content == null)
+                        {
+                            addedMessage.DecryptContent();
+                            addedMessage.AckDelivery(id);
+                        }
                     }
                 }
                 _messages = value;
@@ -45,7 +49,7 @@ namespace Encrypted_Messaging_App
         public string id { get { return _id; } 
             set {
                 _id = value;
-                if (encryptionKey.Equals(default(BigInteger))) { encryptionKey = getSecretKey(); }    // If encryption key is not set yet, fetch it
+                
             } 
         }
         private string _id;
@@ -64,13 +68,11 @@ namespace Encrypted_Messaging_App
 
 
         // Constructors:
-        public void SetEncryptKey(BigInteger chatEncryptKey)
-        {
-            encryptionKey = chatEncryptKey;
-        }
+        
         public void SetID(string chatID)
         {
             id = chatID;
+            if (encryptionKey.Equals(default(BigInteger))) { encryptionKey = getSecretKey(); }    // If encryption key is not set yet, fetch it
         }
         private async Task setUserIDsAndUsers(string[] newUserIDs)  // Sync users with userIDs (F)
         {
@@ -311,6 +313,10 @@ namespace Encrypted_Messaging_App
 
 
         // Deprecated:
+        public void SetEncryptKey(BigInteger chatEncryptKey)
+        {
+            encryptionKey = chatEncryptKey;
+        }
         public async Task<bool> RefreshUsersFromIDs()
         {
             users = new List<User>();
@@ -351,6 +357,7 @@ namespace Encrypted_Messaging_App
 
             return result;
         }
+
     }
 
 }

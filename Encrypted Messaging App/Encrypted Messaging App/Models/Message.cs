@@ -4,6 +4,7 @@ using System.Text;
 using UsefulExtensions;
 using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
+using static Encrypted_Messaging_App.LoggerService;  // Error()
 using System.Numerics;
 using Xamarin.Forms;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace Encrypted_Messaging_App
 {
     public class Message
     {
-        
+        IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();  // Initilise Firetore Service
 
         // Public Attributes:  (Firebase)
         public DateTime createdTime { get; set; }
@@ -32,13 +33,17 @@ namespace Encrypted_Messaging_App
         public string encryptedContent
         {
             get => _encryptedcontent;
-            set { _encryptedcontent = value; DecryptContent(); }
+            set { _encryptedcontent = value;
+                if (content == null && secretKey != default) { 
+                    DecryptContent(); 
+                } }
         }
         private string _encryptedcontent;
         //                      (Non-Firebase)
         public string content;
         public BigInteger secretKey;
         public Action messageChangedAction;
+        public int index = -1;
 
 
         // Constructors:
@@ -57,20 +62,22 @@ namespace Encrypted_Messaging_App
         // Getters:
         public MessageView GetMessageView()
         {
-            Console.WriteLine($"Encrypted Content: {encryptedContent}");
             return new MessageView { content = content, encryptedContent = encryptedContent, author = author };
         }
 
 
 
 
-        public void AckDelivery(string userID) // Acknoweledge that the message has been delivered
+        public void AckDelivery(string chatID) // Acknoweledge that the message has been delivered
         {
-            userEvents.AddEvent(userID, MessageEventTypes.DELIVERED);
+            if(index == -1) { Error("Invalid message object (not server instance)"); return; }
+            userEvents.AddEvent(chatID, index, MessageEventTypes.DELIVERED);
+
         }
-        public void AckRead(string userID)     // Acknowledge that the message has been read
+        public void AckRead(string chatID)     // Acknowledge that the message has been read
         {
-            userEvents.AddEvent(userID, MessageEventTypes.READ);
+            if (index == -1) { Error("Invalid message object (not server instance)"); return; }
+            userEvents.AddEvent(chatID, index, MessageEventTypes.READ);
         }
         public bool Edit(string p_newContent, User p_editor, string[] chatUserIDs)
         {
@@ -164,7 +171,7 @@ namespace Encrypted_Messaging_App
      // User Events:  (When a user receives/reads a message)
     public class MessageUserEvents
     {
-        IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();  // Initilise Firetore Service
+        
         public MessageUserEvents() { }
         public MessageEvent[] readEvents{ 
             get { return _readEvents.ToArray(); } set { _readEvents = value.ToList(); }
@@ -177,17 +184,18 @@ namespace Encrypted_Messaging_App
         }
         private List<MessageEvent> _deliveredEvents = new List<MessageEvent>();
 
-        public void AddEvent(string userID, string eventType)
+        public void AddEvent(string chatID, int messageIndex, string eventType)
         {
             if(eventType == MessageEventTypes.DELIVERED)
             {
-                _deliveredEvents.Add(new MessageEvent(userID));
+                _deliveredEvents.Add(new MessageEvent(CurrentUser.Id));
             }
             else if(eventType == MessageEventTypes.READ)
             {
-                _readEvents.Add(new MessageEvent(userID));
+                _readEvents.Add(new MessageEvent(CurrentUser.Id));
             }
 
+            Error($"Invalid MessageEventType: {eventType}");
         }
     }
     public class MessageEvent
