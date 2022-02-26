@@ -31,7 +31,7 @@
         <StackLayout VerticalOptions="FillAndExpand">
             <Label Text="Chats"
                    TextColor="Black"
-                   FontSize="Title"
+                   FontSize="25"
                    FontFamily="Roboto-Black"
                    HorizontalOptions="CenterAndExpand"/>
             <!--<Label Text="{StaticResource IconSync}" 
@@ -48,7 +48,7 @@
             <StackLayout VerticalOptions="FillAndExpand">
                 <RefreshView Command="{Binding MessageRefreshCommand}" VerticalOptions="FillAndExpand" x:Name="MessageRefresh">  <ScrollView VerticalOptions="Fill">
                         <StackLayout VerticalOptions="Start">
-                            <StackLayout x:Name="UserList" BackgroundColor="Blue" BindableLayout.ItemsSource="{Binding ChatsCollection}" VerticalOptions="Start">
+                            <StackLayout x:Name="UserList" BindableLayout.ItemsSource="{Binding ChatsCollection}" VerticalOptions="Start">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate>
                                         <Grid RowSpacing="0" ClassId="{Binding id}" BackgroundColor="{DynamicResource Secondary}">

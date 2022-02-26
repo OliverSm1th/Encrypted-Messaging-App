@@ -337,6 +337,8 @@ namespace Encrypted_Messaging_App.Droid
         public async Task<(bool, string)> AddToArray(string newItem, string pathInfo, params (string, string)[] arguments)
         {
             string path = GetPath(pathInfo, arguments);
+
+
             return await UpdateField(FieldValue.ArrayUnion(newItem), path);
         }
         public async Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments)

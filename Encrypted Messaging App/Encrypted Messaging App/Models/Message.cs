@@ -6,11 +6,42 @@ using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using System.Numerics;
 using Xamarin.Forms;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Encrypted_Messaging_App
 {
     public class Message
     {
+        
+
+        // Public Attributes:  (Firebase)
+        public DateTime createdTime { get; set; }
+        public User author { get; set; }
+        public MessageUserEvents userEvents { get; set; } = new MessageUserEvents();
+        public MessagePendingEvent[] pendingEvents
+        {
+            get { return _pendingEvents.ToArray(); }
+            set
+            {
+                _pendingEvents = new List<MessagePendingEvent>(value);
+                // For setting, add/subtract to _pendingEvents
+            }
+        }
+        private List<MessagePendingEvent> _pendingEvents = new List<MessagePendingEvent>();
+        public string encryptedContent
+        {
+            get => _encryptedcontent;
+            set { _encryptedcontent = value; DecryptContent(); }
+        }
+        private string _encryptedcontent;
+        //                      (Non-Firebase)
+        public string content;
+        public BigInteger secretKey;
+        public Action messageChangedAction;
+
+
+        // Constructors:
         public Message(string p_content, User p_author, string[] chatUserIDs, BigInteger p_secretKey)    // Creating the message
         {
             content = p_content;
@@ -21,52 +52,26 @@ namespace Encrypted_Messaging_App
             string[] otherUserIDs = chatUserIDs.Remove(p_author.Id); // From Extensions
             if (otherUserIDs != null) { addEvent(PendingEventTypes.CREATED, otherUserIDs); }
         }
+        public Message() { }    // Defining message from server
 
-        public Message() { }   // Defining the message from the server
-        public string content;
-
-        string _encryptedcontent;
-        public string encryptedContent { 
-            get => _encryptedcontent;
-            set { _encryptedcontent = value; DecryptContent(); }
-        }
-        public DateTime createdTime { get; set; }
-        public DateTime deliveredTime { get; set; }
-        public DateTime readTime { get; set; }
-        public User author { get; set; }
-        public BigInteger secretKey; // Set by chat when added to Message[] messages
-
-
-        List<MessagePendingEvent> _pendingEvents = new List<MessagePendingEvent>();
-        public MessagePendingEvent[] pendingEvents
+        // Getters:
+        public MessageView GetMessageView()
         {
-            get { return _pendingEvents.ToArray(); }
-            set
-            {
-                _pendingEvents = new List<MessagePendingEvent>(value);
-                // For setting, add/subtract to _pendingEvents
-            }
+            Console.WriteLine($"Encrypted Content: {encryptedContent}");
+            return new MessageView { content = content, encryptedContent = encryptedContent, author = author };
         }
 
-        public bool EncryptContent()
+
+
+
+        public void AckDelivery(string userID) // Acknoweledge that the message has been delivered
         {
-            if(secretKey.IsZero || content == null || content.Length == 0) { return false; }
-            AES encryptAES = new AES(SecurityLevel, true);
-            byte[] byteEncrypted = encryptAES.Encrypt(secretKey.ToByteArray(), UnicodeToByteArr(content));
-            encryptedContent = ByteArrToBase64(byteEncrypted);
-            return true;
+            userEvents.AddEvent(userID, MessageEventTypes.DELIVERED);
         }
-
-        public bool DecryptContent()
+        public void AckRead(string userID)     // Acknowledge that the message has been read
         {
-            if (secretKey.IsZero || encryptedContent == null || encryptedContent.Length == 0) { return false; }
-            AES decryptAES = new AES(SecurityLevel);
-            byte[] byteContent = decryptAES.Decrypt(secretKey.ToByteArray(), Base64ToByteArr(encryptedContent));
-            content = ByteArrToUnicode(byteContent);
-            return true;
+            userEvents.AddEvent(userID, MessageEventTypes.READ);
         }
-
-
         public bool Edit(string p_newContent, User p_editor, string[] chatUserIDs)
         {
             if(author == null || author != p_editor) { return false; }
@@ -87,13 +92,26 @@ namespace Encrypted_Messaging_App
         }
 
 
-        public MessageView GetMessageView()
+        //   --Encryption + Decryption--  \\
+        public bool EncryptContent()
         {
-            Console.WriteLine($"Encrypted Content: {encryptedContent}");
-            return new MessageView { content = content, encryptedContent = encryptedContent, author = author };
+            if (secretKey.IsZero || content == null || content.Length == 0) { return false; }
+            AES encryptAES = new AES(SecurityLevel);
+            byte[] byteEncrypted = encryptAES.Encrypt(secretKey.ToByteArray(), UnicodeToByteArr(content));
+            encryptedContent = ByteArrToBase64(byteEncrypted);
+            return true;
+        }
+        public bool DecryptContent()
+        {
+            if (secretKey.IsZero || encryptedContent == null || encryptedContent.Length == 0) { return false; }
+            AES decryptAES = new AES(SecurityLevel);
+            byte[] byteContent = decryptAES.Decrypt(secretKey.ToByteArray(), Base64ToByteArr(encryptedContent));
+            content = ByteArrToUnicode(byteContent);
+            return true;
         }
 
 
+        //  Private Methods:
         private bool addEvent(string eventType, string[] pendingUserIDs)
         {
             if (!PendingEventTypes.isValidEventType(eventType)) { return false; }
@@ -101,9 +119,7 @@ namespace Encrypted_Messaging_App
             _pendingEvents.Add(new MessagePendingEvent { eventType = eventType, pendingUserIDs = pendingUserIDs });
             return true;
         }
-
-        // Encryption Conversions:
-        private static byte[] UnicodeToByteArr(string unicode)
+        private static byte[] UnicodeToByteArr(string unicode) //Encryption Conversions
         {
             return Encoding.Unicode.GetBytes(unicode);
         }
@@ -119,10 +135,9 @@ namespace Encrypted_Messaging_App
         {
             return Convert.FromBase64String(base64);
         }
-
     }
 
-    // Pending Events:
+    // Pending Events:   (When the message is changed)
     public class MessagePendingEvent
     {
         public MessagePendingEvent() {}
@@ -145,6 +160,53 @@ namespace Encrypted_Messaging_App
             return Array.IndexOf(validEventTypes, eventType) != -1;
         }
     }
+
+     // User Events:  (When a user receives/reads a message)
+    public class MessageUserEvents
+    {
+        IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();  // Initilise Firetore Service
+        public MessageUserEvents() { }
+        public MessageEvent[] readEvents{ 
+            get { return _readEvents.ToArray(); } set { _readEvents = value.ToList(); }
+        }
+        private List<MessageEvent> _readEvents = new List<MessageEvent>();
+        public MessageEvent[] deliveredEvents
+        {
+            get { return _deliveredEvents.ToArray(); }
+            set { _deliveredEvents = value.ToList(); }
+        }
+        private List<MessageEvent> _deliveredEvents = new List<MessageEvent>();
+
+        public void AddEvent(string userID, string eventType)
+        {
+            if(eventType == MessageEventTypes.DELIVERED)
+            {
+                _deliveredEvents.Add(new MessageEvent(userID));
+            }
+            else if(eventType == MessageEventTypes.READ)
+            {
+                _readEvents.Add(new MessageEvent(userID));
+            }
+
+        }
+    }
+    public class MessageEvent
+    {
+        public MessageEvent() { }
+        public MessageEvent(string p_userID)
+        {
+            userID = p_userID;
+            eventTime = DateTime.Now;
+        }
+        public string userID { get; set; }
+        public DateTime eventTime { get; set; }
+    }
+    public static class MessageEventTypes
+    {
+        public static string DELIVERED { get; } = "Delivered";
+        public static string READ { get; } = "Read";
+    }
+
 
     //Message View:    (for messageList)
     public class MessageView

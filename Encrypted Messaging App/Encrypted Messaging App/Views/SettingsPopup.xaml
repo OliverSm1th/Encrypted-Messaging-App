@@ -21,7 +21,8 @@
             <Label
                 FontFamily="Roboto"
                 TextColor="Black"
-                HorizontalOptions="Start">
+                HorizontalOptions="Start"
+                Padding="0, 0, 40, 0">
                 <Label.FormattedText>
                     <FormattedString>
                         <Span Text="Username: "  FontAttributes="Bold"/>
@@ -52,7 +53,7 @@
                 </Label.FormattedText>
             </Label>
 
-            <StackLayout Orientation="Horizontal">
+            <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
                 <Label 
                     Text="Theme: "
                     FontFamily="Roboto"
@@ -66,7 +67,7 @@
                         </FormattedString>
                     </Label.FormattedText>
                 </Label>
-                <Picker Title="Theme: " HorizontalOptions="StartAndExpand" VerticalOptions="Center" FontFamily="Roboto" TextColor="Black" x:Name="settingThemePicker" FontSize="15" HorizontalTextAlignment="Center" SelectedIndexChanged="OnThemeChanged">
+                <Picker Title="Theme: "  HorizontalOptions="FillAndExpand" VerticalOptions="Center" FontFamily="Roboto" TextColor="Black" x:Name="settingThemePicker" FontSize="15" HorizontalTextAlignment="Center" SelectedIndexChanged="OnThemeChanged">
                 </Picker>
             </StackLayout>
 
