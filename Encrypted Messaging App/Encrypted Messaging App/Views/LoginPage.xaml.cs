@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using static Encrypted_Messaging_App.Views.Functions;
@@ -13,9 +8,7 @@ namespace Encrypted_Messaging_App.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class LoginPage : ContentPage
     {
-        bool invalidEmail = false;
-        Label invalidEmailIcon = new Label();
-        
+        IAuthenticationService authenticationService = DependencyService.Resolve<IAuthenticationService>();
 
         public LoginPage()
         {
@@ -27,7 +20,6 @@ namespace Encrypted_Messaging_App.Views
             base.OnAppearing();
             Console.WriteLine("~~ Login Page ~~");
 
-            IAuthenticationService authenticationService = DependencyService.Resolve<IAuthenticationService>();
             if (authenticationService.isSignedIn())
             {
                 await Shell.Current.GoToAsync($"//{nameof(LoadingPage)}");
@@ -38,32 +30,32 @@ namespace Encrypted_Messaging_App.Views
             base.OnDisappearing();
 
             // Reset Entries:
-            Entry UsernameEntry = (Entry)Content.FindByName("UsernameEntry");
+            Entry EmailEntry = (Entry)Content.FindByName("EmailEntry");
             Entry PasswordEntry = (Entry)Content.FindByName("PasswordEntry");
-            UsernameEntry.Text = "";
+            EmailEntry.Text = "";
             PasswordEntry.Text = "";
         }
+
         // Login
         private async void LoginButton_Clicked(object sender, EventArgs e)
         {
-            Entry UsernameEntry = (Entry)Content.FindByName("UsernameEntry");
+            Entry EmailEntry = (Entry)Content.FindByName("EmailEntry");
             Entry PasswordEntry = (Entry)Content.FindByName("PasswordEntry");
-            string username = UsernameEntry.Text;
+            string email = EmailEntry.Text;
             string password = PasswordEntry.Text;
 
-            IAuthenticationService authenticationService = DependencyService.Resolve<IAuthenticationService>();
+            
             if(authenticationService == null){
                 Console.WriteLine("Not resolved");
                 return;
             }
-            (bool success, string errorMsg) result = await authenticationService.LogIn(username, password);
+            (bool success, string errorMsg) result = await authenticationService.LogIn(email, password);
             if (result.success)
             {
                 await Shell.Current.GoToAsync($"//{nameof(LoadingPage)}");
             }
             else
             {
-                //Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
                 Button LoginBtn = (Button)sender;
 
                 string type = result.errorMsg;
@@ -88,11 +80,11 @@ namespace Encrypted_Messaging_App.Views
         {
             await Shell.Current.GoToAsync($"{nameof(RegisterPage)}");
         }
-
         private async void ForgotPassword_Tap(object sender, EventArgs e)
         {
             await Shell.Current.GoToAsync($"{nameof(ForgotPasswordPage)}");
         }
+
 
         // Password visibility
         private void ChangeVisibility(object sender, EventArgs e)
@@ -120,26 +112,19 @@ namespace Encrypted_Messaging_App.Views
         private void EditedEntry(object sender, EventArgs e)
         {
             Button LoginBtn = (Button)Content.FindByName("LoginButton");
-            Entry UsernameEntry = (Entry)Content.FindByName("UsernameEntry");
+            Entry EmailEntry = (Entry)Content.FindByName("EmailEntry");
             Entry PasswordEntry = (Entry)Content.FindByName("PasswordEntry");
-            String[] texts = new string[] { UsernameEntry.Text, PasswordEntry.Text };
+            string[] texts = new string[] { EmailEntry.Text, PasswordEntry.Text };
             bool filled = true;
             foreach (string text in texts)
             {
-                if (String.IsNullOrEmpty(text)) { filled = false; }
+                if (string.IsNullOrEmpty(text)) { filled = false; }
                 else if (text.Length == 0) { filled = false; }
             }
-            //bool emailValid = isValidEmail(UsernameEntry.Text);
-            //Console.WriteLine($"Email: {UsernameEntry.Text}");
 
 
-            if (filled) // && emailValid
+            if (filled)
             {
-                //if(LoginBtn.BackgroundColor == (Color)App.Current.Resources["Invalid"])
-                //{
-                    //Label InvalidMsg = (Label)Content.FindByName("InvalidLabel");
-                    //InvalidMsg.IsVisible = false;
-                //}
                 LoginBtn.BackgroundColor = (Color)App.Current.Resources["Primary"];
                 LoginBtn.IsEnabled = true;
             }
@@ -148,27 +133,17 @@ namespace Encrypted_Messaging_App.Views
                 LoginBtn.BackgroundColor = Color.FromHex("#FF778899"); //Gray
                 LoginBtn.IsEnabled = false;
             }
-            /*if (!emailValid)
-            {
-                EntryInvalid(EmailEntry, invalidEmailIcon, 2);
-                invalidEmail = true;
-            }
-            else if (invalidEmail)
-            {
-                EntryInvalidReset(EmailEntry, invalidEmailIcon);
-                invalidEmail = false;
-            }*/
         }
 
 
         // Focused- When highlighted, the icon changes colour:
-        private void UsernameFocused(object sender, FocusEventArgs e)
+        private void EmailFocused(object sender, FocusEventArgs e)
         {
-            Label UserIcon = (Label)Content.FindByName("UsernameIcon");
+            Label EmailIcon = (Label)Content.FindByName("EmailIcon");
             Color newColor = (Color)App.Current.Resources["Primary"]; // Primary
             Color defaultColor = Color.FromHex("#000000"); // Black
-            if (UserIcon.TextColor == newColor) { UserIcon.TextColor = defaultColor; }
-            else { UserIcon.TextColor = newColor; } 
+            if (EmailIcon.TextColor == newColor) { EmailIcon.TextColor = defaultColor; }
+            else { EmailIcon.TextColor = newColor; } 
         }
         private void PasswordFocused(object sender, FocusEventArgs e)
         {
@@ -179,6 +154,5 @@ namespace Encrypted_Messaging_App.Views
             else { PasswordIcon.TextColor = newColor; }
         }
 
-        // When Entry is invalid:
     }
 }

@@ -48,14 +48,11 @@ namespace Encrypted_Messaging_App.Droid
                 string[] passwordErrors = new string[] { "The password is invalid or the user does not have a password." };
 
                 if(passwordErrors.Contains(e.Message)) { target = "Password"; }
-                else if (emailErrors.Contains(e.Message)) { target = "Username"; }
+                else if (emailErrors.Contains(e.Message)) { target = "Email"; }
 
                 Console.WriteLine($"LogIn Error: {e.Message}");
                 return (false, target);
             }
-            
-            //string Token = await Result.User.GetIdToken(false);
-
         }
 
         public bool LogOut()

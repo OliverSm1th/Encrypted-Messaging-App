@@ -7,7 +7,6 @@
              >
     <ContentPage.Content>
         <StackLayout VerticalOptions="Fill">
-
             <Grid Padding="30" VerticalOptions="CenterAndExpand" HorizontalOptions="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="4*" />
@@ -31,12 +30,10 @@
                    FontFamily="Roboto-Black"
                    HorizontalOptions="Start"
                    VerticalOptions="Start"
-                   Grid.ColumnSpan="2"
-                   />
+                   Grid.ColumnSpan="2"/>
 
                         <!--Username-->
                 <!--User Icon-->
-                <!--<BoxView BackgroundColor="Red"/>-->
                 <Label Text="{StaticResource IconUser}" 
                        TextColor="Black" 
                        FontSize="22" 
@@ -47,7 +44,6 @@
                        x:Name="UsernameIcon"
                        />
                 <!--User Entry-->
-                <!--<BoxView Grid.Column="1" BackgroundColor="Blue"/>-->
                 <Entry Placeholder="Username" 
                        PlaceholderColor="{StaticResource Gray}" 
                        TextColor="{DynamicResource Primary}" 
@@ -63,8 +59,9 @@
                        Unfocused="UsernameFocused"
                        x:Name="UsernameEntry"/>
 
+                
                         <!--Email Address-->
-                <!--Email Address Icon-->
+                <!--Icon-->
                 <Label Text="{StaticResource IconEmail}" 
                        TextColor="Black" 
                        FontSize="22" 
@@ -74,7 +71,7 @@
                        Grid.Row="2"
                        x:Name="EmailIcon"
                        />
-                <!--Email Address-->
+                <!--Entry-->
                 <Entry Placeholder="Email Address" 
                        PlaceholderColor="{StaticResource Gray}" 
                        TextColor="{DynamicResource Primary}" 
@@ -90,10 +87,8 @@
                        Unfocused="EmailFocused"
                        x:Name="EmailEntry"/>
                 
-                
                         <!--Password-->
-                <!--Password Icon-->
-                <!--<BoxView Grid.Row="1" BackgroundColor="Green"/>-->
+                <!--Icon-->
                 <Label Text="{StaticResource IconHidden}" 
                        TextColor="Black" 
                        FontSize="22" 
@@ -104,11 +99,10 @@
                        Grid.Row="3"
                        x:Name="PasswordIcon">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="ChangeVisibility"/>
+                        <TapGestureRecognizer Tapped="ChangePasswordVisibility"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <!--Password Entry-->
-                <!--<BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="Purple"/>-->
+                <!--Entry-->
                 <Entry Placeholder="Password" 
                        PlaceholderColor="LightSlateGray" 
                        TextColor="{DynamicResource Primary}" 
@@ -126,8 +120,7 @@
                        />
 
                         <!--Confirm Password-->
-                <!--Password Icon-->
-                <!--<BoxView Grid.Row="1" BackgroundColor="Green"/>-->
+                <!--Icon-->
                 <Label Text=" " 
                        TextColor="Black" 
                        FontSize="22" 
@@ -138,11 +131,10 @@
                        Grid.Row="4"
                        x:Name="PasswordConfirmIcon">
                     <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="ChangeVisibility"/>
+                        <TapGestureRecognizer Tapped="ChangePasswordVisibility"/>
                     </Label.GestureRecognizers>
                 </Label>
-                <!--Password Entry-->
-                <!--<BoxView Grid.Row="1" Grid.Column="1" BackgroundColor="Purple"/>-->
+                <!--Entry-->
                 <Entry Placeholder="Confirm Password" 
                        PlaceholderColor="LightSlateGray" 
                        TextColor="{DynamicResource Primary}" 
@@ -155,11 +147,8 @@
                        Grid.ColumnSpan="2"
                        x:Name="PasswordConfirmEntry"
                        TextChanged="EditedEntry"/>
-                       <!--Focused="PasswordConfirmFocused"-->
-                       <!--Unfocused="PasswordConfirmFocused"-->
-                       
-                
-                
+
+                <!-- Register Button-->
                 <Button Text="Register" 
                         FontFamily="Roboto-Bold"
                         BackgroundColor="{StaticResource Gray}"
@@ -168,14 +157,14 @@
                         Grid.Row="5"
                         x:Name="RegisterButton"
                         Clicked="RegisterButton_Clicked" />
-
             </Grid>
+            
+            <!-- Sign-In Link-->
             <Label
-                        TextColor="Orange"
-                        FontFamily="Roboto"
-                        HorizontalOptions="Center"
-                        Padding="0,0,0,30"
-                    >
+                TextColor="Orange"
+                FontFamily="Roboto"
+                HorizontalOptions="Center"
+                Padding="0,0,0,30">
                 <Label.FormattedText>
                     <FormattedString>
                         <Span Text="Already have an account? "/>
@@ -186,7 +175,6 @@
                     <TapGestureRecognizer Tapped="Login_Tap"/>
                 </Label.GestureRecognizers>
             </Label>
-
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
