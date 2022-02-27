@@ -21,8 +21,8 @@
     
     <ContentPage.Content>
 
-        <StackLayout>
-            <StackLayout VerticalOptions="EndAndExpand">
+        <StackLayout VerticalOptions="FillAndExpand">
+            <StackLayout VerticalOptions="EndAndExpand" x:Name="MessageStack">
                 <ScrollView x:Name="MessageScroll">
                 <StackLayout x:Name="MessageList" BindableLayout.ItemsSource="{Binding MessagesCollection}"  Padding="5, 10, 5, 0"  VerticalOptions="StartAndExpand">
                     <BindableLayout.ItemTemplate>
@@ -49,7 +49,8 @@
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
                 </ScrollView>
-                <Grid VerticalOptions="EndAndExpand" Padding="10,5,10,15" BackgroundColor="{DynamicResource Secondary}" >
+                <StackLayout>
+                <Grid VerticalOptions="EndAndExpand" Padding="10,5,10,15" MinimumHeightRequest="40" BackgroundColor="{DynamicResource Secondary}" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="8*"/>
                         <ColumnDefinition Width="2*"/>
@@ -64,6 +65,7 @@
                            ClearButtonVisibility="WhileEditing"
                            Keyboard="Chat"
                            Grid.Column="0"
+                           
                            x:Name="TextEntry"/>
                     <Button 
                         Text="{StaticResource IconSend}"
@@ -80,6 +82,7 @@
                         x:Name="MessageSend"
                         Clicked="SendMessage"/>
                 </Grid>
+                </StackLayout>
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

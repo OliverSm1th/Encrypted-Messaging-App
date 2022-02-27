@@ -33,7 +33,7 @@ namespace Encrypted_Messaging_App.Views
         protected override void OnAppearing()
         {
             Console.WriteLine($"~~ ChatPage: {CurrentChat.id} ~~");
-
+            
 
             UpdateHeaders();
 
@@ -44,9 +44,9 @@ namespace Encrypted_Messaging_App.Views
             CurrentChat.headerChangedAction += UpdateHeaders;
 
             CurrentChat.contentChangedAction += UpdateMessages;
-
-
             base.OnAppearing();
+
+
         }
 
         protected override void OnDisappearing()
@@ -100,6 +100,7 @@ namespace Encrypted_Messaging_App.Views
                 
             }
         }
+
 
         public async void EditTitle(object sender, EventArgs e)
         {

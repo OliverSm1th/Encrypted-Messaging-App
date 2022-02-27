@@ -19,17 +19,6 @@ namespace Encrypted_Messaging_App
         // Public Attributes:  (Firebase)
         public DateTime createdTime { get; set; }
         public User author { get; set; }
-        public MessageUserEvents userEvents { get; set; } = new MessageUserEvents();
-        public MessagePendingEvent[] pendingEvents
-        {
-            get { return _pendingEvents.ToArray(); }
-            set
-            {
-                _pendingEvents = new List<MessagePendingEvent>(value);
-                // For setting, add/subtract to _pendingEvents
-            }
-        }
-        private List<MessagePendingEvent> _pendingEvents = new List<MessagePendingEvent>();
         public string encryptedContent
         {
             get => _encryptedcontent;
@@ -54,8 +43,6 @@ namespace Encrypted_Messaging_App
             author = p_author;
             secretKey = p_secretKey;
 
-            string[] otherUserIDs = chatUserIDs.Remove(p_author.Id); // From Extensions
-            if (otherUserIDs != null) { addEvent(PendingEventTypes.CREATED, otherUserIDs); }
         }
         public Message() { }    // Defining message from server
 
@@ -65,38 +52,6 @@ namespace Encrypted_Messaging_App
             return new MessageView { content = content, encryptedContent = encryptedContent, author = author };
         }
 
-
-
-
-        public void AckDelivery(string chatID) // Acknoweledge that the message has been delivered
-        {
-            if(index == -1) { Error("Invalid message object (not server instance)"); return; }
-            userEvents.AddEvent(chatID, index, MessageEventTypes.DELIVERED);
-
-        }
-        public void AckRead(string chatID)     // Acknowledge that the message has been read
-        {
-            if (index == -1) { Error("Invalid message object (not server instance)"); return; }
-            userEvents.AddEvent(chatID, index, MessageEventTypes.READ);
-        }
-        public bool Edit(string p_newContent, User p_editor, string[] chatUserIDs)
-        {
-            if(author == null || author != p_editor) { return false; }
-
-            string[] otherUserIDs = chatUserIDs.Remove(p_editor.Id); // From Extensions
-            if(otherUserIDs == null) { return false; }
-
-            return addEvent(PendingEventTypes.EDITED, otherUserIDs);
-        }
-        public bool Delete(User p_deleter, string[] chatUserIDs)
-        {
-            if(author == null || author != p_deleter) { return false; }
-
-            string[] otherUserIDs = chatUserIDs.Remove(p_deleter.Id); // From Extensions
-            if (otherUserIDs == null) { return false; }
-
-            return addEvent(PendingEventTypes.DELETED, otherUserIDs);
-        }
 
 
         //   --Encryption + Decryption--  \\
@@ -119,13 +74,6 @@ namespace Encrypted_Messaging_App
 
 
         //  Private Methods:
-        private bool addEvent(string eventType, string[] pendingUserIDs)
-        {
-            if (!PendingEventTypes.isValidEventType(eventType)) { return false; }
-
-            _pendingEvents.Add(new MessagePendingEvent { eventType = eventType, pendingUserIDs = pendingUserIDs });
-            return true;
-        }
         private static byte[] UnicodeToByteArr(string unicode) //Encryption Conversions
         {
             return Encoding.Unicode.GetBytes(unicode);
@@ -144,76 +92,6 @@ namespace Encrypted_Messaging_App
         }
     }
 
-    // Pending Events:   (When the message is changed)
-    public class MessagePendingEvent
-    {
-        public MessagePendingEvent() {}
-
-        public string eventType { get; set; }
-        public string[] pendingUserIDs { get; set; }
-
-    }
-    public static class PendingEventTypes
-    {
-        
-        public static string CREATED { get; } = "Created";
-        public static string DELETED { get; } = "Deleted";
-        public static string EDITED { get; } = "Edited";
-
-        private static string[] validEventTypes = new string[] { "Created", "Deleted", "Edited" };
-
-        public static bool isValidEventType(string eventType)
-        {
-            return Array.IndexOf(validEventTypes, eventType) != -1;
-        }
-    }
-
-     // User Events:  (When a user receives/reads a message)
-    public class MessageUserEvents
-    {
-        
-        public MessageUserEvents() { }
-        public MessageEvent[] readEvents{ 
-            get { return _readEvents.ToArray(); } set { _readEvents = value.ToList(); }
-        }
-        private List<MessageEvent> _readEvents = new List<MessageEvent>();
-        public MessageEvent[] deliveredEvents
-        {
-            get { return _deliveredEvents.ToArray(); }
-            set { _deliveredEvents = value.ToList(); }
-        }
-        private List<MessageEvent> _deliveredEvents = new List<MessageEvent>();
-
-        public void AddEvent(string chatID, int messageIndex, string eventType)
-        {
-            if(eventType == MessageEventTypes.DELIVERED)
-            {
-                _deliveredEvents.Add(new MessageEvent(CurrentUser.Id));
-            }
-            else if(eventType == MessageEventTypes.READ)
-            {
-                _readEvents.Add(new MessageEvent(CurrentUser.Id));
-            }
-
-            Error($"Invalid MessageEventType: {eventType}");
-        }
-    }
-    public class MessageEvent
-    {
-        public MessageEvent() { }
-        public MessageEvent(string p_userID)
-        {
-            userID = p_userID;
-            eventTime = DateTime.Now;
-        }
-        public string userID { get; set; }
-        public DateTime eventTime { get; set; }
-    }
-    public static class MessageEventTypes
-    {
-        public static string DELIVERED { get; } = "Delivered";
-        public static string READ { get; } = "Read";
-    }
 
 
     //Message View:    (for messageList)

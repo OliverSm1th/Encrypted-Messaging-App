@@ -44,6 +44,7 @@ namespace Encrypted_Messaging_App
         }
         private string[] _chatsID = new string[0];
 
+
         private async void onChatsIDSet(string[] newChatsID)   // Fired when chatsID is edited
         {
             string[] addedChatsID = newChatsID.Except(_chatsID).ToArray();

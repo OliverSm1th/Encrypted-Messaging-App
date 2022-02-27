@@ -569,13 +569,11 @@ namespace Encrypted_Messaging_App.Droid.Resources
         {
             if(data["author"] is JavaDictionary authorDict 
                 && data["encryptedContent"].ToString() is string content
-                && data["pendingEvents"] is JavaList eventDict
                 && long.TryParse(data["createdTime"].ToString(), out long createdTime)
                 )
             {
                 User author = ToObject<User>(authorDict);
-                MessagePendingEvent[] pendingEvents = ToObjectArr<MessagePendingEvent>(eventDict);
-                return new Message { author = author, encryptedContent = content, createdTime = DateTime.FromBinary(createdTime), pendingEvents = pendingEvents, index= messageIndex };
+                return new Message { author = author, encryptedContent = content, createdTime = DateTime.FromBinary(createdTime), index= messageIndex };
                 
             }
             Log(data["encryptedContent"].ToString());

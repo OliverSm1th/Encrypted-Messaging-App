@@ -37,7 +37,6 @@ namespace Encrypted_Messaging_App
                         if (addedMessage.content == null)
                         {
                             addedMessage.DecryptContent();
-                            addedMessage.AckDelivery(id);
                         }
                     }
                 }
