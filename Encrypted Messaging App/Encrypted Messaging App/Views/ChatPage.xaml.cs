@@ -19,34 +19,24 @@ namespace Encrypted_Messaging_App.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ChatPage : ContentPage
     {
+        // This uses MessageView instead of Message so that I can combine content and encryptedContent to visibleContent,
+        // so I can change it when you disable/enable decryption (can't be done otherwise)
         public ObservableCollection<MessageView> MessagesCollection { get; } = new ObservableCollection<MessageView>();
-        // This is a list of messageView so that I can combine content and encryptedContent to visibleContent, so I can change it when you disable/enable decryption (can't be done otherwise)
+        
 
-
-        public ChatPage()
-        {
-            InitializeComponent();
-            BindingContext = this;
-
-        }
+        public ChatPage() {  InitializeComponent();  BindingContext = this; }
 
         protected override void OnAppearing()
         {
             Console.WriteLine($"~~ ChatPage: {CurrentChat.id} ~~");
             
-
             UpdateHeaders();
-
             DisplayMessages();
 
-
-
             CurrentChat.headerChangedAction += UpdateHeaders;
-
             CurrentChat.contentChangedAction += UpdateMessages;
+
             base.OnAppearing();
-
-
         }
 
         protected override void OnDisappearing()
@@ -56,11 +46,6 @@ namespace Encrypted_Messaging_App.Views
             CurrentChat.contentChangedAction -= UpdateMessages;
 
             CurrentChat = null;
-        }
-
-        public void MessageTapped(object sender, EventArgs e)
-        {
-            Console.WriteLine("Tapped message");
         }
 
         private void UpdateHeaders()

@@ -12,8 +12,7 @@ using static Encrypted_Messaging_App.LoggerService;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 
 namespace Encrypted_Messaging_App.Views
-{
-    [XamlCompilation(XamlCompilationOptions.Compile)]
+{   [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainMessagePage : ContentPage
     {
         public ObservableCollection<Chat> ChatsCollection { get; } = new ObservableCollection<Chat>();
@@ -25,47 +24,33 @@ namespace Encrypted_Messaging_App.Views
         }
 
         protected override void OnAppearing()
-        {
-            base.OnAppearing();
+        {   base.OnAppearing();
             Console.WriteLine("~~ Main Message Page ~~");
 
             Chat[] chats = CurrentUser.chats.ToArray();
-
-            DisplayChats(CurrentUser.chats.ToArray());
             
+            DisplayChats(CurrentUser.chats.ToArray());  // Display current chats to the user and add listener to update when changed
             CurrentUser.chatsChangedAction = (newChats, index) => { if (index == -1) { DisplayChats((Chat[])newChats); } else { UpdateChats((Chat[])newChats, index); } };
         }
 
-        protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
-        }
-
-
-        Chat[] currentChats;
+        Chat[] currentChats;  // Stores the Chats that are currently being displayed
         private void DisplayChats(Chat[] chats)
         {
             Label noChatLabel = (Label)Content.FindByName("NoChats");
-
             if (chats == null || chats.Length == 0) { noChatLabel.IsVisible = true; }
             else { noChatLabel.IsVisible = false; }
-            if (chats == currentChats) {  return;  }
 
+            if (chats == currentChats) {  return;  }
             currentChats = chats;
 
-            Debug($"Displaying chats: length: {chats.Length}");
-
             ChatsCollection.Clear();
+
             if (chats == null || chats.Length == 0)  { return; }
-
-
             for (int i = 0; i < chats.Length; i++)
             {
                 ChatsCollection.Add(chats[i]);
-                Debug($"{chats[i].id} chat has been added to list");
             }
         }
-
         private void UpdateChats(Chat[] chats, int indexToChange)
         {
             if(chats.Length > indexToChange && ChatsCollection.Count == chats.Length)
@@ -90,6 +75,8 @@ namespace Encrypted_Messaging_App.Views
         } // From: https://xamarinmonkeys.blogspot.com/2020/01/xamarinforms-working-with-refreshview.html
         private Command _messageRefreshCommand;
 
+
+
         public void Refresh()
         {
             CurrentUser.Output();
@@ -98,27 +85,24 @@ namespace Encrypted_Messaging_App.Views
             messageRefresh.IsRefreshing = false;
         }
 
-        
-
+    
 
         public void ChatTapped(object sender, EventArgs e)
         {
             Grid chatGrid = (Grid)sender;
-            Console.WriteLine($"Tapped: {chatGrid.ClassId}");
             foreach (Chat chat in currentChats){
                 if (chat.id == chatGrid.ClassId)
                 {
                     CurrentChat = chat;
                 }
             }
-
             Shell.Current.GoToAsync($"{nameof(ChatPage)}");
         }
 
 
 
         
-
+        // Toolbar Icons:
         public void SettingsPopOut(object sender, EventArgs e)
         {
             Navigation.PushPopupAsync(new SettingsPopup());

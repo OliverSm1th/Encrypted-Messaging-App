@@ -70,7 +70,6 @@
                 <Picker Title="Theme: "  HorizontalOptions="FillAndExpand" VerticalOptions="Center" FontFamily="Roboto" TextColor="Black" x:Name="settingThemePicker" FontSize="15" HorizontalTextAlignment="Center" SelectedIndexChanged="OnThemeChanged">
                 </Picker>
             </StackLayout>
-
         </StackLayout>
     </Frame>
 </pages:PopupPage>

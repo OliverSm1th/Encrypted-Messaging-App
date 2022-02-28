@@ -2,40 +2,34 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Encrypted_Messaging_App.Views.ChatPage"
-             Title="Untitled Chat" >
-
+             Title="Untitled Chat">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Untitled Chat" Priority="0" Order="Primary" Grid.Column="0" Clicked="EditTitle">
+        <ToolbarItem Priority="0" Order="Primary" Grid.Column="0" Clicked="EditTitle">
             <ToolbarItem.IconImageSource>
                 <FontImageSource
                 FontFamily="Icons-S"
                 Glyph="{StaticResource IconEdit}"
                 Color="Black"
-                    Size="20"
-                />
+                    Size="20"/>
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
         <ToolbarItem Text="Chat Info" Priority="0" Order="Secondary" Clicked="DisplayChatInfo"/>
         <ToolbarItem Text="Leave" Priority="0" Order="Secondary" Clicked="LeaveChat"/>
     </ContentPage.ToolbarItems>
-    
     <ContentPage.Content>
-
         <StackLayout VerticalOptions="FillAndExpand">
-            <StackLayout VerticalOptions="EndAndExpand" x:Name="MessageStack">
+            <StackLayout VerticalOptions="EndAndExpand" x:Name="MessageStack">   <!--List of messages-->
                 <ScrollView x:Name="MessageScroll">
                 <StackLayout x:Name="MessageList" BindableLayout.ItemsSource="{Binding MessagesCollection}"  Padding="5, 10, 5, 0"  VerticalOptions="StartAndExpand">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-
-                            <Grid >
-                                    <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{Binding messageColour}" HorizontalOptions="{Binding horizontalOption}" VerticalOptions="End" />
+                            <Grid>
+                                <BoxView HeightRequest="12"  WidthRequest="12" Rotation="0" BackgroundColor="{Binding messageColour}" HorizontalOptions="{Binding horizontalOption}" VerticalOptions="End" />
                                 <Frame 
                                 CornerRadius="15" 
                                 BackgroundColor="{Binding messageColour}"
                                 Padding="0" HorizontalOptions="{Binding horizontalOption}"
-                                x:Name="MessageFrame"
-                                >
+                                x:Name="MessageFrame">
                                     <Label Text="{Binding visibleContent}"
                                    TextColor="Black"
                                    FontSize="Medium"
@@ -49,11 +43,10 @@
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
                 </ScrollView>
-                <StackLayout>
+                <StackLayout>    <!--Send message entry-->
                 <Grid VerticalOptions="EndAndExpand" Padding="10,5,10,15" MinimumHeightRequest="40" BackgroundColor="{DynamicResource Secondary}" >
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="8*"/>
-                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="8*"/><ColumnDefinition Width="2*"/>
                     </Grid.ColumnDefinitions>
                     <Entry Placeholder="Enter your message..." 
                            PlaceholderColor="LightGray" 
@@ -65,7 +58,6 @@
                            ClearButtonVisibility="WhileEditing"
                            Keyboard="Chat"
                            Grid.Column="0"
-                           
                            x:Name="TextEntry"/>
                     <Button 
                         Text="{StaticResource IconSend}"
