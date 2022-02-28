@@ -92,7 +92,6 @@ namespace Encrypted_Messaging_App.Views
 
         public void Refresh()
         {
-            Log("Refreshing");
             CurrentUser.Output();
             DisplayChats(CurrentUser.chats.ToArray());
             RefreshView messageRefresh = (RefreshView)Content.FindByName("MessageRefresh");

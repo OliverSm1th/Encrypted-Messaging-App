@@ -69,7 +69,7 @@ namespace Encrypted_Messaging_App.Views
             
 
             if (filled && emailValid && passwordValid && password2Valid) {
-                RegisterBtn.BackgroundColor = Color.FromHex("#2196F3"); //Primary
+                RegisterBtn.BackgroundColor = (Color)App.Current.Resources["Primary"];
                 RegisterBtn.IsEnabled = true;
             } else {
                 RegisterBtn.IsEnabled = false;

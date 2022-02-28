@@ -9,10 +9,8 @@
                 FontFamily="Icons-S"
                 Glyph="{StaticResource IconSync}"
                 Color="Black"
-                    Size="20"
-                />
+                    Size="20"/>
             </ToolbarItem.IconImageSource>
-
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
@@ -21,19 +19,14 @@
                TextColor="Black" 
                FontSize="Title"
                FontFamily="Roboto-Black"
-               HorizontalOptions="Center"
-               
-               />
+               HorizontalOptions="Center"/>
         <ScrollView VerticalOptions="StartAndExpand" Padding="0,-10,0,0" x:Name="UserScroll"> <StackLayout>
                 <StackLayout x:Name="UserList" BindableLayout.ItemsSource="{Binding Users}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <Grid Padding="20,15,20,0" RowSpacing="0">
-
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="9*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                    <ColumnDefinition Width="1*"/>
+<Grid.ColumnDefinitions><ColumnDefinition Width="9*"/>
+<ColumnDefinition Width="1*"/><ColumnDefinition Width="1*"/>
                                 </Grid.ColumnDefinitions>
                                 <Label
                                     Text="{Binding Username}"
@@ -79,28 +72,21 @@
                        Padding="0,20,0,0"
                        FontFamily="Roboto-Italic"
                        FontSize="16"
-                       x:Name="NoRequests"
-                       />
+                       x:Name="NoRequests"/>
         </StackLayout>   </ScrollView>
         <Line BackgroundColor="Black" HeightRequest="5" VerticalOptions="End" TranslationY="-10"/>
         <Grid Padding="10,0,10,10" VerticalOptions="End">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.5*"/>
-                <ColumnDefinition Width="8*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
+<RowDefinition Height="Auto" /> <RowDefinition Height="Auto" />
+</Grid.RowDefinitions> <Grid.ColumnDefinitions>
+<ColumnDefinition Width="1.5*"/> <ColumnDefinition Width="8*"/>
+<ColumnDefinition Width="Auto"/> </Grid.ColumnDefinitions>
             <Label Text="Send Friend Request" 
                TextColor="Black" 
                FontSize="23"
                FontFamily="Roboto-Black"
                HorizontalOptions="Center"
-               Grid.ColumnSpan="3"
-               />
+               Grid.ColumnSpan="3"/>
             <Label Text="{StaticResource IconFriend}"
                    TextColor="Black"
                    FontFamily="Icons-S"
@@ -108,8 +94,7 @@
                    HorizontalOptions="CenterAndExpand"
                    VerticalOptions="CenterAndExpand"
                    Grid.Row="1"
-                   x:Name="RequestIcon"
-                   />
+                   x:Name="RequestIcon"/>
             <Entry Placeholder="Username" 
                        PlaceholderColor="{StaticResource Gray}" 
                        TextColor="{DynamicResource Primary}" 
@@ -123,10 +108,6 @@
                        TextChanged="EditedEntry"
                        Completed="SendRequest"
                        x:Name="UsernameEntry"/>
-                       <!--TextChanged="EditedEntry"
-                       Focused="UsernameFocused"
-                       Unfocused="UsernameFocused"-->
-
             <Button Text="arrow-alt-circle-right"
                     FontFamily="Icons-R"
                     FontSize="Medium"
