@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using UsefulExtensions;
 using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
-using static Encrypted_Messaging_App.LoggerService;  // Error()
 using System.Numerics;
 using Xamarin.Forms;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Encrypted_Messaging_App
 {
@@ -28,7 +23,7 @@ namespace Encrypted_Messaging_App
                 } }
         }
         private string _encryptedcontent;
-        //                      (Non-Firebase)
+        // (Non-Firebase)
         public string content;
         public BigInteger secretKey;
         public Action messageChangedAction;
@@ -113,5 +108,4 @@ namespace Encrypted_Messaging_App
             get => (author.Id == currentUserId ? (Color)App.Current.Resources["MessageSent"] : (Color)App.Current.Resources["MessageReceived"]);
         }
     }
-
 }

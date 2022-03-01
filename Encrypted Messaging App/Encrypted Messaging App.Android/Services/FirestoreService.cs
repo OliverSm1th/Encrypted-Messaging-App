@@ -335,9 +335,9 @@ namespace Encrypted_Messaging_App.Droid
         public async Task<(bool, string)> AddToArray(object newItem, string pathInfo, params (string, string)[] arguments)
         {
             string path = GetPath(pathInfo, arguments);
-            
 
-            Java.Lang.Object newJItem = GetMap(newItem);
+
+            Java.Lang.Object newJItem;
 
             if(newItem is string newString) {  newJItem = newString;  }
             else  {  newJItem = GetMap(newItem);  }
@@ -400,102 +400,23 @@ namespace Encrypted_Messaging_App.Droid
 
         public async Task<(bool, string)> InitiliseUser(string username)
         {
-            HashMap privateMap = new HashMap();
-            privateMap.Put("Username", username);
-            privateMap.Put("chatsID", new JavaList<string>());
-
-            HashMap publicMap = new HashMap();
-            publicMap.Put("Id", FirebaseAuth.Instance.CurrentUser.Uid);
-            HashMap publicMap2 = new HashMap();
-            publicMap2.Put("Username", username);
-
-            // Private User Data
-            DocumentReference docRef = FirebaseFirestore.Instance.Collection("users").Document(FirebaseAuth.Instance.CurrentUser.Uid);
-            // Public
-            DocumentReference publicDocRef = FirebaseFirestore.Instance.Collection("usersPublic").Document(username);
-            DocumentReference publicDocRef2 = FirebaseFirestore.Instance.Collection("usersPublicID").Document(FirebaseAuth.Instance.CurrentUser.Uid);
-
-            try
-            {
-                await docRef.Set(privateMap);
-                await publicDocRef.Set(publicMap);
-                await publicDocRef2.Set(publicMap2);
-                return (true, "");
-            }
-            catch (Exception e)
-            {
-                return (false, e.Message);
-            }
+            (bool success, string message) privateResult = await WriteObject(new User { Username = username, chatsID = new string[0] }, "CUser", ("CUSERID", FirebaseAuth.Instance.CurrentUser.Uid));
+            if (!privateResult.success) { return privateResult; }
+            (bool success, string message) publicResult = await WriteObject(new User { Id=FirebaseAuth.Instance.CurrentUser.Uid }, "UserFromUsername", ("USERNAME", username));
+            if (!publicResult.success) { return publicResult; }
+            publicResult = await WriteObject(new User { Username= username}, "UserFromId", ("USERID", FirebaseAuth.Instance.CurrentUser.Uid));
+            if (!publicResult.success) { return publicResult; }
+            return (true, "");
         }
-
-        // TODO: Replace all these functions with versions of the WriteObject
-        // Test to see if the WriteObject function works, will be implemented in the actual classes if works.
-        public async Task<(bool, string)> InitiliseChat(Chat chat)
-        {
-            (bool success, string newChatID) result = await WriteObject(chat, "Chat", ("CHATID", ""));
-            return result;
-        }
-
         public async Task<(bool, string)> SendAcceptedRequest(string requestUserID, AcceptedRequest ARequest)
         {
-            CollectionReference requestCollection = FirebaseFirestore.Instance.Collection("requests");
-            DocumentReference acceptedRequests = requestCollection.Document("accepted");
-            DocumentReference userAcceptedRequests = acceptedRequests.Collection(requestUserID).Document(FirebaseAuth.Instance.CurrentUser.Uid);
-
-            DocumentReference pendingRequests = requestCollection.Document("pending");
-            DocumentReference userPendingRequests = pendingRequests.Collection(FirebaseAuth.Instance.CurrentUser.Uid).Document(requestUserID);
-
-
-            HashMap acceptMap = GetMap(ARequest);
-
-            try
-            {
-                await userPendingRequests.Delete();
-                Debug($"Deleted Pending Request for id:{FirebaseAuth.Instance.CurrentUser.Uid}");
-
-                await userAcceptedRequests.Set(acceptMap);
-                Debug($"Added Accepted Request for id:{requestUserID}");
-                return (true, "");
-            } catch(Exception e)
-            {
-                return (false, e.Message);
-            }
+            (bool success, string message) result = await DeleteObject($"Requests/{requestUserID}", ("CUSERID", FirebaseAuth.Instance.CurrentUser.Uid));
+            if (!result.success) { return result; }
+            result = await WriteObject(ARequest, $"AcceptRequests/{FirebaseAuth.Instance.CurrentUser.Uid}", ("CUSERID", requestUserID));
+            if (!result.success) { return result; }
+            return (true, "");
         }
-
-        public async Task<(bool, string)> SendRequest(Request request, string requestUserID)
-        {
-            CollectionReference requestCollection = FirebaseFirestore.Instance.Collection("requests");
-            DocumentReference pendingRequests = requestCollection.Document("pending");
-            CollectionReference userCollection = pendingRequests.Collection(requestUserID);
-
-
-            HashMap pendingRequest = GetMap(request);
-
-            try
-            {
-                await userCollection.Document(request.SourceUser.Id).Set(pendingRequest);
-                Debug("Added Pending Request");
-                return (true, "");
-            } catch(Exception e)
-            {
-                return (false, e.Message);
-            }
-        }
-
-        public async Task<(bool, string)> AddChatIDToUser(string userID, string chatID)
-        {
-            DocumentReference doc = FirebaseFirestore.Instance.Collection("users").Document(userID);
-            try
-            {
-                await doc.Update("chatsID", FieldValue.ArrayUnion(chatID));
-                return (true, "");
-            }
-            catch (Exception e)
-            {
-                return (false, e.Message);
-            }
-        }
-
+        
         public async Task<(bool, string)> AddMessageToChat(Message message, string chatID)
         {
             string path = GetPath("Chat/messages", ("CHATID", chatID));
@@ -605,6 +526,24 @@ namespace Encrypted_Messaging_App.Droid
             string fieldLevel = path[path.Count - 1];
             path.RemoveAt(path.Count - 1);
             return fieldLevel;
+        }
+        public async Task<(bool, string)> InitiliseChat(Chat chat)
+        {
+            (bool success, string newChatID) result = await WriteObject(chat, "Chat", ("CHATID", ""));
+            return result;
+        }
+        public async Task<(bool, string)> AddChatIDToUser(string userID, string chatID)
+        {
+            DocumentReference doc = FirebaseFirestore.Instance.Collection("users").Document(userID);
+            try
+            {
+                await doc.Update("chatsID", FieldValue.ArrayUnion(chatID));
+                return (true, "");
+            }
+            catch (Exception e)
+            {
+                return (false, e.Message);
+            }
         }
     }
 }

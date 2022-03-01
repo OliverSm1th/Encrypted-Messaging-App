@@ -7,14 +7,14 @@
     <Frame VerticalOptions="Center"
         HorizontalOptions="Center"
         Padding="10, 10, 10, 10"
-           BorderColor="{DynamicResource Primary}">
+        BorderColor="{DynamicResource Primary}">
         <StackLayout BackgroundColor="White" >
             <Label 
                 Text="Chat Info" 
                 TextColor="{DynamicResource Secondary}"
                 FontSize="20"
                 HorizontalOptions="Center"
-                FontFamily="Roboto-Black"/>
+                FontFamily="Roboto-Black"/> <!--Chat title-->
             <Label
                 TextColor="Black"
                 FontFamily="Roboto"
@@ -25,9 +25,8 @@
                         <Span Text="" x:Name="chatTitle"/>
                     </FormattedString>
                 </Label.FormattedText>
-            </Label>
-
-            <Label
+            </Label>    <!--Num of messages-->
+            <Label   
                 TextColor="Black"
                 FontFamily="Roboto"
                 HorizontalOptions="Start">
@@ -37,8 +36,7 @@
                         <Span Text="" x:Name="chatMessageNum"/>
                     </FormattedString>
                 </Label.FormattedText>
-            </Label>
-            
+            </Label>    <!--Users in the chat-->
             <Label
                 TextColor="Black"
                 FontFamily="Roboto"
@@ -49,8 +47,7 @@
                         <Span Text="" x:Name="chatUsers"/>
                     </FormattedString>
                 </Label.FormattedText>
-            </Label>
-            
+            </Label>    <!--Encryption key-->
             <Label
                 TextColor="Black"
                 FontFamily="Roboto"
@@ -61,13 +58,12 @@
                         <Span Text="" x:Name="chatKey"/>
                     </FormattedString>
                 </Label.FormattedText>
-            </Label>
-            
+            </Label>      <!--Encryption toggle-->
             <Label
-                        TextColor="Black"
-                        FontFamily="Roboto"
-                        HorizontalOptions="Center"
-                        Padding="0,0,0,30" >
+                TextColor="Black"
+                FontFamily="Roboto"
+                HorizontalOptions="Center"
+                Padding="0,0,0,30">
                 <Label.FormattedText>
                     <FormattedString>
                         <Span Text="Decryption: "/>
@@ -80,5 +76,4 @@
             </Label>
         </StackLayout>
     </Frame>
-    
 </pages:PopupPage>

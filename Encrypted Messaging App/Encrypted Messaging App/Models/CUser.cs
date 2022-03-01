@@ -14,8 +14,6 @@ namespace Encrypted_Messaging_App
 
         User user;
 
-
-
         public CUser(string id, string username) : base(id, username)
         {
             user = new User(id, username);
@@ -27,9 +25,6 @@ namespace Encrypted_Messaging_App
         }
 
 
-
-
-
         //   --- Chats ---   \\
 
         public List<Chat> chats = new List<Chat>();
@@ -38,15 +33,15 @@ namespace Encrypted_Messaging_App
         public string[] chatsID
         {
             get { return _chatsID; }
-            set {    // Syncs the chats to chatID, adds or removes chats accordingly
+            set { // Syncs the chats to chatID, adds or removes chats accordingly
                 onChatsIDSet(value);
             }
         }
         private string[] _chatsID = new string[0];
 
-
-        private async void onChatsIDSet(string[] newChatsID)   // Fired when chatsID is edited
-        {
+        private async void onChatsIDSet(string[] newChatsID)
+        {   // Fired when chatsID is edited
+            if (newChatsID == null || _chatsID == null) { return; }
             string[] addedChatsID = newChatsID.Except(_chatsID).ToArray();
             string[] removedChatsID = _chatsID.Except(newChatsID).ToArray();
 
@@ -63,8 +58,7 @@ namespace Encrypted_Messaging_App
                 await addChat(chatID);    // Fetch any new chat object from their ID
             }
 
-            if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null)
-            {
+            if ((addedChatsID.Length > 0 || removedChatsID.Length > 0) && chatsChangedAction != null) {
                 chatsChangedAction(chats.ToArray(), -1);
             }
         }
@@ -91,22 +85,20 @@ namespace Encrypted_Messaging_App
             if (removedNum == 0) { Error($"Can't remove Chat {chatID} from Chats: Doesn't exist"); }
         }
         
-        public void ChatsIDListenerInit()     // Sync local chatsID with server
+        public void ChatsIDListenerInit() // Syncs local chatsID with server
         {
             FirestoreService.ListenData<string[]>("ChatsID", (newchatsID) => chatsID = (string[])newchatsID);
         }
 
 
         //   --- Pending Friend Requests (sent to user) ---   \\
-
         public Request[] friendRequests { 
             get { return _friendRequests; }
             set
             {
                 _friendRequests = value;
 
-                if (friendRequestAction != null)
-                {
+                if (friendRequestAction != null) {
                     friendRequestAction(value);
                 }
             }
@@ -114,32 +106,24 @@ namespace Encrypted_Messaging_App
         private Request[] _friendRequests = new Request[0];
         public Action<object> friendRequestAction; // Fired when friendRequests is changed
 
-
         public void PendingRequestListenerInit()          // When Requests (Server) is changed -> Update friendRequests
         {
             FirestoreService.ListenData<Request[]>("Requests", (requests) => friendRequests = (Request[])requests);
         }
 
-        public async Task<bool> FetchFriendRequests()  // DEBUG: Refresh button
-        {
+        public async Task<bool> FetchFriendRequests()
+        {   // When Refresh button is pressed
             (bool success, object result) response = await FirestoreService.FetchData<Request[]>("Requests");
             
-            if (!response.success)
-            {
-                if(response.result is string errorMessage && errorMessage.StartsWith("No docs found"))
-                {
+            if (!response.success) {
+                if(response.result is string errorMessage && errorMessage.StartsWith("No docs found")) {
                     friendRequests = null;
                     return true;
-                }
-                else
-                {
+                } else {
                     Error($"Can`'t fetch request: {response.result}");
                     return false;
                 }
-                
-            }
-            else
-            {
+            } else {
                 friendRequests = (Request[])response.result;
                 return true;
             }
@@ -161,11 +145,11 @@ namespace Encrypted_Messaging_App
                 accepted.HandleRequest();
             }
         }
+        //  -----
 
-        
+
         public void LogOut()
-        {
-            // Remove All listeners:
+        {   // Remove All listeners:
             FirestoreService.RemoveAllListeners();
             foreach(Chat chat in chats)
             {
@@ -173,19 +157,15 @@ namespace Encrypted_Messaging_App
             }
         }
 
-
         //   Other useful functions:
         public void Output()
         {
             Debug($"{Username} info: ");
             Debug($"ID: {Id}", 1);
 
-
             string chatIDMsg = "";
             if (chatsID != null && chatsID.Length != 0)
-            {
-                foreach (string chatID in chatsID)
-                {
+            {   foreach (string chatID in chatsID) {
                     chatIDMsg += chatID + ", ";
                 }
                 Debug($"     Chat ID's: {chatIDMsg.Trim().Trim(',')}", 1);
@@ -193,10 +173,8 @@ namespace Encrypted_Messaging_App
             else { Debug("     Chat ID's:  None", 1); }
 
             if(chats != null && chats.Count != 0)
-            {
-                Debug("     Chats: ");
-                foreach (Chat chat in chats)
-                {
+            {   Debug("     Chats: ");
+                foreach (Chat chat in chats) {
                     if (chat.title == null) { Error($"Chat title not defined for: {chat.id}"); }
                     else if (chat.messages == null) { Error($"Chat Messages not defined for: {chat.id}"); }
                     else if (chat.userIDs == null) { Error($"Chat UserIDs not defined for: {chat.id}"); }
@@ -204,10 +182,6 @@ namespace Encrypted_Messaging_App
                 }
             }
             else { Debug("     Chats:  None"); }
-
-
-
-
 
             string requestMsg = "";
             if (friendRequests != null && friendRequests.Length != 0)

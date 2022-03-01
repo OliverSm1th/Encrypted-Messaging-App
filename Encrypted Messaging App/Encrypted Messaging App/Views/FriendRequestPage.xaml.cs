@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.ComponentModel;
 using System.Numerics;
+using System.Collections.ObjectModel;
 
 using Encrypted_Messaging_App.Encryption;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using static Encrypted_Messaging_App.Views.Functions;
 using static Encrypted_Messaging_App.LoggerService;
-using System.Collections.ObjectModel;
+using static Encrypted_Messaging_App.Services.SQLiteService;
+
 
 
 namespace Encrypted_Messaging_App.Views
@@ -20,54 +20,40 @@ namespace Encrypted_Messaging_App.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class FriendRequestPage : ContentPage
     {
+        IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
         public ObservableCollection<User> Users { get; } = new ObservableCollection<User>();
         Dictionary<string, Request> Requests = new Dictionary<string, Request>();
-
-
         Request[] currentRequests;
-        IManageFirestoreService FirestoreService = DependencyService.Resolve<IManageFirestoreService>();
-
-        public FriendRequestPage()
-        { 
-            InitializeComponent();
-            BindingContext = this;
-
-            
-        }
         bool RequestBtnEnabled = true;
 
+
+
+        public FriendRequestPage()  {   InitializeComponent();  BindingContext = this;  }
+        
+
         protected override void OnAppearing()
-        {
-            base.OnAppearing();
+        {   base.OnAppearing();
             Console.WriteLine("~~ Friend Request Page ~~");
 
-            DisplayRequests(CurrentUser.friendRequests);
-
-            // Enable listener
+            DisplayRequests(CurrentUser.friendRequests);  // Display initial requests + bind to listener
             CurrentUser.friendRequestAction = (requests) => DisplayRequests((Request[])requests);
         }
 
         protected override void OnDisappearing()
-        {
-            base.OnDisappearing();
-
-            // Disable listener
-            CurrentUser.friendRequestAction = null;
+        {   base.OnDisappearing();
+            CurrentUser.friendRequestAction = null; // Disable listener
         }
 
 
 
-        // When refresh button is pressed
-        public async void Refresh(object sender, EventArgs e)
-        {
-            bool success = await CurrentUser.FetchFriendRequests();
+        
+        public async void Refresh(object sender, EventArgs e) // When refresh button is pressed
+        {   bool success = await CurrentUser.FetchFriendRequests();
             if (success)
             {
-                Console.WriteLine("Updating Requests:");
                 DisplayRequests(CurrentUser.friendRequests);
             }
         }
-
         // Display the pending requests on a grid
         private void DisplayRequests(Request[] requests)
         {
@@ -75,9 +61,6 @@ namespace Encrypted_Messaging_App.Views
 
             if (requests == currentRequests) { noRequestLabel.Opacity = 1; return; }
             else { currentRequests = requests; }
-
-            Console.WriteLine("Displaying Requests");
-            
 
             Users.Clear();
 
@@ -91,39 +74,25 @@ namespace Encrypted_Messaging_App.Views
                     Users.Add(user);
                     Console.WriteLine($"{user.Username} has been added!");
                     Requests[user.Id] = requests[i];
-                }
-                noRequestLabel.Opacity = 0;
-            }
-            else
-            {
-                noRequestLabel.Opacity = 1;
-            }
-            
+                }  noRequestLabel.Opacity = 0; }
+            else { noRequestLabel.Opacity = 1; }
         }
-
         // Accept:
         public async void AcceptRequest(object sender, EventArgs e)
         {
             Label acceptLabel = (Label)sender;
             string id = acceptLabel.ClassId;
-            User acceptUser = default(User);
+            User acceptUser = null;
 
             // Find User
             foreach (User user in Users)
             {
-                if (user.Id == id)
-                {
-                    Console.WriteLine($"Accept Friend Request: {user.Username}");
-                    acceptUser = user;
-                }
+                if (user.Id == id) {  acceptUser = user;  }
             }
-            if (acceptUser == null)
-            {
+            if (acceptUser == null) {
                 toast.LongAlert("Couldn't find friend request");
-                return;
-            }
+                return; }
 
-            //
             Request request = Requests[acceptUser.Id];
             KeyData requestKeyData = request.EncryptionInfo;
 
@@ -133,31 +102,23 @@ namespace Encrypted_Messaging_App.Views
             requestKeyData = userDH.Respond(requestKeyData);
             BigInteger sharedKey = userDH.getSharedKey(requestKeyData);
 
-
-            // Create new Chat session with keyData
-            //Chat newChat = new Chat();
+            // Create new Chat with keyData
             string[] userIDs = new string[] { request.SourceUser.Id, CurrentUser.Id };
             User[] users = new User[] { request.SourceUser, CurrentUser.GetUser() };
             Chat newChat = new Chat { userIDs = userIDs, users = users.ToList(), encryptionInfo = requestKeyData, title="" };
-
-            // TODO: Check that commenting out setEncryptKey doesn't break it
-            //newChat.SetEncryptKey(sharedKey);
-            //newChat.CreateFromData(requestKeyData, sharedKey, new User[] { request.SourceUser, CurrentUser.GetUser() });
-
 
             // Add new Chat to firestore
             bool success = await newChat.InitiliseFirestore();
             if (!success) { ErrorToast("Unable to create new chat"); return; }
 
-
             success = await newChat.AddToUserFirestore(CurrentUser.Id);
             if (!success) { ErrorToast("Unable to create new chat"); return; }
 
-
-            success = await request.Accept(newChat.id);
+            success = await request.Accept(newChat.id);       // Add accepted friend request obj
             if (!success) { ErrorToast("Unable to accept request"); }
+            ChatKeys.Set(newChat.id, sharedKey.ToString()); // Save secret key for decryption
 
-            success = await request.Delete();
+            success = await request.Delete();                // Delete pending friend request obj
             if (!success) { ErrorToast("Unable to delete request"); }
         }
         public void DenyRequest(object sender, EventArgs e)
@@ -178,58 +139,40 @@ namespace Encrypted_Messaging_App.Views
 
             Request request = Requests[denyUser.Id];
             request.Delete();
-
-
         }
 
-        // When the submit button is pressed to send request
-        public async void SendRequest(object sender, EventArgs e)
+        public async void SendRequest(object sender, EventArgs e) // When submit button is pressed
         {
             if (!RequestBtnEnabled) { return; }
             Entry usernameEntry = (Entry)Content.FindByName("UsernameEntry"); // Username of target user
+            if(CurrentUser.Username == usernameEntry.Text) { ErrorToast("Can't send request to yourself"); SetRequestStatus("Invalid"); return; }
 
-            if(CurrentUser.Username == usernameEntry.Text) { InvalidSendRequest(); return; }
-
-            Console.WriteLine($"Fetching UserID of: {usernameEntry.Text}");
-            (bool success, object user) user_result = await FirestoreService.FetchData<User>("UserFromUsername", ("USERNAME", usernameEntry.Text)); //new Dictionary<string, string>{ { "USERNAME", usernameEntry.Text } }
-            if (!user_result.success)
-            {
+            (bool success, object user) user_result = await FirestoreService.FetchData<User>("UserFromUsername", ("USERNAME", usernameEntry.Text));
+            if (!user_result.success) {
                 toast.LongAlert($"Couldn't find user {usernameEntry.Text}");
-                Console.WriteLine($"Error: Couldn't find user {usernameEntry.Text}, message: {user_result.user}");
-                return;
-            } 
+                SetRequestStatus("Invalid");  return;  } 
             User targetUser = (User)user_result.user;
 
             // Check if you've already made a request:
             (bool success, object obj) result = await FirestoreService.FetchData<Request>("Requests/[CUSERID]", ("CUSERID", targetUser.Id));
-            if(result.success) { ErrorToast("Request already sent"); InvalidSendRequest(); return; }
-
+            if(result.success) { ErrorToast("Request already sent"); SetRequestStatus("Invalid"); return; }
 
             // Set up Request Object:
             Request request = new Request();
             bool send_result = await request.Send(targetUser.Id);
-
-            if (send_result)
-            {
-                usernameEntry.Text = "";
-            }
-            else
-            {
-                InvalidSendRequest();
-            }
+            if (send_result) {  usernameEntry.Text = ""; SetRequestStatus("Valid"); }
+            else {  SetRequestStatus("Invalid"); }
         }
-        public async void InvalidSendRequest()
+        public async void SetRequestStatus(string statusType)
         {
             Button RequestSendButton = (Button)Content.FindByName("RequestButton");
-
-            RequestSendButton.TextColor = (Color)App.Current.Resources["Invalid"];
-            await Task.Delay(2000);
+            if (statusType == "Invalid") { RequestSendButton.TextColor = (Color)App.Current.Resources["Invalid"]; }
+            else if(statusType == "Valid") { RequestSendButton.TextColor = Color.Green; }
+            await Task.Delay(2000);   // After 2 seconds, reset colour
             RequestSendButton.TextColor = Color.Black;
         }
 
-
-
-        // Other GUI Improvements:
+        // Check if username is valid (basic check)
         private void EditedEntry(object sender, EventArgs e)
         {
             Button RequestBtn = (Button)Content.FindByName("RequestButton");
@@ -237,18 +180,13 @@ namespace Encrypted_Messaging_App.Views
             Label FriendIcon = (Label)Content.FindByName("RequestIcon");
 
             bool usernameValid = isValidUsername(UsernameEntry.Text);
-
-
-            //      Valid:
             if (UsernameEntry.Text.Length > 0 && usernameValid)
-            { 
+            {// Valid: 
                 RequestBtnEnabled = true;
                 RequestBtn.TextColor = Color.FromHex("#2196F3");
                 IconInvalidReset(FriendIcon);
-            }
-            //      Invalid:
-            else
-            { 
+            } else
+            {// Invalid:
                 RequestBtnEnabled = false;
                 RequestBtn.TextColor = Color.FromHex("#000000");
 
@@ -256,7 +194,5 @@ namespace Encrypted_Messaging_App.Views
                 else { IconInvalidReset(FriendIcon); }
             }
         }
-
-
     }
 }

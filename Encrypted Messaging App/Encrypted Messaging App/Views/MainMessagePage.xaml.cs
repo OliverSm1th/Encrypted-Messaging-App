@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Rg.Plugins.Popup.Extensions;
@@ -12,7 +7,8 @@ using static Encrypted_Messaging_App.LoggerService;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 
 namespace Encrypted_Messaging_App.Views
-{   [XamlCompilation(XamlCompilationOptions.Compile)]
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class MainMessagePage : ContentPage
     {
         public ObservableCollection<Chat> ChatsCollection { get; } = new ObservableCollection<Chat>();

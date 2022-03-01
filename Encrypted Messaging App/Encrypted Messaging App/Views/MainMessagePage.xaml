@@ -61,7 +61,7 @@
                                             <Label
                                             Text="{Binding id}"
                                             TextColor="Gray"
-                                            FontSize="Caption"]
+                                            FontSize="Caption"
                                             FontFamily="Roboto"
                                             Grid.Row="2"
                                             Padding="20,0,0,0"/>

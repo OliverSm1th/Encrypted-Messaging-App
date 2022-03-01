@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Numerics;
 using Xamarin.Forms;
 using System.Threading.Tasks;
@@ -24,7 +23,6 @@ namespace Encrypted_Messaging_App
         
         public Message[] messages { get => _messages; 
             set {
-
                 if (id != null) { // If server instance:
                     // Get all new messages, give them the secret key and decrypt the content
                     Message[] diff = value.Except(_messages).ToArray();
@@ -53,8 +51,8 @@ namespace Encrypted_Messaging_App
         }
         private string _id;
 
-        public Action headerChangedAction;                 // Fired when you change Title/Id      -> refresh chatList + chatPage
-        public Action<int[], int[]> contentChangedAction;  // Fired when you change/send messages -> refresh chatPage  int[]- Messages index to update (empty if all)
+        public Action headerChangedAction;        // Fired when you change Title/Id      -> refresh chatList + chatPage
+        public Action<int[]> contentChangedAction;// Fired when you change/send messages -> refresh chatPage  int[]- Messages index to update (empty if all)
         public bool showDecryptedMessages = true;
         public int titleMaxLength = 25;
 
@@ -62,12 +60,9 @@ namespace Encrypted_Messaging_App
         private BigInteger encryptionKey;
         
 
-
         public Chat() { }
 
-
         // Constructors:
-        
         public void SetID(string chatID)
         {
             id = chatID;
@@ -84,59 +79,56 @@ namespace Encrypted_Messaging_App
         }
 
         // Getters: 
-        public string GetPrivateKeyStr(int keyLength)  // Used to display the private key to the user (Popup)
-        {
+        public string GetPrivateKeyStr(int keyLength)
+        {   // Used to display the private key to the user (Popup)
             byte[] sharedKey = SHA256.Create().ComputeHash(encryptionKey.ToByteArray());
             Array.Resize(ref sharedKey, keyLength/8);
 
             return BitConverter.ToString(sharedKey).Replace("-", "");
         }
-        public string GetUsersStr()  // Used to display a string with the users  (Popup)
-        {
+        public string GetUsersStr()
+        {   // Used to display a string with the users  (Popup)
             return generateDefaultTitle();
         }
 
 
         //  --Firestore Fetch--  \\
         public async Task<bool> FetchAndListen()
-        {
+        {   // Adds a listener which updates the chat (listener fires once at initilisation)
             if (id != null)
-            {
-                TaskCompletionSource<bool> chatUpdatedTask = new TaskCompletionSource<bool>();
+            {   TaskCompletionSource<bool> chatUpdatedTask = new TaskCompletionSource<bool>();
                 bool success = FirestoreService.ListenData<Chat>("Chat", async (result) => { if(result == null) { return; }
                     await updateChat((Chat)result); chatUpdatedTask.TrySetResult(true);
-                }, listenerKey:"Chat", arguments: ("CHATID", id));  //new Dictionary<string, string> { { "CHATID", Id } }
+                }, listenerKey:"Chat", arguments: ("CHATID", id));
                 await chatUpdatedTask.Task;
                 return success;
-            }
-            return false;
+            }   return false;
         }
-        private async Task<bool> fetchAndAddUser(string userId)  // Adds user to chat
+        private async Task<bool> fetchAndAddUser(string userId)
         {
+            // When a userID is added, fetch the associated User
             User result = await FirestoreService.UserFromId(userId);
             if (result == null) { Error($"Unable to add user: {userId} (chat: {id})"); return false; }
             users.Add(result);
             return true;
         }
         public void RemoveListener()
-        {
-            FirestoreService.RemoveListenersByKey("Chat");   // Removes all listeners added for the chat
+        {   // Removes all listeners added for the chat
+            FirestoreService.RemoveListenersByKey("Chat");
         }
 
 
         //  --Firestore Update/Create--  \\
         public async Task<bool> InitiliseFirestore()
-        {
-            // When the chat is created through a friend request accept, add it to the server
+        {   // When the chat is created through a friend request accept, add it to the server
             id = "";
             if (!propertiesDefined()) { Error("Not all properties are defined: Invalid Chat Object"); return false; }
-            (bool success, string message) result = await FirestoreService.InitiliseChat(this);
+            (bool success, string message) result = await FirestoreService.WriteObject(this, "Chat", ("CHATID", ""));
 
             if (result.success) {
                 id = result.message;
                 _ = FirestoreService.UpdateString(id, "Chat", ("CHATID", id));
             }
-            
             return result.success;
 
         }
@@ -151,16 +143,15 @@ namespace Encrypted_Messaging_App
             return result.success;
         }
         public async Task<bool> UpdateTitle(string newTitle)
-        {
+        {   // When the user edits the title (ChatPage)
             (bool success, string message) result = await FirestoreService.UpdateString(newTitle, "Chat/title", ("CHATID", id));   //FirestoreService.GetPath("Chat", arguments: ("CHATID", id)) + "/Title"
             if (!result.success) { Error($"Can\'t change title of {id} to: {newTitle}      {result.message}"); }
             return result.success;
         }
         public async Task<bool> SendMessage(string content, User authorUser)
-        {
-            if (encryptionKey.Equals(default(BigInteger))) { encryptionKey = getSecretKey(); }
-
-            Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);      // Initilises message + encrypts it
+        {   if (encryptionKey.Equals(default(BigInteger))) { encryptionKey = getSecretKey(); }
+            // Initilises message + encrypts it:
+            Message newMessage = new Message(content, authorUser, userIDs, encryptionKey);     
             bool encryptSuccess = newMessage.EncryptContent();
             if (!encryptSuccess) { Error("Unable to encrypt message content"); return false; }
             (bool success, string message) result = await FirestoreService.AddMessageToChat(newMessage, id);
@@ -180,51 +171,38 @@ namespace Encrypted_Messaging_App
 
 
         // Private Methods:
-        private async Task updateChat(Chat newChat)   // Sets all properties from another chat object (from firestore result)
-        {
+        private async Task updateChat(Chat newChat)
+        {   // Sets all properties from another chat object (from firestore)
             bool headerChanged = false;
             bool contentChanged = false;
             List<int> editedMessages = new List<int>();
-            List<int> deletedMessages = new List<int>();
 
             if (newChat.messages == null) { Error($"Invalid messages retrieved for: {id}"); }
             else if(messages != newChat.messages && messages != null) { 
                 contentChanged = true;
                 
-                // TODO: Test this to ensure it works with different combinations of edited/added/deleted messages
-                for(int i=0; i< newChat.messages.Length; i++)
+                if(contentChangedAction != null)
                 {
-                    if(messages == null || i > messages.Length-1)
+                    for (int i = 0; i < newChat.messages.Length; i++)
                     {
-                        editedMessages.Add(i);
-                        continue;
-                    }
-
-                    if(messages[i].content != newChat.messages[i].content) 
-                    {
-                        if(messages[i].createdTime == newChat.messages[i].createdTime && messages[i].author == messages[i].author)  // Edited
+                        if (messages == null || i > messages.Length - 1)
                         {
                             editedMessages.Add(i);
                         }
-                        else  // Deleted
+                        else if (messages[i].encryptedContent != newChat.messages[i].encryptedContent)
                         {
-                            deletedMessages.Add(i);
+                            editedMessages.Add(i);
                         }
                     }
                 }
-                for(int i=messages.Length-deletedMessages.Count; i<newChat.messages.Length; i++)
-                {
-                    editedMessages.Add(i);
-                }
                 messages = newChat.messages;
             }
-            else if (messages != newChat.messages) // If there are no messages before, add all messages
-            {
+            else if (messages != newChat.messages)
+            { // If there are no messages before, add all messages
                 contentChanged = true;
                 for(int i=0; i<newChat.messages.Length; i++) { editedMessages.Add(i); }
                 messages = newChat.messages;
             }
-
 
             if (newChat.userIDs == null || newChat.userIDs.Length < 2) { Error($"Invalid user IDs retrieved for: {id}"); }
             else { await setUserIDsAndUsers(newChat.userIDs); }
@@ -251,7 +229,6 @@ namespace Encrypted_Messaging_App
                 encryptionInfo = newChat.encryptionInfo;
             }
             
-
             // Invokes the events which can refresh chatList / chatPage
             if (headerChanged && headerChangedAction != null)
             {
@@ -259,11 +236,11 @@ namespace Encrypted_Messaging_App
             }
             if (contentChanged && contentChangedAction != null)
             {
-                contentChangedAction.Invoke(deletedMessages.ToArray(), editedMessages.ToArray());
+                contentChangedAction.Invoke(editedMessages.ToArray());
             }
         }
-        private bool propertiesDefined()  // Checks if all the properties are defined before adding it to firestore
-        {
+        private bool propertiesDefined()
+        {   // Checks if all the properties are defined before adding it to firestore
             bool defined = true;
             foreach (PropertyInfo prop in this.GetType().GetProperties())
             {
@@ -275,8 +252,8 @@ namespace Encrypted_Messaging_App
             }
             return defined;
         }
-        private string generateDefaultTitle()  // Generates a title from the uers in the chat
-        {
+        private string generateDefaultTitle()
+        {    // Generates a title from the usernames in the chat
             string title = "";
             foreach (User user in users)
             {
@@ -291,21 +268,16 @@ namespace Encrypted_Messaging_App
                 }
                 return title;
             }
-            else
-            {
-                return "Empty Chat";
-            }
-            
+            else {  return "Empty Chat";  }
         }
-        private BigInteger getSecretKey()  // Get's the secret key from ChatKeys (phone local storage) + converts it to BigInt
-        {
-            if(id == null) { return default; }
+        private BigInteger getSecretKey()
+        {   // Get's the secret key from ChatKeys (phone local storage) + converts it to BigInt
+            if (id == null) { return default; }
 
             string keyString = SQLiteService.ChatKeys.Get(id);
             if(keyString.Length == 0) { return default; }
 
             bool resultBool = BigInteger.TryParse(keyString, out BigInteger resultInt);
-
             if (!resultBool) { return default; }
             else { return resultInt; }
         }
@@ -356,7 +328,5 @@ namespace Encrypted_Messaging_App
 
             return result;
         }
-
     }
-
 }

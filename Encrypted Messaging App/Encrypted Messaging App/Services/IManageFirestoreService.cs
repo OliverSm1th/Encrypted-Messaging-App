@@ -9,10 +9,7 @@ namespace Encrypted_Messaging_App
     {
         Task<(bool, string)> InitiliseUser(string Username);
 
-        Task<(bool, string)> InitiliseChat(Chat chat);
-
         Task<(bool, string)> SendAcceptedRequest(string requestUserID, AcceptedRequest ARequest);
-        Task<(bool, string)> SendRequest(Request request, string requestUserID);
 
         Task<(bool, string)> AddToArray(object newItem, string pathInfo, params (string, string)[] arguments);
         Task<(bool, string)> RemoveFromArray(string oldItem, string pathInfo, params (string, string)[] arguments);

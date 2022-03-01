@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using static Encrypted_Messaging_App.LoggerService;
 
 namespace Encrypted_Messaging_App
@@ -12,6 +9,8 @@ namespace Encrypted_Messaging_App
 
         public string Id { get; set; }
         public string Username { get; set; }
+        public string[] chatsID { get; set; }  // Only set when initilising firstore users
+        
 
         public User() { }
         public User(string id)
@@ -29,36 +28,5 @@ namespace Encrypted_Messaging_App
         {
             return Username;
         }
-
-        public async void GetFromServer()
-        {
-            (bool success, object user) user_result;
-            if (Username != null && Username.Length > 0)
-            {
-                user_result = await FirestoreService.FetchData<User>("UserFromUsername", ("USERNAME", Username));
-                
-            }
-            else if (Id != null && Id.Length > 0)
-            {
-                user_result = await FirestoreService.FetchData<User>("UserFromId", ("USERID", Id));
-            }
-            else
-            {
-                Error("Can't get from server, both Id and Username is null");
-                return;
-            }
-
-            if (user_result.success && user_result.user is User result)
-            {
-                Id = result.Id;
-                Username = result.Username;
-            }
-            else
-            {
-                Error($"Can't get from server: {user_result.user}");
-            }
-        }
-
-
     }
 }

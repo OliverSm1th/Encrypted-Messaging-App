@@ -188,199 +188,9 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
 
 
-        private T[] ToObjectArr<T>(JavaList dict) where T : class, new()
-        {
-            List<T> result = new List<T>();
-            
-
-            for (int i = 0; i < dict.Count; i++)
-            {
-                JavaDictionary objectDict = (JavaDictionary)dict.Get(i);
-                object convertedObject = ToObject<T>(objectDict);
-                result.Add((T)convertedObject);
-            }
-            return result.ToArray();
-        }
-
-        // User
-        /*
-        public (bool, object) ParseCUser(DocumentSnapshot doc)
-        {
-            // Private user info: chatsID
-
-            CUser user = new CUser(doc.Id, FirebaseAuth.Instance.CurrentUser.DisplayName);
-            try
-            {
-                // Chats:
-                if (doc.Get("chatsID") != null)
-                {
-                    JavaList chats = (JavaList)doc.Get("chatsID");
-
-                    string[] chatsArr = (string[])ParseEnumerator(chats.GetEnumerator(), chats.Count);
-
-                    user.chatsID = chatsArr;
-                    //user.SetChats(chatsArr);
-                }
-                return (true, user);
-            }
-            catch (Exception e)
-            {
-                //Error($"Failed settings values: {e.Message}");
-                return (false, "Failed to get user");
-            }
-        }
-        public (bool, object) ParseChatsID(DocumentSnapshot doc)
-        {
-            try
-            {
-                // Chats:
-                if (doc.Get("chatsID") != null)
-                {
-                    JavaList chats = (JavaList)doc.Get("chatsID");
-
-                    string[] chatsArr = (string[])ParseEnumerator(chats.GetEnumerator(), chats.Count);
-
-                    return (true, chatsArr);
-                }
-                return (false, "No chatID found");
-            }
-            catch (Exception e)
-            {
-                Error($"Failed getting id: {e.Message}");
-                return (false, "Failed to get chatsID");
-            }
-        }
-        public (bool, object) ParseUserFromUsername(DocumentSnapshot doc)
-        {
-            // Public user info: username, id
-
-            User user = new User();
-            user.Username = doc.Id;
-
-            try
-            {
-                if (doc.Get("Id") != null)
-                {
-                    user.Id = (string)doc.Get("Id");
-                }
-
-
-                return (true, user);
-            }
-            catch (Exception e)
-            {
-                Error($"Failed settings values: {e.Message}");
-                return (false, "Failed to get user");
-            }
-        }
-        public (bool, object) ParseUserFromId(DocumentSnapshot doc)
-        {
-            // Public user info: username, id
-            User user = new User();
-            user.Id = doc.Id;
-
-            try
-            {
-                if (doc.Get("Username") != null)
-                {
-                    user.Username = (string)doc.Get("Username");
-                }
-
-                return (true, user);
-            }
-            catch (Exception e)
-            {
-                Error($"Failed settings values: {e.Message}");
-                return (false, "Failed to get user");
-            }
-        }
-
-        // Chat
-        public (bool, object) ParseChat(DocumentSnapshot doc)
-        {
-            List<Message> messages = new List<Message>();
-            List<User> users = new List<User>();
-
-            try
-            {
-                if (doc.Get("messages") != null)
-                {
-                    JavaList messagesObj = (JavaList)doc.Get("messages");
-
-
-                    object[] messageArr = ParseEnumerator(messagesObj.GetEnumerator(), messagesObj.Count);
-
-                    foreach (object message in messageArr)
-                    {
-                        (bool success, object message) result = ParseMessage(message);
-                        if (result.success)
-                        {
-                            messages.Add((Message)message);
-                        }
-                        else
-                        {
-                            Error($"Unable to parse message: {message.GetType()}");
-                        }
-                    }
-                }
-                if (doc.Get("users") != null)
-                {
-                    JavaList usersObj = (JavaList)doc.Get("users");
-
-                    object[] userArr = ParseJavaList(usersObj);
-
-                    foreach (object user in userArr)
-                    {
-                        //users.Add((string)user);
-                    }
-
-
-
-                }
-
-                Chat chat = new Chat { messages = messages.ToArray(), users = users.ToArray() };
-
-                return (false, "");
-            }
-            catch (Exception e)
-            {
-                Error($"Failed settings values: {e.Message}");
-                return (false, "Failed to get chats");
-            }
-        }
         
 
-        // Request
-        public (bool, object) ParseRequests(DocumentSnapshot[] docs)
-        {
-            List<Request> requests = new List<Request>();
-
-            foreach (DocumentSnapshot doc in docs)
-            {
-                var t_data = doc.Data;
-
-                JavaDictionary data = (JavaDictionary)t_data;
-                Request request = ParseRequest(data);
-                if (request != null) { requests.Add(request); }
-            }
-            return (true, requests.ToArray());
-        }
-       
-
-        public (bool, object) ParseAcceptRequests(DocumentSnapshot[] docs)
-        {
-            List<AcceptedRequest> requests = new List<AcceptedRequest>();
-
-            foreach (DocumentSnapshot doc in docs)
-            {
-                JavaDictionary data = (JavaDictionary)doc.Data;
-                AcceptedRequest request = ParseARequest(data);
-                if (request != null) { requests.Add(request); }
-                doc.Reference.Delete();
-            }
-            return (true, requests.ToArray());
-        }
-        */
+        // User
         //-------------------//
 
 
@@ -764,6 +574,19 @@ namespace Encrypted_Messaging_App.Droid.Resources
             {
                 return (false, status.errorMessage);
             }
+        }
+        private T[] ToObjectArr<T>(JavaList dict) where T : class, new()
+        {
+            List<T> result = new List<T>();
+
+
+            for (int i = 0; i < dict.Count; i++)
+            {
+                JavaDictionary objectDict = (JavaDictionary)dict.Get(i);
+                object convertedObject = ToObject<T>(objectDict);
+                result.Add((T)convertedObject);
+            }
+            return result.ToArray();
         }
     }
 }

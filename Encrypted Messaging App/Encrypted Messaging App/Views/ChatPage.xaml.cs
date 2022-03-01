@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Rg.Plugins.Popup.Extensions;
 using static Encrypted_Messaging_App.Views.GlobalVariables;
 using static Encrypted_Messaging_App.LoggerService;
-using static Encrypted_Messaging_App.Views.Functions;
-using System.ComponentModel;
 
 namespace Encrypted_Messaging_App.Views
 {
@@ -48,44 +41,36 @@ namespace Encrypted_Messaging_App.Views
             CurrentChat = null;
         }
 
-        private void UpdateHeaders()
-        {
-            Title = CurrentChat.title;
-        }
-
         private void DisplayMessages()
         {
             MessagesCollection.Clear();
 
-            for (int i=0; i< CurrentChat.messages.Length; i++)
+            for (int i = 0; i < CurrentChat.messages.Length; i++)
             {
                 MessagesCollection.Add(CurrentChat.messages[i].GetMessageView());
-                LoggerService.Log($"Added the {i}th message: {CurrentChat.messages[i].content}");
             }
-            LoggerService.Log($"Added {MessagesCollection.Count} items to the messagesCollection");
         }
 
+        private void UpdateHeaders() {
+            Title = CurrentChat.title;
+        }
 
-        private void UpdateMessages(int[] deletedIndex, int[] editedIndex)  
+        
+
+        private void UpdateMessages(int[] editedIndex)  
         {
-            foreach(int index in deletedIndex)
-            {
-                MessagesCollection.Remove(MessagesCollection[index]);
-            }
+            if(editedIndex == null) { DisplayMessages(); }
+
             foreach(int index in editedIndex)
             {
                 if(index < MessagesCollection.Count)
                 {
                     MessagesCollection[index] = CurrentChat.messages[index].GetMessageView();
-                }
-                else
-                {
+                } else {
                     MessagesCollection.Add(CurrentChat.messages[index].GetMessageView());
                 }
-                
             }
         }
-
 
         public async void EditTitle(object sender, EventArgs e)
         {
@@ -112,7 +97,7 @@ namespace Encrypted_Messaging_App.Views
             bool result = await CurrentChat.SendMessage(MessageEntry.Text, CurrentUser.GetUser());
             MessageSendButton.IsEnabled = true;
             if (!result) { SendingFailed(); }
-            else { LoggerService.Log("Sent message"); }
+            else { Log("Sent message"); }
             MessageEntry.Text = "";
         }
 
@@ -126,17 +111,11 @@ namespace Encrypted_Messaging_App.Views
             Error("Unable to send message");
         }
 
-        private Action decryptChanged; 
-
         public void DisplayChatInfo(object sender, EventArgs e)
         {
-            decryptChanged = DisplayMessages;
+            Action decryptChanged = DisplayMessages;
             Functions.OutputProperties(CurrentChat);
             Navigation.PushPopupAsync(new ChatPopup(decryptChanged));
         }
-
-        
-        
-
     }
 }
