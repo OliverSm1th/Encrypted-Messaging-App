@@ -4,7 +4,6 @@ using System.Numerics;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
-using System.Text;
 
 
 namespace Encrypted_Messaging_App.Encryption
@@ -260,9 +259,6 @@ namespace Encrypted_Messaging_App.Encryption
                 get { return Words; }
             }
         }
-
-
-
 
 
         public AES(int level = 192, bool p_debug = false, string debug_type = "64") // Constructor

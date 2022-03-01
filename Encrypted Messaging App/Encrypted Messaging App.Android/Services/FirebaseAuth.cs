@@ -1,18 +1,8 @@
-﻿using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Xamarin.Forms;
-using Firebase;
-using Firebase.Firestore;
 using Android.Gms.Extensions;
 using Encrypted_Messaging_App.Droid;
 

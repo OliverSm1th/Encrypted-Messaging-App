@@ -1,30 +1,18 @@
-﻿using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
+﻿using Android.Runtime;
 using Firebase.Auth;
 using Firebase.Firestore;
-using Java.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
-using Xamarin.Forms;
 using static Encrypted_Messaging_App.LoggerService;
 
 
 namespace Encrypted_Messaging_App.Droid.Resources
 {
-
-
-
-    class ListenerHelper        // Converting:  Firebase Output > Classes
+     class ListenerHelper        // Converting:  Firebase Output > Classes
     {
         public class ParseStatus
         {
@@ -59,35 +47,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             }
         }
-
-
-        /*public (bool, object) ParseObject(string objectName, object input)
-        {
-            string methodName = "Parse" + objectName;
-            MethodInfo helperMethod = this.GetType().GetMethod(methodName);
-            if (helperMethod != null && helperMethod.GetParameters().Length > 0 && helperMethod.GetParameters()[0].ParameterType == input.GetType())
-            {
-                (bool, object) result = ((bool, object))helperMethod.Invoke(this, new object[] { input });
-                return result;
-            }
-            else if (helperMethod == null)
-            {
-                Console.WriteLine($"Invalid type {methodName} for Helper Method");
-            }
-            else
-            {
-                if (this.GetType().GetMethod(methodName).GetGenericArguments().Length > 0)
-                {
-                    Console.WriteLine($"Expected Input Type: {this.GetType().GetMethod(methodName).GetGenericArguments()[0]}\nActual Input Type Provided: {input.GetType()}");
-                }
-                else
-                {
-                    Console.WriteLine($"Unexpected parameters for: {methodName} \nActual Input Type Provided: {input.GetType()}");
-                }
-            }
-            return (false, "Invalid type/params given to ParseObject");
-        }
-        */
 
         private T ToObject<T>(JavaDictionary dict) where T : class, new() // WARNING: Also update EventListener Version
         {
@@ -153,49 +112,10 @@ namespace Encrypted_Messaging_App.Droid.Resources
             //}
             return instance;
         }
-        private T ToObject<T>(Dictionary<string, Java.Lang.Object> dict) where T : class, new()
-        {
-            //var instance = Activator.CreateInstance(type);
-            var instance = new T();
-            Type type = instance.GetType();
-
-            string[] keys = dict.Keys.ToArray();
-            object[] values = dict.Values.ToArray();
-
-
-
-            for (int i = 0; i < dict.Keys.Count; i++)
-            {
-                PropertyInfo prop = type.GetProperty(keys[i]);
-                string initialValue = (string)values[i];
-
-                // Special Type Conversions:
-                if (prop.PropertyType == typeof(BigInteger))
-                {
-                    prop.SetValue(instance, BigInteger.Parse(initialValue), null);
-                }
-                else if (prop.PropertyType == typeof(Int32))
-                {
-                    prop.SetValue(instance, Int32.Parse(initialValue), null);
-                }
-                else
-                {
-                    prop.SetValue(instance, initialValue, null);
-                }
-            }
-            return instance;
-        }
 
 
 
         
-
-        // User
-        //-------------------//
-
-
-        // Version 2.0
-
         public (bool, object) ParseObject(object input, Type expectedType)
         {
             Debug($"Parsing: {expectedType.Name}", includeMethod: true, indentationLvl: 1);
@@ -451,7 +371,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
             }
         }
 
-        // 
         public object[] ParseEnumerator(IEnumerator enumerator, int length)
         {
             // Enumerator -> Object[]
@@ -501,66 +420,10 @@ namespace Encrypted_Messaging_App.Droid.Resources
             // Used in: ParseChat
             return ParseEnumerator(list.GetEnumerator(), list.Count);
         }
-
-        
-
-        
-
-
-
-        // Test method  (Deprecated)
-        //private Type targetType;
-        /*
-        private object GetObject(DocumentSnapshot doc, Type type, string optionalExtra = "")
-        {
-            var instance = Activator.CreateInstance(type);
-            if (optionalExtra.Length > 0)
-            {
-                var final = doc.Get(optionalExtra);
-                Console.WriteLine("Got extra");
-            }
-
-            foreach (PropertyInfo prop in targetType.GetProperties())
-            {
-                var test = prop.GetValue(instance, null);
-                Type childType = test.GetType();
-                Console.WriteLine($"Type: {childType.ToString()}");
-
-
-                if (!childType.Namespace.StartsWith("System"))
-                {
-                    Console.WriteLine($"{prop.Name}: ");
-                    foreach (PropertyInfo testProp in test.GetType().GetProperties())
-                    {
-                        Console.WriteLine($"Inner: {testProp.Name}:{testProp.GetValue(prop, null).ToString()}");
-                    }
-                    //map.Put(prop.Name, GetMap(test));
-
-                    Console.WriteLine("\n");
-                }
-                else
-                {
-                    Console.WriteLine($"{prop.Name}:{test.ToString()}");
-                    //map.Put(prop.Name, test.ToString());
-                }
-            }
-            return instance;
-        }*/
-        private Dictionary<string, object> HashMapToDict(HashMap hash)       // HashMap -> Dictionary<string, object>
-        {
-            string[] keyArr = (string[])ParseEnumerator(hash.KeySet().GetEnumerator(), hash.KeySet().Count);
-            object[] valueArr = ParseEnumerator(hash.Values().GetEnumerator(), hash.Values().Count);
-            Dictionary<string, object> dict = new Dictionary<string, object>();
-            for (int i = 0; i < keyArr.Length; i++)
-            {
-                dict.Add(keyArr[i], valueArr[i]);
-            }
-            return dict;
-        }
-
         private (bool, object) CovertReturnedTuple(ITuple tuple)
         {
-            if(tuple == null){
+            if (tuple == null)
+            {
                 Error("No tuple given");
                 return (false, "No tuple given to tuple converter");
             }
@@ -574,19 +437,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
             {
                 return (false, status.errorMessage);
             }
-        }
-        private T[] ToObjectArr<T>(JavaList dict) where T : class, new()
-        {
-            List<T> result = new List<T>();
-
-
-            for (int i = 0; i < dict.Count; i++)
-            {
-                JavaDictionary objectDict = (JavaDictionary)dict.Get(i);
-                object convertedObject = ToObject<T>(objectDict);
-                result.Add((T)convertedObject);
-            }
-            return result.ToArray();
         }
     }
 }

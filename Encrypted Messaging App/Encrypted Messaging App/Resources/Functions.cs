@@ -1,12 +1,7 @@
-﻿using SQLite;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Runtime.CompilerServices;
 
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 using System.Reflection;
 using System.Numerics;
 
@@ -114,12 +109,10 @@ namespace Encrypted_Messaging_App.Views
             return null;
         }
     
-        public static void IconInvalid(Label Icon)
-        {
+        public static void IconInvalid(Label Icon) {
             Icon.TextColor = (Color)App.Current.Resources["Invalid"];
         }
-        public static void IconInvalid(Button Icon)
-        {
+        public static void IconInvalid(Button Icon) {
             Icon.TextColor = (Color)App.Current.Resources["Invalid"];
         }
 
@@ -230,29 +223,6 @@ namespace Encrypted_Messaging_App.Views
             else {
                 return null;
             }
-        }
-
-    }
-    class DebugManager
-    {
-        public static IToastMessage toast = DependencyService.Resolve<IToastMessage>();
-        public static void ErrorToast(string toastMsg, string debugMsg, [CallerFilePath] string sourceFilePath="", [CallerLineNumber] int sourceLineNumber=0)
-        {
-            if (!GlobalVariables.DeveloperMode) { toast.LongAlert($"{toastMsg}");
-            }
-            ErrorSilent(debugMsg, sourceFilePath, sourceLineNumber);
-        }
-        public static void ErrorSilent(string debugMsg, [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
-        {
-            if (GlobalVariables.DeveloperMode) { toast.LongAlert($"⚠️ {debugMsg}"); }
-            Console.WriteLine($"[ERROR] {LastOfPath(sourceFilePath)}:{sourceLineNumber}  |  {debugMsg}");
-
-        }
-
-        private static string LastOfPath(string path)
-        {
-            string[] parts = path.Split('/');
-            return parts[parts.Length - 1];
         }
 
     }

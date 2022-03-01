@@ -1,19 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Diagnostics;
-using System.Reflection;
 using Xamarin.Forms;
 
 namespace Encrypted_Messaging_App
 {
     public static class LoggerService
-    {
-        static int errorMsgMaxLength = 30;
-        public static IToastMessage toast = DependencyService.Resolve<IToastMessage>();
-
-
+    {   public static IToastMessage toast = DependencyService.Resolve<IToastMessage>();
 
         public static void Error(string message, int indentationLvl = 0, [CallerLineNumber] int lineNumber = 0)
         {
@@ -27,8 +20,7 @@ namespace Encrypted_Messaging_App
 
             Console.WriteLine($"{new string('ㅤ', indentationLvl*2)}Error: {message}".PadRight(45) +$"{fileName}/{className}/{methodName}:{lineNumber}");
         }
-        public static void ErrorToast(string toastMessage)
-        {
+        public static void ErrorToast(string toastMessage) {
             toast.LongAlert($"{toastMessage}");
         }
 
@@ -37,7 +29,6 @@ namespace Encrypted_Messaging_App
             Console.WriteLine($"{new string('ㅤ', indentationLvl*2)}{message}" +  (includeMethod ? $"    ({caller}:{lineNumber})".PadLeft(Math.Max((45-message.Length- indentationLvl*2), 0)) : "") );
         }
 
-        //public static void Debug(string message, bool includeMethod, [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = null) { Debug(message, 0, includeMethod, lineNumber, caller); }
         public static void Log(string message)
         {
             Console.WriteLine($"Log: {message}");

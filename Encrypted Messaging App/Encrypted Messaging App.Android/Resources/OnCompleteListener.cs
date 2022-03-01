@@ -44,7 +44,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
 
             if (result is DocumentSnapshot doc)
             {
-                
                 if(doc.Data == null) { _tcs.TrySetResult((false, "Invalid document path")); }
                 _tcs.TrySetResult(Helper.ParseObject(doc, ReturnType));
             } 

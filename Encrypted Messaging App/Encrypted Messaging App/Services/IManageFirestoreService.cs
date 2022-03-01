@@ -21,7 +21,6 @@ namespace Encrypted_Messaging_App
         Task<(bool, object)> FetchData<ReturnType>(string pathInfo, params (string, string)[] arguments);
 
         bool ListenData<ReturnType>(string type, Action<object> action, string changeType = null,string listenerKey = "", params (string, string)[] arguments);
-        Task<bool> ListenDataAsync<returnType>(string pathInfo, Action<object> action, string changeType = null, bool returnOnInitial = true, string listenerKey = "", params (string, string)[] arguments);
 
         Task<(bool, string)> WriteObject(object obj, string pathInfo, params (string, string)[] arguments);
 

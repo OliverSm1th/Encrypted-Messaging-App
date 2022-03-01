@@ -50,7 +50,6 @@ namespace Encrypted_Messaging_App.Droid.Resources
                 if(doc.Data == null) { OnEventMethod(null); return; }
                 if(FieldName == null) {
                     response = Helper.ParseObject(doc, EventType);
-
                 }
                 else
                 {
