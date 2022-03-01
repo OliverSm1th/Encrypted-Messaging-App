@@ -10,35 +10,14 @@ namespace Encrypted_Messaging_App
     public partial class App : Application
     {
         public User CurrentUser;
-
-        
-
         public App()
         {
             InitializeComponent();
-
             MainPage = new AppShell();
-
-            
         }
 
         protected override void OnStart()
-        {
-            Functions.setColour("Blue");
-        }
-
-        protected override void OnSleep()
-        {
-        }
-
-        protected override void OnResume()
-        {
-        }
-
-        public interface IFirebaseAuthenticator
-        {
-
-        }
+        { Functions.setColour("Blue"); }
     }
 }
 

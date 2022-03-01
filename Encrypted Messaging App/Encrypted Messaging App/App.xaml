@@ -14,9 +14,6 @@
             <Color x:Key="MessageReceived">#FFFFFF</Color>
             <Color x:Key="Gray">#FF778899</Color>
 
-
-            <!--#34ACBC-->
-
             <x:String x:Key="IconUser">&#xf2bd;</x:String>
             <x:String x:Key="IconHidden">&#xf070;</x:String>
             <x:String x:Key="IconShown">&#xf06e;</x:String>
@@ -29,7 +26,5 @@
             <x:String x:Key="IconSettings">&#xf013;</x:String>
             <x:String x:Key="IconEdit">&#xf303;</x:String>
         </ResourceDictionary>
-        
-        
     </Application.Resources>
 </Application>
