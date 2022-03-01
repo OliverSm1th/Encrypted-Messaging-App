@@ -10,9 +10,7 @@ using Xamarin.Forms;
 [assembly: ExportFont("Roboto-Light.ttf", Alias = "Roboto-Light")]
 [assembly: ExportFont("Roboto-Regular.ttf", Alias = "Roboto")]
 [assembly: ExportFont("Roboto-Medium.ttf", Alias = "Roboto-Medium")]
-
 [assembly: ExportFont("Roboto-Thin.ttf", Alias = "Roboto-Thin")]
 
 [assembly: ExportFont("FontAwesome5-Regular.otf", Alias = "Icons-R")]
 [assembly: ExportFont("FontAwesome5-Solid.otf", Alias = "Icons-S")]
-
