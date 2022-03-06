@@ -336,19 +336,6 @@ namespace Encrypted_Messaging_App.Encryption
                 debug($"{i}");
             }
             debug($"All 128-bit segments added: {ConvertByteArr(cipher)}");
-            /*if (b_message.Length % 16 > 0)
-            {
-                if (decrypt)
-                {
-                    DecryptByte(l_sharedKey, message_128).Take((b_message.Length % 16)).ToArray().CopyTo(cipher, cipher.Length - 16);
-                }
-                else
-                {
-                    EncryptByte(l_sharedKey, message_128).CopyTo(cipher, cipher.Length - 16);   //.Take((b_message.Length % 16)).ToArray()
-                }
-
-                debug($"Sub-Message {b_message.Length / 16}:");
-            }*/
 
 
             return cipher;
@@ -522,7 +509,6 @@ namespace Encrypted_Messaging_App.Encryption
                 for (int j = 0; j < 4; j++)
                 {
                     Word[j] = sharedKey[(4 * i) + j];
-                    //Words[i, j] = sharedKey[(4 * i) + j];
                 }
                 Words.SetWord(Word, i);
             }
@@ -554,7 +540,6 @@ namespace Encrypted_Messaging_App.Encryption
                     Console.WriteLine("Reached end!!!");
                     break;
                 }
-                //else { Console.WriteLine(currentWordNum); }
 
                 // Generate other 3/5/7 words
                 //tex:$$w_{i+5}=w_{i+4}\otimes w_{i+1}\\w_{i+6}=w_{i+5}\otimes w_{i+2}\\w_{i+7}=w_{i+6}\otimes w_{i+3}$$
@@ -576,7 +561,6 @@ namespace Encrypted_Messaging_App.Encryption
                     PreviousWord = Words.SetWord(XOR_Result, currentWordNum);
                     currentWordNum++;
                     if (Words.GetLength(0) == currentWordNum) { break; }
-                    //else { Console.WriteLine(Words.GetLength(0) ); }
                 }
                 if (Words.GetLength(0) == currentWordNum) { break; }
             }

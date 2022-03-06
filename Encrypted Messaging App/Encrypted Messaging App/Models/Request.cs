@@ -102,7 +102,7 @@ namespace Encrypted_Messaging_App
         // Accept Request: Respond to DH + send AcceptedRequest obj to SourceUser
         public async Task<bool> Accept(string newChatID)     
         {
-            EncryptionInfo = userDH.Respond(EncryptionInfo);
+
 
             (bool success, string message) result = await FirestoreService.SendAcceptedRequest(SourceUser.Id, new AcceptedRequest(newChatID, EncryptionInfo));
 
