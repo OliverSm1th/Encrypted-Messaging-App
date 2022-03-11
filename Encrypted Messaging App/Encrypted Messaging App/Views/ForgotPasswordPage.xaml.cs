@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using static Encrypted_Messaging_App.Views.Functions;
 
 namespace Encrypted_Messaging_App.Views
-{   [XamlCompilation(XamlCompilationOptions.Compile)]
+{
+    [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ForgotPasswordPage : ContentPage
     {
         public ForgotPasswordPage() {  InitializeComponent(); }
@@ -25,10 +22,14 @@ namespace Encrypted_Messaging_App.Views
         {
             Button LoginBtn = (Button)Content.FindByName("SubmitButton");
             Entry EmailEntry = (Entry)Content.FindByName("EmailEntry");
-            if (!String.IsNullOrEmpty(EmailEntry.Text) && EmailEntry.Text.Length > 0)
-            {    LoginBtn.BackgroundColor = (Color)App.Current.Resources["Primary"];   }
-            else {
-                 LoginBtn.BackgroundColor = Color.FromHex("#FF778899"); //Gray
+            bool emailValid = !String.IsNullOrEmpty(EmailEntry.Text) && EmailEntry.Text.Length > 0 && isValidEmail(EmailEntry.Text);
+
+            if (emailValid) {
+                LoginBtn.BackgroundColor = (Color)App.Current.Resources["Primary"];
+                LoginBtn.IsEnabled = true;
+            } else {   
+                LoginBtn.BackgroundColor = Color.FromHex("#FF778899"); //Gray
+                LoginBtn.IsEnabled = false;
             }
         }
 

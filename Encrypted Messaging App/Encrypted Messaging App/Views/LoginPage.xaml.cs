@@ -10,6 +10,9 @@ namespace Encrypted_Messaging_App.Views
     {
         IAuthenticationService authenticationService = DependencyService.Resolve<IAuthenticationService>();
 
+        Label invalidEmailIcon = new Label();
+        Label invalidPasswordIcon = new Label();
+
         public LoginPage()
         {
             InitializeComponent();
@@ -121,9 +124,11 @@ namespace Encrypted_Messaging_App.Views
                 if (string.IsNullOrEmpty(text)) { filled = false; }
                 else if (text.Length == 0) { filled = false; }
             }
+            bool emailValid = isValidEmail(EmailEntry.Text);
+            bool passwordValid = PasswordEntry.Text == null || PasswordEntry.Text.Length >= 6;
 
 
-            if (filled)
+            if (filled && emailValid && passwordValid)
             {
                 LoginBtn.BackgroundColor = (Color)App.Current.Resources["Primary"];
                 LoginBtn.IsEnabled = true;
@@ -133,6 +138,15 @@ namespace Encrypted_Messaging_App.Views
                 LoginBtn.BackgroundColor = Color.FromHex("#FF778899"); //Gray
                 LoginBtn.IsEnabled = false;
             }
+
+            // Changing icons colours to red of invalid entries:
+            if(!emailValid && !string.IsNullOrEmpty(EmailEntry.Text))
+            {
+                invalidEmailIcon = EntryInvalid(EmailEntry, invalidEmailIcon, 1);
+            } else if(invalidEmailIcon != null) { invalidEmailIcon = EntryInvalidReset(EmailEntry, invalidEmailIcon); }
+
+            if (!passwordValid && !string.IsNullOrEmpty(PasswordEntry.Text)) { invalidPasswordIcon = EntryInvalid(PasswordEntry, invalidPasswordIcon, 2); }
+            else if (invalidPasswordIcon != null) { invalidPasswordIcon = EntryInvalidReset(PasswordEntry, invalidPasswordIcon); }
         }
 
 
