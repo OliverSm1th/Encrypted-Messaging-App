@@ -70,6 +70,17 @@
                 <Picker Title="Theme: "  HorizontalOptions="FillAndExpand" VerticalOptions="Center" FontFamily="Roboto" TextColor="Black" x:Name="settingThemePicker" FontSize="15" HorizontalTextAlignment="Center" SelectedIndexChanged="OnThemeChanged">
                 </Picker>
             </StackLayout>
+
+
+            <Grid HorizontalOptions="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <Button Text="Leave Feedback" HorizontalOptions="Fill" BackgroundColor="{DynamicResource Secondary}" Clicked="OnFeedbackPressed" Grid.Column="0"/>
+                    <Button BackgroundColor="White" TextColor="{DynamicResource Invalid}" BorderColor="{DynamicResource Invalid}" BorderWidth="1"  Text="{StaticResource IconBug}" FontFamily="Icons-S" Clicked="OnFeedbackPressed" Grid.Column="1"/>
+            </Grid>
+            
         </StackLayout>
     </Frame>
 </pages:PopupPage>

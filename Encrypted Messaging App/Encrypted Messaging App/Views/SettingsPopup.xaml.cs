@@ -41,5 +41,26 @@ namespace Encrypted_Messaging_App.Views
         public void OnThemeChanged(object sender, EventArgs e) { 
             setColour((string)settingThemePicker.SelectedItem);
         }
+
+        public async void OnFeedbackPressed(object sender, EventArgs e)
+        {
+            Button feedbackButton = (Button)sender;
+            string feedbackType = feedbackButton.Text;
+            if(feedbackType != "Leave Feedback") { feedbackType = "Report Bug"; }
+            string feedbackMessage = await DisplayPromptAsync($"{feedbackType}:", null, maxLength:100, keyboard:Keyboard.Text);
+            if(feedbackMessage == null || feedbackMessage.Length == 0) { return; }
+            await DependencyService.Resolve<IManageFirestoreService>().AddToArray(feedbackMessage, $"other/feedback/{feedbackType.Split(' ')[1].ToLower()}");
+            Color startColor = feedbackButton.BackgroundColor;
+            Color textColor = feedbackButton.TextColor;
+            double borderWidth = feedbackButton.BorderWidth;
+
+            feedbackButton.BackgroundColor = Color.Green;
+            feedbackButton.TextColor = Color.White;
+            feedbackButton.BorderWidth = 0;
+            await Task.Delay(2000);
+            feedbackButton.BackgroundColor = startColor;
+            feedbackButton.TextColor = textColor;
+            feedbackButton.BorderWidth = borderWidth;
+        }
     }
 }
