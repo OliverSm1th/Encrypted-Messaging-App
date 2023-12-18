@@ -1,6 +1,4 @@
-
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,xamarinstudio,android,androidstudio
-# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,xamarinstudio,android,androidstudio
 
 ### Android ###
 # Built application files
@@ -16,7 +14,7 @@
 *.class
 
 # Generated files
-bin/
+**/bin/
 gen/
 out/
 #  Uncomment the following line in case you need and you don't have the release build type files in your app
@@ -101,7 +99,7 @@ output.json
 # with Android Studio 3.5.
 
 ### XamarinStudio ###
-obj/
+**/obj/
 *.userprefs
 .packages
 
@@ -619,3 +617,9 @@ Encrypted Messaging App/Encrypted Messaging App.Android/obj/Debug/110/_Telemetry
 *.cache
 Encrypted Messaging App/Encrypted Messaging App.Android/obj/**
 Encrypted Messaging App/Encrypted Messaging App.Android/bin/**
+Encrypted Messaging App/Encrypted Messaging App.iOS/**
+# Key files:
+Encrypted Messaging App/Encrypted Messaging App.Android/google-services.json
+Encrypted Messaging App/Encrypted Messaging App/encrypted-messaging-app-b689c5915859.json
+# Temp:
+git-filter-repo.py

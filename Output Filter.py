@@ -1,9 +1,10 @@
-startBlacklist = ["[d_messaging_ap]", "Thread started: ","[ForceDarkHelper]", "[monodroid-assembly]", "[chatty]", "[Looper]", "[AdrenoGLES]", "[DynamiteModule]", "[ProviderInstaller]", "[FeatureParser]",
-                  "Resolved pending breakpoint", "[Perf]", "[Activity]", "[TabLayout]", "[NativeCrypto]", "[NetworkSecurityConfig]", "[AdrenoUtils]", "[RenderThread]", "[Gralloc3]", "[LB]", "[OpenGLRenderer]", "[Choreographer]",
-                  "[Toast]", "[ViewRootImpl]", "[AssistStructure]", ]
+# Used to filter out the useless debug messages produced whilst the app is running:
 
-
-
+startBlacklist = ["[d_messaging_ap]", "Thread started: ","[ForceDarkHelper]", "[monodroid-assembly]", "[chatty]", "[Looper]",
+                 "[AdrenoGLES]", "[DynamiteModule]", "[ProviderInstaller]", "[FeatureParser]", "Resolved pending breakpoint", 
+                 "[Perf]", "[Activity]", "[TabLayout]", "[NativeCrypto]", "[NetworkSecurityConfig]", "[AdrenoUtils]", 
+                 "[RenderThread]", "[Gralloc3]", "[LB]", "[OpenGLRenderer]", "[Choreographer]","[Toast]", "[ViewRootImpl]", 
+                 "[AssistStructure]", ]
 
 def filterLine(outputLine):
     colourCode = ""
